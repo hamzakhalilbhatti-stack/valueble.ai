@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — RUNTIME</title>
+<meta name="description" content="Explore RUNTIME's automation systems: Google Maps lead scraping, WhatsApp & voice AI agents, and content automation, built on n8n.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo"><span class="dot"></span>RUNTIME</a>
+    <nav class="navlinks">
+      <a href="index.html">Home</a>
+      <a href="services.html" class="active">Services</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a href="contact.html" class="nav-cta">Book a call →</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="page-hero" style="border-bottom:none;">
+    <div class="eyebrow">SERVICE_REGISTRY</div>
+    <h1>Three systems.<br>Deploy separately or <span class="accent">chained</span> together.</h1>
+    <p style="max-width:560px; margin-top:16px;">Every service below runs on the same underlying stack — n8n orchestration, AI agents at the decision points — so they can operate standalone or feed directly into one another.</p>
+  </section>
+
+  <!-- SERVICE 01 -->
+  <section>
+    <div class="node-status" style="margin-bottom:8px;">NODE_01 · LEAD GENERATION</div>
+    <h2>Google Maps<br>Lead <span class="accent">Scraper</span></h2>
+    <div class="grid-2" style="margin-top:36px;">
+      <div class="node-card">
+        <div class="node-status">WHAT IT DOES</div>
+        <p style="font-size:14.5px;">Searches Google Maps by category, city, and radius, then pulls business name, phone number, website, rating, and review count into a clean, exportable list — no manual copy-pasting.</p>
+      </div>
+      <div class="node-card">
+        <div class="node-status">WHO IT'S FOR</div>
+        <p style="font-size:14.5px;">Agencies and sales teams who need a steady pipeline of qualified local leads — e-commerce service providers, B2B outreach teams, and local business consultants.</p>
+      </div>
+    </div>
+    <div class="node-card" style="margin-top:24px;">
+      <div class="node-status">EXECUTION LOG</div>
+      <p style="font-size:14.5px; font-family:var(--font-mono); color:var(--text-dim); margin:0;">
+        &gt; query: "restaurants in Lahore" &nbsp;→&nbsp; 340 results found<br>
+        &gt; filtered by rating &lt; 4.2 &nbsp;→&nbsp; 87 qualified leads<br>
+        &gt; export: leads_lahore_restaurants.csv &nbsp;<span style="color:var(--green);">[done]</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- SERVICE 02 -->
+  <section>
+    <div class="node-status" style="margin-bottom:8px;">NODE_02 · CUSTOMER RESPONSE</div>
+    <h2>WhatsApp &amp;<br>Voice <span class="accent">Agent</span></h2>
+    <div class="grid-2" style="margin-top:36px;">
+      <div class="node-card">
+        <div class="node-status">WHAT IT DOES</div>
+        <p style="font-size:14.5px;">An AI voice and chat agent — built on Vapi and orchestrated through n8n — answers inbound calls and WhatsApp messages, qualifies the customer, books meetings straight into your calendar, and logs every conversation to a shared sheet.</p>
+      </div>
+      <div class="node-card">
+        <div class="node-status">WHO IT'S FOR</div>
+        <p style="font-size:14.5px;">Local service businesses that lose leads outside business hours — clinics, salons, contractors, restaurants — anywhere a missed call is a missed sale.</p>
+      </div>
+    </div>
+    <div class="node-card" style="margin-top:24px;">
+      <div class="node-status">EXECUTION LOG</div>
+      <p style="font-size:14.5px; font-family:var(--font-mono); color:var(--text-dim); margin:0;">
+        &gt; inbound_call received, 9:42 PM &nbsp;→&nbsp; agent answered in 1 ring<br>
+        &gt; intent classified: booking_request<br>
+        &gt; calendar.event.create() &nbsp;<span style="color:var(--green);">[booked]</span> &nbsp;→&nbsp; lead saved to CRM
+      </p>
+    </div>
+  </section>
+
+  <!-- SERVICE 03 -->
+  <section style="border-bottom:none;">
+    <div class="node-status" style="margin-bottom:8px;">NODE_03 · AUDIENCE GROWTH</div>
+    <h2>Content &amp;<br>Social <span class="accent">Automation</span></h2>
+    <div class="grid-2" style="margin-top:36px;">
+      <div class="node-card">
+        <div class="node-status">WHAT IT DOES</div>
+        <p style="font-size:14.5px;">A recurring pipeline that scripts, generates, and schedules content across social channels — keeping your accounts active without a content team producing every post by hand.</p>
+      </div>
+      <div class="node-card">
+        <div class="node-status">WHO IT'S FOR</div>
+        <p style="font-size:14.5px;">Content creators and e-commerce brands who need consistent posting cadence but don't have the bandwidth to script and edit daily.</p>
+      </div>
+    </div>
+    <div class="node-card" style="margin-top:24px;">
+      <div class="node-status">EXECUTION LOG</div>
+      <p style="font-size:14.5px; font-family:var(--font-mono); color:var(--text-dim); margin:0;">
+        &gt; brief: "weekly product highlight" &nbsp;→&nbsp; script generated<br>
+        &gt; render: cinematic clip, 16:9 &nbsp;<span style="color:var(--green);">[done]</span><br>
+        &gt; scheduled: Mon 9:00 AM, 3 platforms
+      </p>
+    </div>
+  </section>
+
+  <section style="border-bottom:none; text-align:center; padding-top:40px;">
+    <h2>Not sure which system<br>fits your <span class="accent">business</span>?</h2>
+    <div class="hero-actions" style="justify-content:center; margin-top:28px;">
+      <a href="contact.html" class="btn btn-primary">Talk it through →</a>
+      <a href="case-studies.html" class="btn btn-ghost">See it in action</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div class="mono">© 2026 RUNTIME. All systems operational.</div>
+    <div class="mono">Lahore, PK · <a href="contact.html" style="color:var(--green);">hello@runtime.agency</a></div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
