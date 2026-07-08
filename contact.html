@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — RUNTIME</title>
+<meta name="description" content="Book a call or submit a project brief to RUNTIME.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo"><span class="dot"></span>RUNTIME</a>
+    <nav class="navlinks">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+    <a href="contact.html" class="nav-cta">Book a call →</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="page-hero" style="border-bottom:none;">
+    <div class="eyebrow">NEW_CONNECTION</div>
+    <h1>Let's deploy your<br>first <span class="accent">agent</span>.</h1>
+    <p style="max-width:520px; margin-top:16px;">Tell us what's eating your time and we'll scope the fastest system to fix it — usually within one call.</p>
+  </section>
+
+  <section style="border-bottom:none;">
+    <div class="grid-2" style="align-items:start;">
+
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+          <span class="path">~/runtime/new-project.sh</span>
+        </div>
+        <div class="terminal-body">
+          <!--
+            Set data-webhook to your n8n Webhook node URL to receive
+            submissions directly, e.g. data-webhook="https://your-n8n-instance.com/webhook/leads"
+          -->
+          <form id="leadForm" data-webhook="">
+            <div class="field">
+              <label for="name">name</label>
+              <input type="text" id="name" name="name" required placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="business">business</label>
+              <input type="text" id="business" name="business" required placeholder="Business name">
+            </div>
+            <div class="field">
+              <label for="contact">contact</label>
+              <input type="text" id="contact" name="contact" required placeholder="Email or WhatsApp number">
+            </div>
+            <div class="field">
+              <label for="system">system_interest</label>
+              <select id="system" name="system">
+                <option>Lead Scraper</option>
+                <option>WhatsApp / Voice Agent</option>
+                <option>Content Automation</option>
+                <option>Not sure — let's talk</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="brief">brief</label>
+              <textarea id="brief" name="brief" placeholder="What's slowing you down right now?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">RUN →</button>
+            <div class="form-msg"></div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="node-card" style="margin-bottom:20px;">
+          <div class="node-status">RESPONSE TIME</div>
+          <p style="font-size:14.5px; margin:0;">We reply within 1 business day — usually faster. No sales calls before we understand what you actually need.</p>
+        </div>
+        <div class="node-card" style="margin-bottom:20px;">
+          <div class="node-status">DIRECT</div>
+          <p style="font-size:14.5px; margin:0;">Prefer to skip the form? Reach out directly:</p>
+          <p style="font-family:var(--font-mono); font-size:13.5px; color:var(--green); margin-top:10px;">hello@runtime.agency</p>
+        </div>
+        <div class="node-card">
+          <div class="node-status">LOCATION</div>
+          <p style="font-size:14.5px; margin:0;">Based in Lahore, Pakistan — working with clients worldwide, remote-first.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div class="mono">© 2026 RUNTIME. All systems operational.</div>
+    <div class="mono">Lahore, PK · <a href="contact.html" style="color:var(--green);">hello@runtime.agency</a></div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
