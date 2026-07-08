@@ -9,97 +9,60 @@
 </head>
 <body>
 
+<!-- Preloader -->
+<div id="preloader">
+  <div class="boot-lines"></div>
+</div>
+
+<!-- Custom cursor -->
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<!-- Ambient grid + WebGL network scene -->
+<div class="grid-backdrop"></div>
+<canvas id="webgl-canvas"></canvas>
+
 <header>
   <div class="nav">
-    <a href="index.html" class="logo"><span class="dot"></span>RUNTIME</a>
+    <a href="#home" class="logo"><span class="dot"></span>RUNTIME</a>
     <nav class="navlinks">
-      <a href="index.html" class="active">Home</a>
-      <a href="services.html">Services</a>
-      <a href="case-studies.html">Case Studies</a>
-      <a href="contact.html">Contact</a>
+      <a href="#home">Home</a>
+      <a href="#services">Services</a>
+      <a href="#case-studies">Case Studies</a>
+      <a href="#contact">Contact</a>
     </nav>
-    <a href="contact.html" class="nav-cta">Book a call →</a>
+    <a href="#contact" class="nav-cta">Book a call →</a>
   </div>
 </header>
 
-<main class="wrap">
+<main>
 
-  <section class="hero" style="border-bottom:none;">
-    <div>
-      <div class="terminal-line mono" data-boot-line="INITIALIZING RUNTIME_OS v2.4..."></div>
-      <h1>Your business,<br>running on <span class="accent">autopilot</span>.</h1>
-      <p class="lede">We design and deploy AI agents that scrape leads, answer calls, and post content — so your workflows execute while you sleep. Built on n8n. Live in days, not months.</p>
-      <div class="hero-actions">
-        <a href="contact.html" class="btn btn-primary">Deploy a system →</a>
-        <a href="services.html" class="btn btn-ghost">View services</a>
+  <!-- ================= HERO ================= -->
+  <section id="home" class="hero" style="border-bottom:none;">
+    <div class="wrap">
+      <div class="hero-inner">
+        <div class="terminal-line mono">&gt; system ready</div>
+        <h1>Your business,<br>running on <span class="accent">autopilot</span>.</h1>
+        <p class="lede">We design and deploy AI agents that scrape leads, answer calls, and post content — so your workflows execute while you sleep. Built on n8n. Live in days, not months.</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">Deploy a system →</a>
+          <a href="#services" class="btn btn-ghost">View services</a>
+        </div>
       </div>
-    </div>
-
-    <div>
-      <!-- Signature element: animated workflow canvas -->
-      <svg viewBox="0 0 520 340" width="100%" role="img" aria-label="Animated diagram showing a trigger connecting to an AI agent, which connects to an action, with a pulse of light travelling through the workflow">
-        <defs>
-          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="4" result="blur"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- grid backdrop -->
-        <rect x="0" y="0" width="520" height="340" fill="none"/>
-
-        <!-- wires -->
-        <path id="wire1" d="M 95 90 C 150 90, 150 170, 205 170" stroke="#223226" stroke-width="2" fill="none"/>
-        <path id="wire2" d="M 315 170 C 370 170, 370 250, 425 250" stroke="#223226" stroke-width="2" fill="none"/>
-        <path d="M 95 90 C 150 90, 150 170, 205 170" stroke="#3DFF8A" stroke-width="2" fill="none"
-              stroke-dasharray="6 220" stroke-dashoffset="0" opacity="0.9">
-          <animate attributeName="stroke-dashoffset" values="0;-226" dur="2.4s" repeatCount="indefinite"/>
-        </path>
-        <path d="M 315 170 C 370 170, 370 250, 425 250" stroke="#3DFF8A" stroke-width="2" fill="none"
-              stroke-dasharray="6 220" stroke-dashoffset="0" opacity="0.9">
-          <animate attributeName="stroke-dashoffset" values="0;-226" dur="2.4s" begin="0.8s" repeatCount="indefinite"/>
-        </path>
-
-        <!-- Node 1: TRIGGER -->
-        <g filter="url(#glow)">
-          <rect x="15" y="65" width="80" height="50" rx="4" fill="#101512" stroke="#3DFF8A" stroke-width="1.4">
-            <animate attributeName="stroke-opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite"/>
-          </rect>
-        </g>
-        <text x="55" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C948A" letter-spacing="1">NODE_01</text>
-        <text x="55" y="101" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#E8F5EC" font-weight="700">TRIGGER</text>
-
-        <!-- Node 2: AI AGENT -->
-        <g filter="url(#glow)">
-          <rect x="205" y="145" width="110" height="50" rx="4" fill="#101512" stroke="#3DFF8A" stroke-width="1.4">
-            <animate attributeName="stroke-opacity" values="0.3;0.3;1;0.3" dur="2.4s" begin="0.8s" repeatCount="indefinite"/>
-          </rect>
-        </g>
-        <text x="260" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C948A" letter-spacing="1">NODE_02</text>
-        <text x="260" y="181" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#E8F5EC" font-weight="700">AI AGENT</text>
-
-        <!-- Node 3: ACTION -->
-        <g filter="url(#glow)">
-          <rect x="425" y="225" width="80" height="50" rx="4" fill="#101512" stroke="#3DFF8A" stroke-width="1.4">
-            <animate attributeName="stroke-opacity" values="0.3;0.3;0.3;1;0.3" dur="2.4s" begin="1.6s" repeatCount="indefinite"/>
-          </rect>
-        </g>
-        <text x="465" y="246" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C948A" letter-spacing="1">NODE_03</text>
-        <text x="465" y="261" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#E8F5EC" font-weight="700">ACTION</text>
-
-        <!-- status readout -->
-        <text x="15" y="320" font-family="JetBrains Mono, monospace" font-size="10" fill="#3DFF8A">
-          &gt; workflow.status: <tspan fill="#E8F5EC">running</tspan>
-        </text>
-      </svg>
     </div>
   </section>
 
-  <section>
-    <div class="stats">
+  <!-- ================= MARQUEE ================= -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>SCRAPE <em>//</em> RESPOND <em>//</em> AUTOMATE <em>//</em> SCALE <em>//</em></span>
+      <span>SCRAPE <em>//</em> RESPOND <em>//</em> AUTOMATE <em>//</em> SCALE <em>//</em></span>
+    </div>
+  </div>
+
+  <!-- ================= STATS ================= -->
+  <section class="wrap">
+    <div class="stats reveal-stagger">
       <div>
         <div class="stat-num">3</div>
         <div class="stat-label mono">CORE AGENT SYSTEMS</div>
@@ -115,14 +78,15 @@
     </div>
   </section>
 
-  <section>
-    <div class="section-head">
+  <!-- ================= SERVICES ================= -->
+  <section id="services" class="wrap">
+    <div class="section-head reveal">
       <div class="eyebrow">SYSTEM_MODULES</div>
       <h2>Three agents.<br>One <span class="accent">runtime</span>.</h2>
       <p style="margin-top:16px;">Each system is modular — deploy one or chain them together into a single pipeline that finds, contacts, and converts customers without manual work.</p>
     </div>
 
-    <div class="grid-3">
+    <div class="grid-3 tilt-stage reveal-stagger">
       <div class="node-card">
         <div class="node-status">DEPLOYED</div>
         <h3 style="font-size:19px;">Lead Scraper</h3>
@@ -144,12 +108,13 @@
     </div>
   </section>
 
-  <section>
-    <div class="section-head">
+  <!-- ================= WHY ================= -->
+  <section class="wrap">
+    <div class="section-head reveal">
       <div class="eyebrow">WHY_RUNTIME</div>
       <h2>Built for owners<br>who can't wait on <span class="accent">hiring</span>.</h2>
     </div>
-    <div class="grid-2">
+    <div class="grid-2 tilt-stage reveal-stagger">
       <div class="node-card">
         <div class="node-status">01 · SPEED</div>
         <p style="font-size:14.5px; margin:0;">Most systems are scoped, built, and live within two weeks — not the multi-month timeline of hiring and training an in-house team.</p>
@@ -161,11 +126,152 @@
     </div>
   </section>
 
-  <section style="border-bottom:none; text-align:center; padding-bottom:64px;">
-    <div class="eyebrow" style="justify-content:center;">READY_TO_DEPLOY</div>
-    <h2>Let's put your first<br>agent into <span class="accent">production</span>.</h2>
-    <div class="hero-actions" style="justify-content:center; margin-top:28px;">
-      <a href="contact.html" class="btn btn-primary">Book a call →</a>
+  <!-- ================= CASE STUDIES ================= -->
+  <section id="case-studies" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">DEPLOYMENT_LOGS</div>
+      <h2>Systems in <span class="accent">production</span>.</h2>
+      <p style="margin-top:16px;">A record of what's been built and deployed. Replace the metrics below with your own client numbers as they come in.</p>
+    </div>
+
+    <div class="reveal-stagger">
+      <div class="log-entry">
+        <div class="log-head">
+          <span>CLIENT: TACO HEAT (RESTAURANT)</span>
+          <span>SYSTEM: WHATSAPP / VOICE AGENT</span>
+        </div>
+        <h3 style="font-size:22px; margin-bottom:12px;">A voice agent that never misses an order</h3>
+        <p style="font-size:14.5px; max-width:640px;">Taco Heat was losing after-hours phone orders to voicemail. RUNTIME deployed a Vapi-based voice agent wired through n8n that answers every call, takes the order, and confirms it back to the customer — with no staff on the line.</p>
+        <div class="log-metrics">
+          <div>
+            <div class="log-metric-num">100%</div>
+            <div class="log-metric-label">CALLS ANSWERED</div>
+          </div>
+          <div>
+            <div class="log-metric-num">&lt;2s</div>
+            <div class="log-metric-label">AVG. RESPONSE TIME</div>
+          </div>
+          <div>
+            <div class="log-metric-num">24/7</div>
+            <div class="log-metric-label">COVERAGE, NO NEW HIRES</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-head">
+          <span>CLIENT: [ADD CLIENT NAME]</span>
+          <span>SYSTEM: LEAD SCRAPER</span>
+        </div>
+        <h3 style="font-size:22px; margin-bottom:12px;">[Headline: the specific problem this solved]</h3>
+        <p style="font-size:14.5px; max-width:640px;">[Replace with a short description of the client's situation before RUNTIME, what was deployed, and what changed.]</p>
+        <div class="log-metrics">
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">LEADS GENERATED / MONTH</div>
+          </div>
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">HOURS SAVED / WEEK</div>
+          </div>
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">COST vs. MANUAL RESEARCH</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-head">
+          <span>CLIENT: [ADD CLIENT NAME]</span>
+          <span>SYSTEM: CONTENT AUTOMATION</span>
+        </div>
+        <h3 style="font-size:22px; margin-bottom:12px;">[Headline: the specific outcome this drove]</h3>
+        <p style="font-size:14.5px; max-width:640px;">[Replace with what the posting cadence was before, what the pipeline produces now, and any measurable lift.]</p>
+        <div class="log-metrics">
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">POSTS / WEEK, AUTOMATED</div>
+          </div>
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">ENGAGEMENT LIFT</div>
+          </div>
+          <div>
+            <div class="log-metric-num">[#]</div>
+            <div class="log-metric-label">HOURS SAVED / MONTH</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact" class="wrap" style="border-bottom:none;">
+    <div class="section-head reveal">
+      <div class="eyebrow">NEW_CONNECTION</div>
+      <h2>Let's deploy your<br>first <span class="accent">agent</span>.</h2>
+      <p style="margin-top:16px;">Tell us what's eating your time and we'll scope the fastest system to fix it — usually within one call.</p>
+    </div>
+
+    <div class="grid-2 reveal" style="align-items:start;">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+          <span class="path">~/runtime/new-project.sh</span>
+        </div>
+        <div class="terminal-body">
+          <!--
+            Set data-webhook to your n8n Webhook node URL to receive
+            submissions directly, e.g. data-webhook="https://your-n8n-instance.com/webhook/leads"
+          -->
+          <form id="leadForm" data-webhook="">
+            <div class="field">
+              <label for="name">name</label>
+              <input type="text" id="name" name="name" required placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="business">business</label>
+              <input type="text" id="business" name="business" required placeholder="Business name">
+            </div>
+            <div class="field">
+              <label for="contact_info">contact</label>
+              <input type="text" id="contact_info" name="contact" required placeholder="Email or WhatsApp number">
+            </div>
+            <div class="field">
+              <label for="system">system_interest</label>
+              <select id="system" name="system">
+                <option>Lead Scraper</option>
+                <option>WhatsApp / Voice Agent</option>
+                <option>Content Automation</option>
+                <option>Not sure — let's talk</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="brief">brief</label>
+              <textarea id="brief" name="brief" placeholder="What's slowing you down right now?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">RUN →</button>
+            <div class="form-msg"></div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="node-card" style="margin-bottom:20px;">
+          <div class="node-status">RESPONSE TIME</div>
+          <p style="font-size:14.5px; margin:0;">We reply within 1 business day — usually faster.</p>
+        </div>
+        <div class="node-card" style="margin-bottom:20px;">
+          <div class="node-status">DIRECT</div>
+          <p style="font-size:14.5px; margin:0;">Prefer to skip the form? Reach out directly:</p>
+          <p style="font-family:var(--font-mono); font-size:13.5px; color:var(--green); margin-top:10px;">hello@runtime.agency</p>
+        </div>
+        <div class="node-card">
+          <div class="node-status">LOCATION</div>
+          <p style="font-size:14.5px; margin:0;">Based in Lahore, Pakistan — working with clients worldwide, remote-first.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -174,10 +280,13 @@
 <footer>
   <div class="wrap footer-row">
     <div class="mono">© 2026 RUNTIME. All systems operational.</div>
-    <div class="mono">Lahore, PK · <a href="contact.html" style="color:var(--green);">hello@runtime.agency</a></div>
+    <div class="mono">Lahore, PK · <a href="#contact" style="color:var(--green);">hello@runtime.agency</a></div>
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
