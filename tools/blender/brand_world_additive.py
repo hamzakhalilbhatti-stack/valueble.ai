@@ -38,25 +38,30 @@ CHANNEL_LO, CHANNEL_HI = -2.0, 2.0
 # name, az_from, az_to, el_from, el_to, thickness, gap, role
 PANELS = [
     # name, az_from, az_to, el_from, el_to, thickness, gap, role, taper, projection
-    # `projection` is radial standoff beyond the nominal envelope. This is what
-    # now carries the silhouette — NOT the recess.
-    # ── 4 major panels — 0.035-0.055 proud ──
-    ("major_upper_front", 303, 425, 2.0, 49, 0.115, 1.5, "major", 0.0, 1.052),
-    ("major_upper_rear", 105, 240, 2.0, 52, 0.118, 1.5, "major", 0.0, 1.038),
+    #
+    # CROWN JUNCTION: every upper panel is dimensioned so that AFTER its own gap
+    # inset it terminates at exactly el 49.0, and the cap begins at 50.4. That
+    # gives one coordinated 1.4 deg seam (~0.024 units) instead of two
+    # independent insets compounding into an opening.
+    #
+    # RECESS: az 250-270 (20 deg). The hero camera sits at az 24 and sees
+    # roughly 294->114, so this sits squarely on the far side and is only
+    # discovered when the camera travels round.
+    ("major_upper_front", 330, 425, 2.0, 50.5, 0.115, 1.5, "major", 0.0, 1.052),
+    ("major_upper_rear", 105, 250, 2.0, 50.5, 0.118, 1.5, "major", 0.0, 1.038),
     ("major_lower_front", 296, 430, -57, -2.0, 0.112, 1.5, "major", 0.0, 1.046),
     ("major_lower_rear", 70, 215, -90, -2.0, 0.110, 1.5, "major", 0.0, 1.035),
-    # ── 3 port panels — service shoulders, 0.045-0.070 proud ──
-    ("port_maps_panel", 65, 105, 2.0, 49, 0.098, 1.7, "port", 0.0, 1.068),
+    ("port_maps_panel", 65, 105, 2.0, 50.7, 0.098, 1.7, "port", 0.0, 1.068),
     ("port_orderrise_panel", 215, 296, -57, -2.0, 0.102, 1.7, "port", 0.0, 1.052),
-    ("port_agents_cap", 0, 360, 49, 90, 0.094, 0.0, "port", 0.0, 1.044),
-    # ── 2 bridges — near the envelope; structural continuity, not drama ──
+    ("port_agents_cap", 0, 360, 50.4, 90, 0.094, 0.0, "port", 0.0, 1.044),
     ("bridge_a", 28, 54, CHANNEL_LO, CHANNEL_HI, 0.120, 0.5, "bridge", 0.0, 1.010),
     ("bridge_b", 148, 168, CHANNEL_LO, CHANNEL_HI, 0.118, 0.5, "bridge", 0.0, 1.008),
-    # ── 1 dual-role transition panel — crosses the channel and closes the side ──
-    ("bridge_c", 240, 278, CHANNEL_LO, 50, 0.120, 0.9, "transition", 7.0, 1.024),
+    # Dual-role transition: crosses the channel and carries the side shell from
+    # major_upper_rear across to the recess edge.
+    ("bridge_c", 270, 330, CHANNEL_LO, 49.9, 0.120, 0.9, "transition", 9.0, 1.024),
 ]
 
-# Controlled recess: azimuth 278-303 above the channel (25 degrees) exposes
+# Controlled recess: azimuth 250-270 above the channel (20 degrees) exposes
 # chassis depth as a secondary side detail. The first attempt left 115 degrees
 # open, which read as a missing quarter of the shell rather than a design
 # feature. bridge_c now spans channel-to-upper-shell to close the rest.
@@ -74,6 +79,8 @@ PORTS = {
 RIBS = [
     # Major-panel supports: broader and more stable.
     ("rib_major_upper_front", 20, 26, 0.105, 0.062, "major_upper_front"),
+    # Sits behind the recess so one rib is glimpsed through it.
+    ("rib_recess_witness", 260, 26, 0.090, 0.056, "major_upper_rear"),
     ("rib_major_upper_rear", 152, 30, 0.100, 0.060, "major_upper_rear"),
     ("rib_major_lower_front", 350, -32, 0.105, 0.062, "major_lower_front"),
     ("rib_major_lower_rear", 140, -38, 0.098, 0.058, "major_lower_rear"),
@@ -84,7 +91,7 @@ RIBS = [
     # Bridge supports: narrower but structurally continuous across the channel.
     ("rib_bridge_a", 41, 0, 0.070, 0.048, "bridge_a"),
     ("rib_bridge_b", 158, 0, 0.068, 0.046, "bridge_b"),
-    ("rib_bridge_c", 259, 22, 0.082, 0.052, "bridge_c"),
+    ("rib_bridge_c", 300, 24, 0.082, 0.052, "bridge_c"),
 ]
 
 

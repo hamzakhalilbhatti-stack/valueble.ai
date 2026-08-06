@@ -41,7 +41,7 @@ def envelope_flatten(az: float, el: float) -> float:
     el_deg, az_deg = math.degrees(el), math.degrees(az) % 360
 
     if el_deg > 58:
-        f -= 0.055 * ((el_deg - 58) / 32) ** 1.5          # upper flat
+        f -= 0.085 * ((el_deg - 58) / 32) ** 1.5          # upper flat
     if el_deg < -64:
         f -= 0.035 * ((-el_deg - 64) / 26) ** 1.5         # lower flat
 
