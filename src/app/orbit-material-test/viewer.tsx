@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { Environment, Lightformer, OrbitControls, useGLTF } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   ACESFilmicToneMapping,
@@ -135,13 +135,23 @@ function PresetCamera({ view, aspect }: { view: ViewKey | null; aspect: number }
   return null;
 }
 
+/**
+ * Direct-light rig. Deliberately contains NO environment map.
+ *
+ * Every mode renders from these lights alone, so the scene can never be
+ * blocked by a reflection system. drei's <Environment preset> fetches an HDRI
+ * from a remote CDN; when that request could not complete the component
+ * suspended forever, the render loop never started, and clay and dark modes
+ * rendered a blank canvas with a 0x0 drawing buffer.
+ */
 function Rig({ mode }: { mode: Mode }) {
-  const rig = mode === "dark" ? DARK_RIG : CLAY_RIG;
   if (mode === "silhouette") return <ambientLight intensity={1} />;
 
+  const rig = mode === "dark" ? DARK_RIG : CLAY_RIG;
   return (
     <>
       <ambientLight intensity={rig.ambient} />
+      {mode === "clay" && <hemisphereLight intensity={0.25} groundColor="#5a5f66" />}
       <directionalLight
         position={[-4.5, 5.5, 3.5]}
         intensity={rig.key}
@@ -152,6 +162,61 @@ function Rig({ mode }: { mode: Mode }) {
       <directionalLight position={[1.5, 0.5, 6]} intensity={rig.fill} color="#c4d0e6" />
       <directionalLight position={[2.5, 1.5, -5]} intensity={rig.rim} color="#dbe3f2" />
     </>
+  );
+}
+
+/**
+ * Dark-mode reflections, generated locally from Lightformers.
+ *
+ * No `preset`, no HDRI file, no network request — the cube map is rendered
+ * once (`frames={1}`) from geometry defined here, so it works fully offline.
+ * `background={false}` keeps the page's dark colour rather than showing the
+ * environment itself.
+ */
+function ProceduralStudio() {
+  return (
+    <Environment resolution={256} frames={1} background={false}>
+      {/* Large overhead-left softbox — the dominant reflection. */}
+      <Lightformer
+        form="rect"
+        intensity={1.6}
+        color="#e8eef8"
+        position={[-3.5, 4.5, 2.5]}
+        rotation={[-Math.PI / 3, 0, 0]}
+        scale={[7, 5, 1]}
+      />
+      {/* Broad, weak frontal card so dark panels keep some fill. */}
+      <Lightformer
+        form="rect"
+        intensity={0.35}
+        color="#aebdd6"
+        position={[2, 0.5, 5]}
+        scale={[6, 4, 1]}
+      />
+      {/* Narrow rear strip for edge separation. */}
+      <Lightformer
+        form="rect"
+        intensity={1.1}
+        color="#cfd9ea"
+        position={[3, 1.5, -4.5]}
+        rotation={[0, Math.PI / 2, 0]}
+        scale={[5, 0.7, 1]}
+      />
+      {/* Small top card — puts a highlight on the upper flattened region. */}
+      <Lightformer
+        form="rect"
+        intensity={0.7}
+        color="#ffffff"
+        position={[0, 5, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[2.5, 2.5, 1]}
+      />
+      {/* Dark base so the lower hemisphere does not wash out. */}
+      <mesh scale={40}>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshBasicMaterial color="#0a0c12" side={1} />
+      </mesh>
+    </Environment>
   );
 }
 
@@ -265,15 +330,11 @@ export function MaterialTestViewer({
         <PresetCamera view={view} aspect={aspect} />
         <Instruments onStats={setStats} />
         <Rig mode={mode} />
-        {mode !== "silhouette" && (
-          <Environment
-            preset={mode === "dark" ? "warehouse" : "studio"}
-            environmentIntensity={rig.env}
-          />
-        )}
         <Suspense fallback={null}>
           <Model url={MODELS[model]} mode={mode} onReport={setReport} />
         </Suspense>
+        {/* Optional reflections only. Never gates the scene. */}
+        {mode === "dark" && <ProceduralStudio />}
         {/* Free inspection only, and never `makeDefault`, so it can never
             contest the preset camera. */}
         {!view && <OrbitControls enablePan target={[0, 0, 0]} />}
