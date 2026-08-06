@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, PerformanceMonitor, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /**
  * The block field — the one visual on the site.
@@ -34,26 +35,6 @@ function rng(seed: number) {
     s = (s * 1664525 + 1013904223) % 4294967296;
     return s / 4294967296;
   };
-}
-
-/**
- * Reads the reduced-motion preference.
- *
- * A media query is external state, so it is subscribed to rather than copied
- * into a state variable inside an effect — that pattern renders once with the
- * wrong answer and then again with the right one. The server snapshot is
- * `false` so markup matches on hydrate.
- */
-function useReducedMotion() {
-  return useSyncExternalStore(
-    (onChange) => {
-      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    () => false,
-  );
 }
 
 type Block = {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SceneBackdrop, SceneBreak } from "@/components/scene-backdrop";
+import { ProductDemo } from "@/components/product/product-demo";
 import { ArrowUpRight, Body, BoxButton, Head, Section } from "@/components/ui";
 import { getProduct, productCta, products } from "@/lib/site";
 
@@ -41,9 +42,13 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
       <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
         <SceneBackdrop density={4} seed={product.seed} />
         <div className="rail">
-          <p className="eyebrow reveal">
-            {product.index} · {product.kind}
-          </p>
+          <div className="reveal">
+            <p className="eyebrow">
+              {product.index} · {product.kind}
+            </p>
+            <p className="mt-3 text-fine text-faint">{product.audience}</p>
+            <p className="mt-1 text-fine text-paper">{product.price}</p>
+          </div>
           <div className="measure">
             <h1 className="reveal text-hero max-w-[16ch] text-balance text-paper">
               {product.hero.headline}
@@ -55,6 +60,17 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
           </div>
         </div>
       </section>
+
+      {/*
+        The product itself, before a single paragraph of argument. A buyer who
+        can see the thing working needs far less convincing than one who has to
+        assemble it from a description.
+      */}
+      <div className="mx-auto max-w-[96rem] px-6 pb-8 md:px-[3.25rem] md:pb-12">
+        <div className="reveal">
+          <ProductDemo slug={product.slug} />
+        </div>
+      </div>
 
       {/* Spec table. Facts only — the things a buyer checks before reading prose. */}
       <Section label="At a glance">

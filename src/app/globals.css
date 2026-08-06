@@ -22,6 +22,19 @@
   --color-rule: #1c1c1e;
   --color-rule-strong: #2e2e32;
 
+  /*
+   * One accent per product, and they are never used interchangeably.
+   *
+   * The page itself stays black and white — these appear only inside product
+   * demonstrations and on the index rows, where their whole job is to let a
+   * visitor tell three offerings apart at a glance. Without them the products
+   * read as one undifferentiated thing, which is the single most expensive
+   * mistake a three-product site can make.
+   */
+  --color-scan: #3ddbc0; /* 01 — Maps Lead Scraper. Data, precision */
+  --color-warm: #ffab4a; /* 02 — OrderRise. Conversation, response */
+  --color-mind: #9b8cff; /* 03 — Custom agents. Assembly, intelligence */
+
   /* Display scale. Desktop targets: 80/88, 35/45, 16/26. */
   --text-hero: clamp(2.5rem, 5.6vw, 5rem);
   --text-hero--line-height: 1.1;
@@ -133,6 +146,26 @@
   /* Hairline separator, deliberately barely visible. */
   .hairline {
     border-top: 1px solid var(--color-rule);
+  }
+
+  /*
+   * Interface label. Used only inside the product demonstrations — it is the
+   * voice of the software, not of the page, so it is monospaced and small
+   * where everything else is Geist at reading size.
+   */
+  .ui-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Chrome for the demo panels: one surface, one border, used everywhere. */
+  .panel {
+    border: 1px solid var(--color-rule);
+    background-color: rgba(255, 255, 255, 0.022);
+    backdrop-filter: blur(6px);
   }
 }
 

@@ -1,16 +1,23 @@
 import Link from "next/link";
 import { Hero } from "@/components/hero";
 import { SceneBreak } from "@/components/scene-backdrop";
+import { ScraperDemo } from "@/components/product/scraper-demo";
+import { OrderRiseDemo } from "@/components/product/orderrise-demo";
+import { AgentDemo } from "@/components/product/agent-demo";
 import { ArrowUpRight, Body, BoxButton, Head, List, Section } from "@/components/ui";
-import { contact, products, whatsappUrl } from "@/lib/site";
+import { contact, getProduct, productCta, whatsappUrl } from "@/lib/site";
 
 /**
  * Home.
  *
- * Problem → solution → what it is → who builds it → contact. Five sections and
- * nothing else. The argument has to land for someone who has never heard of
- * any of this, so it is told in plain business terms first and only names the
- * products once the reader already wants them.
+ * Problem, then each product shown *working*, then who builds it, then contact.
+ *
+ * The demonstrations are the argument. An earlier version of this page
+ * described three products in prose and showed nothing, which asked a visitor
+ * to take on trust the one thing that is trivial to simply prove. Every panel
+ * below is built from the real product: the scraper fields and score weights
+ * come from the v5.2 source, and the OrderRise thread and ticket are the same
+ * order seen from both ends.
  */
 export default function HomePage() {
   return (
@@ -43,94 +50,50 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* Full-bleed scene break, in place of the reference's video interstitial. */}
       <SceneBreak />
 
-      <Section label="The solution" id="solution">
-        <Head>Systems that hold the line without being asked</Head>
+      <ProductShowcase slug="lead-extractor">
+        <ScraperDemo />
+      </ProductShowcase>
+
+      <ProductShowcase slug="orderrise">
+        <OrderRiseDemo />
+      </ProductShowcase>
+
+      <ProductShowcase slug="ai-agents">
+        <AgentDemo className="max-w-3xl" />
+      </ProductShowcase>
+
+      <Section label="Who builds it" id="approach">
+        <Head>One person, and you talk to him</Head>
 
         <div className="mt-8 space-y-6">
           <Body>
-            valueble.ai builds the software that absorbs that load. Not advice, not a
-            strategy deck — running systems, pointed at one specific job each, built until
-            they hold up against real customers and real mess.
+            I am Hamza Khalil Bhatti. I scope the work, build it, and support it after it
+            ships — there is no account manager between you and the person writing the code.
+            That is a hard limit on how much I take on, and it is the reason the work holds.
           </Body>
-
-          <List
-            items={[
-              "Reach a whole market without opening a single browser tab",
-              "Answer every customer instantly, in the app they already use",
-              "Hand a recurring internal process to something that never forgets it",
-              "Own the system and its data outright — no platform commission, no lock-in",
-            ]}
-          />
+          <Body>
+            Everything here came out of a real business problem rather than a product
+            roadmap. The scraper exists because prospecting by hand was eating weekends.
+            OrderRise exists because restaurants were losing paid orders to a phone nobody
+            could reach during the dinner rush.
+          </Body>
+          <Body>
+            The first thing I do on any project is tell you which parts are not worth
+            automating. A system that handles eighty percent of a process reliably is worth
+            more than one that claims all of it and quietly fails on the cases that matter.
+          </Body>
         </div>
-      </Section>
 
-      <Section label="How it works" id="work">
-        <Head>Three products, one idea</Head>
-        <Body className="mt-8">
-          Each one started as a real problem in a real business and was built until it
-          worked. Two are live and in use today.
-        </Body>
-
-        <ul className="mt-16 space-y-0">
-          {products.map((product) => (
-            <li key={product.slug} className="hairline reveal">
-              <Link
-                href={`/products/${product.slug}`}
-                className="group block py-10 transition-opacity duration-300 hover:opacity-65"
-              >
-                <div className="flex items-baseline gap-5">
-                  <span className="text-fine text-faint">{product.index}</span>
-                  <div className="flex-1">
-                    <h3 className="flex items-center gap-3 text-sub text-paper">
-                      {product.name}
-                      <ArrowUpRight className="size-3 shrink-0 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </h3>
-                    <p className="mt-1 text-fine text-faint">
-                      {product.kind} · {product.status}
-                    </p>
-                    <p className="mt-4 max-w-[52ch] text-mute">{product.tagline}</p>
-                  </div>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section label="About us" id="approach">
-        <Head>Built by one person who ships</Head>
-
-        <div className="mt-8 space-y-10">
-          <div className="space-y-3">
-            <h3 className="text-paper">Who</h3>
-            <Body>
-              I am Hamza Khalil Bhatti. I build AI agents and growth tools for businesses and
-              agencies, and I do the work myself — scoping, building, and supporting it after
-              it ships. You talk to the person writing the code.
-            </Body>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-paper">How</h3>
-            <Body>
-              Every engagement starts with one process, not a platform. We find the task that
-              is high-volume, rules-shaped, and currently eating hours, and I tell you plainly
-              which parts are worth automating and which are not.
-            </Body>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-paper">Why it holds up</h3>
-            <Body>
-              Getting a model to produce something impressive takes an afternoon. Getting a
-              system that runs unattended for six months — through the customer who types in
-              three languages and the API that rate-limits at the worst moment — is the
-              actual job, and it is the one I do.
-            </Body>
-          </div>
+        <div className="mt-10">
+          <Link
+            href="/about"
+            className="reveal inline-flex items-center gap-2 text-mute transition-colors duration-200 hover:text-paper"
+          >
+            More about how I work
+            <ArrowUpRight className="size-3" />
+          </Link>
         </div>
       </Section>
 
@@ -139,7 +102,7 @@ export default function HomePage() {
         <Body className="mt-8">
           You do not need to know how it should be built. You need to know which twenty hours
           a month you want back. Tell me what those hours go on and I will tell you honestly
-          whether I can take them.
+          whether I can take them — including when the answer is no.
         </Body>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -154,5 +117,74 @@ export default function HomePage() {
         </div>
       </Section>
     </>
+  );
+}
+
+/** Accent per product. Used only here and on the hero index — never mixed. */
+const ACCENT: Record<string, { text: string; border: string }> = {
+  "lead-extractor": { text: "text-scan", border: "border-scan/40" },
+  orderrise: { text: "text-warm", border: "border-warm/40" },
+  "ai-agents": { text: "text-mind", border: "border-mind/40" },
+};
+
+/**
+ * One product: who it is for, what it costs, then the thing itself running.
+ *
+ * The demonstration is full-bleed rather than confined to the rail's content
+ * column — these panels carry the persuasion and the reading measure would
+ * squeeze them into illegibility.
+ */
+function ProductShowcase({
+  slug,
+  children,
+}: {
+  slug: string;
+  children: React.ReactNode;
+}) {
+  const product = getProduct(slug);
+  if (!product) return null;
+
+  const accent = ACCENT[slug];
+  const cta = productCta[product.slug];
+
+  return (
+    <section id={slug} className="py-24 md:py-32">
+      <div className="rail">
+        <div className="reveal">
+          <p className={`ui-label ${accent.text}`}>{product.index}</p>
+          <p className="mt-3 text-fine text-faint">{product.audience}</p>
+        </div>
+
+        <div className="measure">
+          <h2 className="reveal text-head max-w-[20ch] text-balance">{product.name}</h2>
+          <p className="reveal mt-5 max-w-[54ch] text-sub text-mute">{product.tagline}</p>
+
+          <div className="reveal mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-fine">
+            <span className={`border px-3 py-1.5 ${accent.border} ${accent.text}`}>
+              {product.price}
+            </span>
+            <span className="text-faint">
+              {product.kind} · {product.status}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Full width — the demo is the argument, not an illustration beside it. */}
+      <div className="mx-auto mt-12 max-w-[96rem] px-6 md:mt-16 md:px-[3.25rem]">
+        <div className="reveal">{children}</div>
+
+        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <BoxButton href={cta.href}>{cta.label}</BoxButton>
+          <Link
+            href={`/products/${product.slug}`}
+            className="inline-flex items-center gap-2 py-3.5 text-mute transition-colors duration-200 hover:text-paper"
+          >
+            How {product.name} works
+            <ArrowUpRight className="size-3" />
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -79,6 +79,17 @@ export type Product = {
    * per product, so each page shows a different corner of the same world.
    */
   seed: number;
+  /**
+   * Who this is for, in their own words. Shown before the product name on the
+   * home index — a visitor's first question is "is this for me", and two of
+   * these three are bought by completely different people.
+   */
+  audience: string;
+  /**
+   * What it costs, stated plainly. Only OrderRise has a confirmed figure; the
+   * other two say what actually happens next instead of inventing a number.
+   */
+  price: string;
   tagline: string;
   /** One-paragraph summary used on the home index and in metadata. */
   summary: string;
@@ -110,6 +121,8 @@ export const products: Product[] = [
     name: "Maps Lead Scraper",
     kind: "Chrome extension",
     seed: 4021,
+    audience: "For agencies and sales teams",
+    price: "Free sample list first",
     tagline: "Turn any Google Maps search into a scored, contactable lead list.",
     summary:
       "A Chrome extension that reads a Google Maps result set, follows each business to its own website, and pulls out the contact surface — emails, phones, socials — then scores every lead and hands you a spreadsheet instead of forty browser tabs.",
@@ -189,6 +202,8 @@ export const products: Product[] = [
     name: "OrderRise",
     kind: "WhatsApp AI agent",
     seed: 7734,
+    audience: "For restaurants and takeaways",
+    price: "$50 / month",
     tagline: "A restaurant's WhatsApp, answered instantly — even at 11pm on a Friday.",
     summary:
       "An AI ordering assistant that lives in the WhatsApp number a restaurant already gives out. It shows the menu, builds the cart, takes delivery details, and drops a finished order onto the kitchen screen.",
@@ -266,6 +281,8 @@ export const products: Product[] = [
     name: "Custom AI Agents",
     kind: "Built for your business",
     seed: 1518,
+    audience: "For any repetitive process",
+    price: "Project-based",
     tagline: "The repetitive part of your operation, handed to something that does not get tired.",
     summary:
       "Agents built around one specific process you already run — qualifying inbound leads, answering the same forty questions, moving data between tools that were never meant to talk. Scoped to a real workflow, not a demo.",
