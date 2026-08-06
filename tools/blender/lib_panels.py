@@ -47,6 +47,7 @@ def make_panel(
     thickness: float = 0.055,
     gap: float = 1.4,
     scale: float = 1.0,
+    az_taper: float = 0.0,
     segments_az: int | None = None,
     segments_el: int | None = None,
 ):
@@ -58,6 +59,11 @@ def make_panel(
     seams are gaps rather than grooves.
 
     `az_to` may exceed 360 to wrap across zero (e.g. 315 -> 425 means 315..65).
+
+    `az_taper` narrows the azimuth span linearly toward the top edge (degrees
+    removed from each side at el_to). A transition panel that tapers reads as a
+    deliberate shape resolving into its neighbours; a constant-width one reads
+    as a filler plate.
     """
     a0 = math.radians(az_from + gap)
     a1 = math.radians(az_to - gap)
@@ -80,9 +86,13 @@ def make_panel(
     grid: list[list[bmesh.types.BMVert]] = []
     for i in range(n_el + 1):
         row = []
-        el = e0 + (e1 - e0) * (i / n_el)
+        t = i / n_el
+        el = e0 + (e1 - e0) * t
+        # Taper pulls both azimuth edges inward as elevation rises.
+        inset = math.radians(az_taper) * t
+        ta0, ta1 = a0 + inset, a1 - inset
         for j in range(n_az + 1):
-            az = a0 + (a1 - a0) * (j / n_az)
+            az = ta0 + (ta1 - ta0) * (j / n_az)
             row.append(bm.verts.new(spheroid_point(az, el, scale)))
         grid.append(row)
 

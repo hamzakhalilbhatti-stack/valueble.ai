@@ -64,6 +64,37 @@ const CLAY_RIG = {
   background: "#8e9299",
 } as const;
 
+
+/**
+ * Deterministic review cameras. Every artifact angle is reproducible from a URL
+ * so reviews never depend on hand-dragging orbit controls.
+ */
+const VIEWS = {
+  front: { pos: [2.9, 1.5, 3.4], target: [0, 0, 0] },
+  rear: { pos: [-3.0, 1.4, -3.2], target: [0, 0, 0] },
+  side: { pos: [-1.0, 0.5, 4.6], target: [0, 0, 0] },   // recess side (az ~296)
+  elevated: { pos: [2.2, 4.2, 2.6], target: [0, 0, 0] },
+  hero: { pos: [3.4, 1.1, 3.0], target: [0, -0.1, 0] },
+  mobile: { pos: [0.9, 1.0, 5.4], target: [0, 0, 0] },
+  thumb: { pos: [3.0, 1.4, 3.3], target: [0, 0, 0] },
+  bridge: { pos: [-1.4, 1.5, 2.4], target: [-0.55, 0.55, 0.9] },
+  rib: { pos: [1.5, 0.9, 2.0], target: [0.55, 0.3, 0.75] },
+  collar: { pos: [2.3, 0.15, 2.1], target: [0.5, 0, 0.5] },
+} as const;
+type ViewKey = keyof typeof VIEWS;
+
+function PresetCamera({ view }: { view: ViewKey | null }) {
+  const { camera } = useThree();
+  useEffect(() => {
+    if (!view) return;
+    const v = VIEWS[view];
+    camera.position.set(v.pos[0], v.pos[1], v.pos[2]);
+    camera.lookAt(v.target[0], v.target[1], v.target[2]);
+    camera.updateProjectionMatrix();
+  }, [camera, view]);
+  return null;
+}
+
 type Report = {
   meshes: number;
   triangles: number;
@@ -215,11 +246,23 @@ function AutoOrbit({ active }: { active: boolean }) {
 }
 
 export function MaterialTestViewer() {
-  const [model, setModel] = useState<ModelKey>("additive-proof");
-  const [mode, setMode] = useState<Mode>("clay");
+  // Review state is URL-addressable so every artifact angle is reproducible.
+  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const urlModel = params?.get("model") as ModelKey | null;
+  const urlMode = params?.get("mode") as Mode | null;
+  const urlView = params?.get("view") as ViewKey | null;
+  const debug = params?.get("debug") === "1";
+  const view = urlView && urlView in VIEWS ? urlView : null;
+
+  const [model, setModel] = useState<ModelKey>(
+    urlModel && urlModel in MODELS ? urlModel : "additive-full",
+  );
+  const [mode, setMode] = useState<Mode>(
+    urlMode && ["clay", "dark", "silhouette"].includes(urlMode) ? urlMode : "clay",
+  );
   const [wireframe, setWireframe] = useState(false);
   const [orbiting, setOrbiting] = useState(false);
-  const [hud, setHud] = useState(true);
+  const [hud, setHud] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
   const [fps, setFps] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -227,6 +270,10 @@ export function MaterialTestViewer() {
   const url = MODELS[model];
   const rig = mode === "dark" ? DARK_RIG : CLAY_RIG;
   const background = mode === "silhouette" ? "#f2f2f0" : rig.background;
+
+  useEffect(() => {
+    if (debug) setHud(true);
+  }, [debug]);
 
   useEffect(() => {
     setError(null);
@@ -246,6 +293,7 @@ export function MaterialTestViewer() {
         camera={{ position: [2.6, 1.3, 2.9], fov: 40 }}
       >
         <RendererConfig exposure={mode === "silhouette" ? 1 : rig.exposure} />
+        <PresetCamera view={view} />
         <Fps onFps={setFps} />
         <AutoOrbit active={orbiting} />
         <Rig mode={mode} />
@@ -255,7 +303,7 @@ export function MaterialTestViewer() {
         <Suspense fallback={null}>
           {!error && <Model url={url} mode={mode} wireframe={wireframe} onReport={setReport} />}
         </Suspense>
-        <OrbitControls makeDefault enablePan enabled={!orbiting} target={[0, 0, 0]} />
+        {!view && <OrbitControls makeDefault enablePan enabled={!orbiting} target={[0, 0, 0]} />}
       </Canvas>
 
       {hud && (
@@ -334,4 +382,6 @@ export function MaterialTestViewer() {
   );
 }
 
-Object.values(MODELS).forEach((u) => useGLTF.preload(u));
+// Preload ONLY the approved model. Preloading the whole map pulled all three
+// GLBs on every load, including the 1.29 MB rejected boolean experiment.
+useGLTF.preload(MODELS["additive-full"]);
