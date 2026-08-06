@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Blender asset pipeline (vendored Blender runtime, ~1GB)
+.venv-blender/
+
+# Python bytecode from the Blender asset scripts
+__pycache__/
