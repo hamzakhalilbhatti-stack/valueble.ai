@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Lightformer, RoundedBox } from "@react-three/drei";
+import { Environment, Lightformer, PerformanceMonitor, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 /**
@@ -34,6 +34,26 @@ function rng(seed: number) {
     s = (s * 1664525 + 1013904223) % 4294967296;
     return s / 4294967296;
   };
+}
+
+/**
+ * Reads the reduced-motion preference.
+ *
+ * A media query is external state, so it is subscribed to rather than copied
+ * into a state variable inside an effect — that pattern renders once with the
+ * wrong answer and then again with the right one. The server snapshot is
+ * `false` so markup matches on hydrate.
+ */
+function useReducedMotion() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
 }
 
 type Block = {
@@ -157,7 +177,7 @@ function Blocks({
           // shows a thin bright line running the length of the edge. At this
           // block size the bevel has to grow with it to stay visible.
           radius={0.09}
-          smoothness={6}
+          smoothness={3}
           position={block.position}
           rotation={block.rotation}
         >
@@ -226,7 +246,7 @@ function Blocks({
 function Studio() {
   return (
     <>
-      <Environment resolution={512} frames={1}>
+      <Environment resolution={256} frames={1}>
         {/* Black room. Anything that is not a source must read as void. */}
         <mesh scale={140}>
           <sphereGeometry args={[1, 32, 32]} />
@@ -346,20 +366,81 @@ export function BlockField({
   clearCentre?: boolean;
 }) {
   const blocks = useBlocks(density, seed, scale, clearCentre);
+  const host = useRef<HTMLDivElement>(null);
+
+  /*
+   * Only render while on screen.
+   *
+   * Every page carries two of these, and a transmissive material forces the
+   * renderer to draw the whole scene a second time into a transmission buffer
+   * on every frame. Two canvases both doing that continuously — including the
+   * one metres below the fold — is what locked up the main thread.
+   *
+   * `frameloop="never"` stops the loop entirely rather than merely skipping
+   * draws, so an off-screen canvas costs nothing at all.
+   */
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    const el = host.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setLive(entry.isIntersecting),
+      // Start a little early so the scene is already moving when it arrives.
+      { rootMargin: "150px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  /*
+   * Resolution is the other half of the cost, and it is quadratic. Start at a
+   * modest cap rather than the display's full ratio — at dpr 1.75 a 1900px
+   * canvas is rendering 11M pixels per frame, twice, for a background.
+   */
+  const [dpr, setDpr] = useState(1.2);
+
+  // Honour reduced motion by rendering a single frame and then stopping.
+  const reduced = useReducedMotion();
+
+  const frameloop = reduced ? "demand" : live ? "always" : "never";
 
   return (
-    <div className={className} aria-hidden>
+    <div ref={host} className={className} aria-hidden>
       <Canvas
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.75]}
+        frameloop={frameloop}
+        gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+        dpr={dpr}
         camera={{ position: [0, 0, 8.5], fov: 44 }}
         onCreated={({ gl }) => {
           // Without tone mapping the specular sweeps clip to a flat white slab
           // and the gradient across each face is lost.
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 0.82;
+          /*
+           * The transmission pass does not need full resolution. It is only
+           * ever seen refracted through glass, which blurs it anyway, so half
+           * resolution is invisible here and quarters that pass's pixel cost.
+           */
+          gl.transmissionResolutionScale = 0.5;
         }}
       >
+        {/*
+          Steps resolution down if the machine cannot hold frame rate, and back
+          up if it can. A fixed dpr that happens to suit this laptop is not a
+          performance decision, it is a guess about someone else's hardware.
+        */}
+        <PerformanceMonitor
+          onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))}
+          onIncline={() => setDpr((d) => Math.min(1.5, d + 0.25))}
+          // Lowering resolution raises frame rate, which can read as headroom
+          // and raise it straight back. `flipflops` caps how many times that
+          // can reverse before `onFallback` pins the value for good — without
+          // it the monitor can sit there oscillating, which is worse than any
+          // resolution it might have settled on.
+          flipflops={3}
+          onFallback={() => setDpr(0.75)}
+        />
         <Studio />
         <Blocks blocks={blocks} parallax={parallax} />
       </Canvas>
