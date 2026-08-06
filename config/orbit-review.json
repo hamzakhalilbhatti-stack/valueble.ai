@@ -1,0 +1,27 @@
+{
+  "_comment": "Single source of truth for review cameras and the Blender<->Three axis mapping. Both the Blender generator and the R3F review route read these values so they cannot drift apart.",
+  "axisMapping": {
+    "_comment": "glTF export uses export_yup=true.",
+    "blenderToThree": "(Bx, By, Bz) -> (Bx, Bz, -By)",
+    "threeHorizontalToBlender": "[Bx, By] = [Tx, -Tz]"
+  },
+  "heroCamera": {
+    "position": [1.426, 0.555, 3.203],
+    "target": [0, -0.04, 0],
+    "yawDeg": 24,
+    "pitchDeg": 9,
+    "distance": 3.55,
+    "fov": 40
+  },
+  "mobileCamera": {
+    "position": [1.539, 0.936, 4.229],
+    "target": [0, -0.02, 0],
+    "fov": 46
+  },
+  "recess": {
+    "_comment": "Must sit opposite the hero camera. Validated by dot product at generation time.",
+    "relationToHero": "opposite",
+    "maxDotProduct": -0.95,
+    "spanDeg": 18
+  }
+}

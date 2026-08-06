@@ -20,6 +20,7 @@ Run:
 
 from __future__ import annotations
 
+import json
 import math
 import pathlib
 import sys
@@ -28,7 +29,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import bpy  # noqa: E402
 
-from lib_hardsurface import MODELS_DIR, export_glb, pbr_material, reset_scene  # noqa: E402
+from lib_hardsurface import MODELS_DIR, ROOT, export_glb, pbr_material, reset_scene  # noqa: E402
 from lib_panels import make_chassis, make_panel, make_rib, port_collar  # noqa: E402
 
 # Equatorial separation band: no panel occupies this elevation range except the
@@ -48,7 +49,7 @@ PANELS = [
     # roughly 294->114, so this sits squarely on the far side and is only
     # discovered when the camera travels round.
     ("major_upper_front", 330, 425, 2.0, 50.5, 0.115, 1.5, "major", 0.0, 1.052),
-    ("major_upper_rear", 105, 250, 2.0, 50.5, 0.118, 1.5, "major", 0.0, 1.038),
+    ("major_upper_rear", 123, 270, 2.0, 50.5, 0.118, 1.5, "major", 0.0, 1.038),
     ("major_lower_front", 296, 430, -57, -2.0, 0.112, 1.5, "major", 0.0, 1.046),
     ("major_lower_rear", 70, 215, -90, -2.0, 0.110, 1.5, "major", 0.0, 1.035),
     ("port_maps_panel", 65, 105, 2.0, 50.7, 0.098, 1.7, "port", 0.0, 1.068),
@@ -80,7 +81,7 @@ RIBS = [
     # Major-panel supports: broader and more stable.
     ("rib_major_upper_front", 20, 26, 0.105, 0.062, "major_upper_front"),
     # Sits behind the recess so one rib is glimpsed through it.
-    ("rib_recess_witness", 260, 26, 0.090, 0.056, "major_upper_rear"),
+    ("rib_recess_witness", 114, 26, 0.090, 0.056, "major_upper_rear"),
     ("rib_major_upper_rear", 152, 30, 0.100, 0.060, "major_upper_rear"),
     ("rib_major_lower_front", 350, -32, 0.105, 0.062, "major_lower_front"),
     ("rib_major_lower_rear", 140, -38, 0.098, 0.058, "major_lower_rear"),
@@ -93,6 +94,54 @@ RIBS = [
     ("rib_bridge_b", 158, 0, 0.068, 0.046, "bridge_b"),
     ("rib_bridge_c", 300, 24, 0.082, 0.052, "bridge_c"),
 ]
+
+
+RECESS_CENTRE = 114.0   # Blender azimuth, derived from the hero camera below.
+RECESS_SPAN = 18.0      # 105 -> 123
+
+
+def validate_recess_against_hero() -> None:
+    """
+    Refuse to export if the recess is not opposite the hero camera.
+
+    Two previous repositionings failed because the azimuth was reasoned about in
+    Blender space while the camera lives in Three space, and glTF export
+    (export_yup=True) remaps the axes. This converts explicitly and checks the
+    dot product rather than trusting intuition.
+
+        Blender (Bx, By, Bz) -> Three (Bx, Bz, -By)
+        Three horizontal     -> Blender [Bx, By] = [Tx, -Tz]
+    """
+    cfg = json.loads((ROOT / "config" / "orbit-review.json").read_text(encoding="utf-8"))
+    cam = cfg["heroCamera"]["position"]
+    limit = cfg["recess"]["maxDotProduct"]
+
+    # Hero camera horizontal direction, normalised, in Three space.
+    cx, cz = cam[0], cam[2]
+    clen = math.hypot(cx, cz)
+    cam_three = (cx / clen, 0.0, cz / clen)
+
+    # Recess outward normal in Blender, transformed into Three space.
+    a = math.radians(RECESS_CENTRE)
+    recess_three = (math.cos(a), 0.0, -math.sin(a))
+
+    dot = recess_three[0] * cam_three[0] + recess_three[2] * cam_three[2]
+
+    facing = math.degrees(math.atan2(-cz, cx)) % 360
+    print(f"  hero camera horizontal (three) : [{cam_three[0]:.4f}, 0, {cam_three[2]:.4f}]")
+    print(f"  camera-facing Blender azimuth  : {facing:.2f} deg")
+    print(f"  opposite (rear) azimuth        : {(facing + 180) % 360:.2f} deg")
+    print(f"  recess centre                  : {RECESS_CENTRE:.2f} deg")
+    print(f"  recess span                    : {RECESS_CENTRE - RECESS_SPAN/2:.1f} -> {RECESS_CENTRE + RECESS_SPAN/2:.1f}")
+    print(f"  recess vector (three)          : [{recess_three[0]:.4f}, 0, {recess_three[2]:.4f}]")
+    print(f"  dot(recess, heroCamera)        : {dot:.4f}  (must be <= {limit})")
+
+    if dot > limit:
+        raise SystemExit(
+            f"RECESS VALIDATION FAILED: dot {dot:.4f} > {limit}. "
+            "The recess is not opposite the hero camera; refusing to export."
+        )
+    print("  RECESS VALIDATION PASSED")
 
 
 def build_ribs(panel_names: set[str]) -> list:
@@ -167,6 +216,8 @@ def build_ports() -> list:
 
 def main() -> int:
     proof = "--proof" in sys.argv
+    print("Recess / hero-camera validation:")
+    validate_recess_against_hero()
     reset_scene()
 
     chassis_parts = make_chassis(scale=0.680, port_dirs=list(PORTS.values()))
