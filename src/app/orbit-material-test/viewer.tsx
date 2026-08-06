@@ -71,12 +71,14 @@ const CLAY_RIG = {
  */
 const VIEWS = {
   front: { pos: [2.9, 1.5, 3.4], target: [0, 0, 0] },
-  rear: { pos: [-3.0, 1.4, -3.2], target: [0, 0, 0] },
-  side: { pos: [-1.0, 0.5, 4.6], target: [0, 0, 0] },   // recess side (az ~296)
+  rear: { pos: [2.6, 0.9, -2.9], target: [0, 0, 0] },   // opposite the recess
+  side: { pos: [-3.35, 0.55, 2.0], target: [0, 0, 0] },  // recess side (az ~290)
   elevated: { pos: [2.2, 4.2, 2.6], target: [0, 0, 0] },
-  hero: { pos: [3.4, 1.1, 3.0], target: [0, -0.1, 0] },
-  mobile: { pos: [0.9, 1.0, 5.4], target: [0, 0, 0] },
-  thumb: { pos: [3.0, 1.4, 3.3], target: [0, 0, 0] },
+  // Designed hero: yaw 24 deg, pitch 9 deg, distance 3.55. The thumbnail is
+  // judged from HERE, not from a dead front view.
+  hero: { pos: [1.426, 0.555, 3.203], target: [0, -0.04, 0] },
+  mobile: { pos: [1.505, 0.936, 4.136], target: [0, -0.02, 0] },
+  thumb: { pos: [1.426, 0.555, 3.203], target: [0, -0.04, 0] },
   bridge: { pos: [-1.4, 1.5, 2.4], target: [-0.55, 0.55, 0.9] },
   rib: { pos: [1.5, 0.9, 2.0], target: [0.55, 0.3, 0.75] },
   collar: { pos: [2.3, 0.15, 2.1], target: [0.5, 0, 0.5] },
@@ -247,19 +249,25 @@ function AutoOrbit({ active }: { active: boolean }) {
 
 export function MaterialTestViewer() {
   // Review state is URL-addressable so every artifact angle is reproducible.
-  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-  const urlModel = params?.get("model") as ModelKey | null;
-  const urlMode = params?.get("mode") as Mode | null;
-  const urlView = params?.get("view") as ViewKey | null;
-  const debug = params?.get("debug") === "1";
-  const view = urlView && urlView in VIEWS ? urlView : null;
+  //
+  // Read AFTER mount, never during render: reading window.location during the
+  // render pass makes the client tree diverge from the server tree, and the
+  // resulting hydration error tore down the canvas and blanked every preset URL.
+  const [model, setModel] = useState<ModelKey>("additive-full");
+  const [mode, setMode] = useState<Mode>("clay");
+  const [view, setView] = useState<ViewKey | null>(null);
+  const [debug, setDebug] = useState(false);
 
-  const [model, setModel] = useState<ModelKey>(
-    urlModel && urlModel in MODELS ? urlModel : "additive-full",
-  );
-  const [mode, setMode] = useState<Mode>(
-    urlMode && ["clay", "dark", "silhouette"].includes(urlMode) ? urlMode : "clay",
-  );
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const m = p.get("model") as ModelKey | null;
+    const md = p.get("mode") as Mode | null;
+    const v = p.get("view") as ViewKey | null;
+    if (m && m in MODELS) setModel(m);
+    if (md && ["clay", "dark", "silhouette"].includes(md)) setMode(md);
+    if (v && v in VIEWS) setView(v);
+    if (p.get("debug") === "1") setDebug(true);
+  }, []);
   const [wireframe, setWireframe] = useState(false);
   const [orbiting, setOrbiting] = useState(false);
   const [hud, setHud] = useState(false);

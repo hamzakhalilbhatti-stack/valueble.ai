@@ -37,26 +37,26 @@ CHANNEL_LO, CHANNEL_HI = -2.0, 2.0
 
 # name, az_from, az_to, el_from, el_to, thickness, gap, role
 PANELS = [
-    # name, az_from, az_to, el_from, el_to, thickness, gap_deg, role, az_taper
-    # ── 4 major panels — establish the mass and the silhouette ──
-    ("major_upper_front", 315, 425, 2.0, 49, 0.115, 1.5, "major", 0.0),
-    ("major_upper_rear", 105, 240, 2.0, 52, 0.118, 1.5, "major", 0.0),
-    ("major_lower_front", 296, 430, -57, -2.0, 0.112, 1.5, "major", 0.0),
-    ("major_lower_rear", 70, 215, -90, -2.0, 0.110, 1.5, "major", 0.0),
-    # ── 3 port-surround panels — thinner, so collars read as the thick part ──
-    ("port_maps_panel", 65, 105, 2.0, 49, 0.098, 1.7, "port", 0.0),
-    ("port_orderrise_panel", 215, 296, -57, -2.0, 0.102, 1.7, "port", 0.0),
-    ("port_agents_cap", 0, 360, 49, 90, 0.094, 0.0, "port", 0.0),
-    # ── 2 structural bridges — thickest; they carry load across the channel ──
-    ("bridge_a", 28, 54, CHANNEL_LO, CHANNEL_HI, 0.120, 0.5, "bridge", 0.0),
-    ("bridge_b", 148, 168, CHANNEL_LO, CHANNEL_HI, 0.118, 0.5, "bridge", 0.0),
-    # ── 1 dual-role transition panel — crosses the channel AND rises to el 50
-    #    to close the side shell. Tapered 7deg/side so it resolves into
-    #    major_upper_rear instead of butting against it as a slab. ──
-    ("bridge_c", 240, 278, CHANNEL_LO, 50, 0.120, 0.9, "transition", 7.0),
+    # name, az_from, az_to, el_from, el_to, thickness, gap, role, taper, projection
+    # `projection` is radial standoff beyond the nominal envelope. This is what
+    # now carries the silhouette — NOT the recess.
+    # ── 4 major panels — 0.035-0.055 proud ──
+    ("major_upper_front", 303, 425, 2.0, 49, 0.115, 1.5, "major", 0.0, 1.052),
+    ("major_upper_rear", 105, 240, 2.0, 52, 0.118, 1.5, "major", 0.0, 1.038),
+    ("major_lower_front", 296, 430, -57, -2.0, 0.112, 1.5, "major", 0.0, 1.046),
+    ("major_lower_rear", 70, 215, -90, -2.0, 0.110, 1.5, "major", 0.0, 1.035),
+    # ── 3 port panels — service shoulders, 0.045-0.070 proud ──
+    ("port_maps_panel", 65, 105, 2.0, 49, 0.098, 1.7, "port", 0.0, 1.068),
+    ("port_orderrise_panel", 215, 296, -57, -2.0, 0.102, 1.7, "port", 0.0, 1.052),
+    ("port_agents_cap", 0, 360, 49, 90, 0.094, 0.0, "port", 0.0, 1.044),
+    # ── 2 bridges — near the envelope; structural continuity, not drama ──
+    ("bridge_a", 28, 54, CHANNEL_LO, CHANNEL_HI, 0.120, 0.5, "bridge", 0.0, 1.010),
+    ("bridge_b", 148, 168, CHANNEL_LO, CHANNEL_HI, 0.118, 0.5, "bridge", 0.0, 1.008),
+    # ── 1 dual-role transition panel — crosses the channel and closes the side ──
+    ("bridge_c", 240, 278, CHANNEL_LO, 50, 0.120, 0.9, "transition", 7.0, 1.024),
 ]
 
-# Controlled recess: azimuth 278-315 above the channel (37 degrees) exposes
+# Controlled recess: azimuth 278-303 above the channel (25 degrees) exposes
 # chassis depth as a secondary side detail. The first attempt left 115 degrees
 # open, which read as a missing quarter of the shell rather than a design
 # feature. bridge_c now spans channel-to-upper-shell to close the rest.
@@ -178,8 +178,9 @@ def main() -> int:
     )
 
     panels = []
-    for name, a0, a1, e0, e1, thick, gap, _role, taper in selected:
-        panel = make_panel(name, a0, a1, e0, e1, thickness=thick, gap=gap, az_taper=taper)
+    for name, a0, a1, e0, e1, thick, gap, _role, taper, proj in selected:
+        panel = make_panel(name, a0, a1, e0, e1, thickness=thick, gap=gap,
+                           az_taper=taper, scale=proj)
         panel.data.materials.clear()
         panel.data.materials.append(graphite)
         panels.append(panel)

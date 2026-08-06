@@ -24,18 +24,46 @@ import bpy
 
 # Tri-axial spheroid: wider than tall, and slightly unequal front-to-back so no
 # two axes match. A perfectly round mass is what makes an object read as a planet.
-RADII = (1.06, 1.00, 0.92)  # x (width), y (depth), z (height)
+RADII = (1.08, 0.99, 0.92)  # x (width), y (depth), z (height)
+
+
+def envelope_flatten(az: float, el: float) -> float:
+    """
+    Broad manufactured flattening. Returns a radial multiplier.
+
+    Four deliberate regions, all shallow surface decisions rather than cuts:
+      * upper cap  — engineered rather than perfectly domed
+      * lower cap  — smaller, gives the mass physical weight
+      * Maps side  — slight lateral compression, makes one side directional
+      * rear side  — calm shallow recession
+    """
+    f = 1.0
+    el_deg, az_deg = math.degrees(el), math.degrees(az) % 360
+
+    if el_deg > 58:
+        f -= 0.055 * ((el_deg - 58) / 32) ** 1.5          # upper flat
+    if el_deg < -64:
+        f -= 0.035 * ((-el_deg - 64) / 26) ** 1.5         # lower flat
+
+    # Lateral compression centred on the Maps port azimuth (85 deg).
+    d_maps = abs(((az_deg - 85 + 180) % 360) - 180)
+    if d_maps < 46:
+        f -= 0.030 * math.cos(math.radians(d_maps * 90 / 46)) ** 2
+
+    # Calm rear recession centred on 200 deg.
+    d_rear = abs(((az_deg - 200 + 180) % 360) - 180)
+    if d_rear < 55:
+        f -= 0.022 * math.cos(math.radians(d_rear * 90 / 55)) ** 2
+
+    return f
 
 
 def spheroid_point(az: float, el: float, scale: float = 1.0):
-    """Point on the tri-axial spheroid. az in radians around Z, el from -pi/2 to pi/2."""
+    """Point on the flattened tri-axial envelope."""
+    s = scale * envelope_flatten(az, el)
     ca, sa = math.cos(az), math.sin(az)
     ce, se = math.cos(el), math.sin(el)
-    return (
-        RADII[0] * scale * ce * ca,
-        RADII[1] * scale * ce * sa,
-        RADII[2] * scale * se,
-    )
+    return (RADII[0] * s * ce * ca, RADII[1] * s * ce * sa, RADII[2] * s * se)
 
 
 def make_panel(
