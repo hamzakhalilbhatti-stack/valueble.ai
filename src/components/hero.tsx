@@ -20,7 +20,7 @@ export function Hero() {
     <section className="relative isolate min-h-[100svh] overflow-hidden">
       {/* Scene sits behind everything, bleeding past the fold. */}
       <div className="absolute inset-0 -z-10">
-        <BlockField className="h-full w-full" density={11} />
+        <BlockField className="h-full w-full" density={5} parallax={1} />
       </div>
 
       {/*
@@ -35,7 +35,9 @@ export function Hero() {
         a still — the blocks turn, and a highlight that is not there on load
         arrives four seconds later directly behind the text.
       */}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-black/45" />
+      {/* Kept light. A heavy flat wash was crushing the bright end of every
+          specular sweep, which is the only thing in the frame with any life. */}
+      <div aria-hidden className="absolute inset-0 -z-10 bg-black/15" />
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[radial-gradient(75%_60%_at_12%_28%,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.6)_45%,rgba(0,0,0,0)_100%)]"

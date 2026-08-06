@@ -169,11 +169,18 @@ export default function HomePage() {
 function SceneBreak() {
   return (
     <div className="relative h-[45svh] min-h-[18rem] w-full overflow-hidden md:h-[60svh]">
-      <BlockField className="h-full w-full" density={9} />
-      {/* Fades the strip into the black above and below it so it has no seams. */}
+      {/* Slightly larger than the hero, so the strip reads as a closer pass
+          through the same cluster rather than as a different scene. */}
+      <BlockField className="h-full w-full" density={5} seed={90210} scale={1.15} />
+      {/*
+        Fades the strip into the black above and below it. The stops are pulled
+        well inside the edges because the blocks are bright here — with a narrow
+        fade the canvas boundary showed as a hard horizontal cut across a lit
+        face.
+      */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#000_0%,transparent_22%,transparent_78%,#000_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.25)_32%,rgba(0,0,0,0.25)_58%,#000_100%)]"
       />
     </div>
   );
