@@ -153,6 +153,44 @@ def build_ribs(panel_names: set[str]) -> list:
     ]
 
 
+# ── Segmented seam backing ────────────────────────────────────────────
+# Local plates sitting just behind selected shell seams, so a narrow gap shows
+# STRUCTURE close behind rather than a 0.28-unit black shaft down to the
+# chassis. Deliberately segmented: a continuous shell at this radius would read
+# as a second sphere and would undo the chassis recession.
+#
+# name, az_from, az_to, el_from, el_to, radial, thickness
+BACKING = [
+    # The hero-facing junction (major_upper_rear | bridge_c at az 270).
+    ("backing_rear_bridge", 261, 279, -1.0, 50.5, 0.822, 0.030),
+    # bridge_c | major_upper_front at az 330.
+    ("backing_bridge_front", 321, 339, -1.0, 50.5, 0.816, 0.028),
+    # major_upper_front | port_maps_panel at az 65.
+    ("backing_front_maps", 56, 74, -1.0, 50.5, 0.816, 0.028),
+    # Lower shell junctions.
+    ("backing_lower_a", 61, 79, -54, -1.0, 0.810, 0.028),
+    ("backing_lower_b", 206, 224, -54, -1.0, 0.810, 0.028),
+    # Crown seam, in three arcs. Broken at the recess (105-123) so the rear
+    # opening keeps its deep view through to the 0.68 chassis.
+    ("backing_crown_a", 128, 262, 44.0, 54.0, 0.834, 0.026),
+    ("backing_crown_b", 280, 320, 44.0, 54.0, 0.834, 0.026),
+    ("backing_crown_c", 340, 420, 44.0, 54.0, 0.834, 0.026),
+]
+
+# Deliberately NOT backed, so depth hierarchy survives:
+#   * rear recess az 105-123      - deep view to the 0.68 chassis
+#   * the three future service chamber sites
+#   * the equatorial channel      - collar and ribs stay readable
+
+
+def build_backing() -> list:
+    """Segmented plates behind selected seams. Never a continuous layer."""
+    return [
+        make_panel(name, a0, a1, e0, e1, thickness=th, gap=0.0, scale=r)
+        for name, a0, a1, e0, e1, r, th in BACKING
+    ]
+
+
 def build_ports() -> list:
     """Three collars in one design family, differing in construction detail."""
     parts = []
@@ -243,6 +281,13 @@ def main() -> int:
         panel.data.materials.append(graphite)
         panels.append(panel)
 
+    # Backing is exterior-adjacent structure, so it carries the chassis
+    # material and stays visually subordinate to the shell panels.
+    backing = [] if proof else build_backing()
+    for b in backing:
+        b.data.materials.clear()
+        b.data.materials.append(core_mat)
+
     ribs = build_ribs({p.name for p in panels})
     for rib in ribs:
         rib.data.materials.clear()
@@ -280,7 +325,7 @@ def main() -> int:
             except Exception:
                 continue
 
-    all_objs = chassis_parts + ribs + panels + port_parts
+    all_objs = chassis_parts + backing + ribs + panels + port_parts
     tris = 0
     verts = 0
     depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -305,6 +350,7 @@ def main() -> int:
             "panels": len(panels),
             "port_parts": len(port_parts),
             "ribs": len(ribs),
+            "backing_segments": len(backing),
         },
     )
     return 0
