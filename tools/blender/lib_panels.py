@@ -109,58 +109,115 @@ def make_panel(
     return obj
 
 
-def make_chassis(scale: float = 0.735, port_dirs: list[tuple[float, float]] | None = None):
-    """
-    Recessed structural chassis — NOT a sphere.
+def surface_point(az_deg: float, el_deg: float, radial: float):
+    """Point at a given fraction of the spheroid radius. Used to seat ribs."""
+    az, el = math.radians(az_deg), math.radians(el_deg)
+    return (
+        RADII[0] * radial * math.cos(el) * math.cos(az),
+        RADII[1] * radial * math.cos(el) * math.sin(az),
+        RADII[2] * radial * math.sin(el),
+    )
 
-    The previous proof failed because a smooth core at 0.90 scale sat flush
-    against the panels and became the silhouette. This is a low-subdivision
-    icosphere (80 large planes, flat-shaded) with extra vertical compression,
-    recessed to ~0.735 so seams open onto real depth.
 
-    Ribs run outward toward each port so panels visibly land on structure
-    instead of floating over a void.
+def make_rib(name: str, az_deg: float, el_deg: float, base: float, tip: float,
+             r_start: float = 0.70, r_end: float = 0.93):
     """
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=1.0)
+    A tapered support member spanning chassis → panel.
+
+    The previous version placed free-standing cubes at mid-radius touching
+    neither end. This is built from the two endpoints, deliberately
+    over-running both (0.70 starts inside the chassis at 0.735; 0.93 ends
+    inside the panel inner face at ~0.89) so contact is guaranteed and no rib
+    can read as floating.
+
+    Tapered base→tip so load visibly travels outward: broad where it meets the
+    chassis, narrow where it meets the panel.
+    """
+    x0, y0, z0 = surface_point(az_deg, el_deg, r_start)
+    x1, y1, z1 = surface_point(az_deg, el_deg, r_end)
+    dx, dy, dz = x1 - x0, y1 - y0, z1 - z0
+    length = math.sqrt(dx * dx + dy * dy + dz * dz)
+
+    pitch = math.acos(max(-1.0, min(1.0, dz / length)))
+    yaw = math.atan2(dy, dx)
+
+    # 4-sided cone = tapered rectangular member, cheap and reads as machined.
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=4,
+        radius1=base,
+        radius2=tip,
+        depth=length,
+        location=((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2),
+        rotation=(0.0, pitch, yaw),
+    )
+    rib = bpy.context.active_object
+    rib.name = name
+    return rib
+
+
+def make_chassis(scale: float = 0.680, port_dirs: list[tuple[float, float]] | None = None):
+    """
+    Purpose-built inner chassis — a compressed engineered drum.
+
+    Replaces the subdivision-1 icosphere, whose triangular faceting risked the
+    gemstone read. A 16-sided drum gives broad controlled surfaces and genuinely
+    flat upper and lower regions, and its silhouette can never be mistaken for a
+    planet when glimpsed through a seam.
+
+    Returns a single JOINED mesh: drum + stepped collar + mounting zones. Joining
+    is what stops the collar reading as a separate saucer floating around a core.
+    """
+    parts = []
+
+    # ── Central drum. Flat top and bottom, broad vertical facets. ──
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.0, depth=1.0)
+    drum = bpy.context.active_object
+    drum.name = "Chassis"
+    drum.scale = (RADII[0] * scale, RADII[1] * scale, RADII[2] * scale * 1.02)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    parts.append(drum)
+
+    # ── Integrated stepped collar at the equator. ──
+    # Three shallow radial steps, each joined into the drum body, providing
+    # mounting surfaces for the bridge panels. Kept below the panel line so it
+    # is only ever seen through the channel and selected gaps.
+    for radial, height in ((scale + 0.020, 0.30), (scale + 0.048, 0.185), (scale + 0.072, 0.10)):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.0, depth=height)
+        step = bpy.context.active_object
+        step.name = f"ChassisCollarStep_{radial:.3f}"
+        step.scale = (RADII[0] * radial, RADII[1] * radial, 1.0)
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        parts.append(step)
+
+    # ── Three mounting zones aligned to the service ports. ──
+    # Raised pads on the drum that give the port collars something to seat
+    # against and mark each service region on the chassis itself.
+    for i, (az_deg, el_deg) in enumerate(port_dirs or []):
+        pad = make_rib(f"ChassisMount_{i}", az_deg, el_deg, 0.22, 0.17,
+                       r_start=0.60, r_end=scale + 0.06)
+        parts.append(pad)
+
+    # Join everything into one mesh so there is no unsupported separation.
+    bpy.ops.object.select_all(action="DESELECT")
+    for part in parts:
+        part.select_set(True)
+    bpy.context.view_layer.objects.active = drum
+    bpy.ops.object.join()
+
     chassis = bpy.context.active_object
     chassis.name = "Chassis"
-    # Flattened harder than the shell — glimpsed through a gap it must never
-    # read as a continuation of the outer sphere.
-    chassis.scale = (RADII[0] * scale, RADII[1] * scale, RADII[2] * scale * 0.88)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+    # Light bevel so the drum edges catch the key light rather than reading as
+    # a raw primitive, then flat shading to keep the surfaces broad.
+    bevel = chassis.modifiers.new("Bevel", "BEVEL")
+    bevel.width = 0.012
+    bevel.segments = 2
+    bevel.limit_method = "ANGLE"
+    bevel.angle_limit = math.radians(30)
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
     bpy.ops.object.shade_flat()
 
-    parts = [chassis]
-
-    # Equatorial support ring: gives the structural channel something to read
-    # at depth so it is an assembly zone rather than an empty black belt.
-    bpy.ops.mesh.primitive_cylinder_add(radius=1.0, depth=0.16, vertices=18)
-    ring = bpy.context.active_object
-    ring.name = "ChassisRing"
-    ring.scale = (RADII[0] * (scale + 0.085), RADII[1] * (scale + 0.085), 1.0)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    bpy.ops.object.shade_flat()
-    parts.append(ring)
-
-    # Radial ribs toward each port — the visible attachment logic.
-    for i, (az_deg, el_deg) in enumerate(port_dirs or []):
-        az, el = math.radians(az_deg), math.radians(el_deg)
-        inner = 0.62
-        outer = 0.90
-        mid = (inner + outer) / 2
-        cx = RADII[0] * mid * math.cos(el) * math.cos(az)
-        cy = RADII[1] * mid * math.cos(el) * math.sin(az)
-        cz = RADII[2] * mid * math.sin(el)
-
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, cy, cz))
-        rib = bpy.context.active_object
-        rib.name = f"ChassisRib_{i}"
-        rib.scale = (0.30, 0.30, 0.30)
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-        bpy.ops.object.shade_flat()
-        parts.append(rib)
-
-    return parts
+    return [chassis]
 
 
 def port_collar(name: str, az_deg: float, el_deg: float, outer: float, inner: float, depth: float):

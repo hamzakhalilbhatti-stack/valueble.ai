@@ -29,7 +29,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import bpy  # noqa: E402
 
 from lib_hardsurface import MODELS_DIR, export_glb, pbr_material, reset_scene  # noqa: E402
-from lib_panels import make_chassis, make_panel, port_collar  # noqa: E402
+from lib_panels import make_chassis, make_panel, make_rib, port_collar  # noqa: E402
 
 # Equatorial separation band: no panel occupies this elevation range except the
 # three bridges. This is what makes the channel structural rather than engraved.
@@ -62,6 +62,35 @@ PORTS = {
     "orderrise": (255, -30),  # on port_orderrise_panel
     "agents": (150, 66),      # on port_agents_cap
 }
+
+
+# Support ribs: (name, az, el, base_width, tip_width, panel_supported)
+# Only enough are exposed to explain the assembly - they must stay subordinate
+# to the shell panels, so most sit behind panel centres where they are unseen.
+RIBS = [
+    # Major-panel supports: broader and more stable.
+    ("rib_major_upper_front", 20, 26, 0.105, 0.062, "major_upper_front"),
+    ("rib_major_upper_rear", 152, 30, 0.100, 0.060, "major_upper_rear"),
+    ("rib_major_lower_front", 350, -32, 0.105, 0.062, "major_lower_front"),
+    ("rib_major_lower_rear", 140, -38, 0.098, 0.058, "major_lower_rear"),
+    # Port-region supports: directional, aligned with each port axis.
+    ("rib_port_maps", 85, 28, 0.088, 0.055, "port_maps_panel"),
+    ("rib_port_orderrise", 255, -30, 0.090, 0.056, "port_orderrise_panel"),
+    ("rib_port_agents", 150, 66, 0.082, 0.052, "port_agents_cap"),
+    # Bridge supports: narrower but structurally continuous across the channel.
+    ("rib_bridge_a", 41, 0, 0.070, 0.048, "bridge_a"),
+    ("rib_bridge_b", 158, 0, 0.068, 0.046, "bridge_b"),
+    ("rib_bridge_c", 272, 0, 0.070, 0.048, "bridge_c"),
+]
+
+
+def build_ribs(panel_names: set[str]) -> list:
+    """Tapered members spanning chassis to panel. Only build ribs whose panel exists."""
+    return [
+        make_rib(name, az, el, base, tip, r_start=0.64, r_end=0.94)
+        for name, az, el, base, tip, panel in RIBS
+        if panel in panel_names
+    ]
 
 
 def build_ports() -> list:
@@ -129,7 +158,7 @@ def main() -> int:
     proof = "--proof" in sys.argv
     reset_scene()
 
-    chassis_parts = make_chassis(scale=0.735, port_dirs=list(PORTS.values()))
+    chassis_parts = make_chassis(scale=0.680, port_dirs=list(PORTS.values()))
     graphite = pbr_material("Graphite", (0.055, 0.061, 0.078), 0.18, 0.52)
     core_mat = pbr_material("CoreDark", (0.020, 0.023, 0.030), 0.30, 0.62)
     for part in chassis_parts:
@@ -150,6 +179,11 @@ def main() -> int:
         panel.data.materials.clear()
         panel.data.materials.append(graphite)
         panels.append(panel)
+
+    ribs = build_ribs({p.name for p in panels})
+    for rib in ribs:
+        rib.data.materials.clear()
+        rib.data.materials.append(core_mat)
 
     port_parts = []
     if proof:
@@ -183,7 +217,7 @@ def main() -> int:
             except Exception:
                 continue
 
-    all_objs = chassis_parts + panels + port_parts
+    all_objs = chassis_parts + ribs + panels + port_parts
     tris = 0
     verts = 0
     depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -207,6 +241,7 @@ def main() -> int:
             "meshes": len(all_objs),
             "panels": len(panels),
             "port_parts": len(port_parts),
+            "ribs": len(ribs),
         },
     )
     return 0
