@@ -103,8 +103,13 @@ def make_panel(
 
     # Resolution follows angular size, so small panels do not carry the same
     # vertex budget as large ones.
-    n_az = segments_az or max(6, min(40, int(span_az / 4.5)))
-    n_el = segments_el or max(4, min(30, int(span_el / 4.5)))
+    #
+    # 2.0 deg per quad, not 4.5. At 4.5 the curvature read as visible faceting
+    # in dark mode - flat quads catching the key light as discrete planes, which
+    # is the single thing that made the object look low-poly rather than
+    # manufactured. Smooth shading cannot rescue geometry that coarse.
+    n_az = segments_az or max(8, min(110, int(span_az / 2.0)))
+    n_el = segments_el or max(6, min(80, int(span_el / 2.0)))
 
     mesh = bpy.data.meshes.new(name)
     obj = bpy.data.objects.new(name, mesh)
@@ -208,7 +213,7 @@ def make_chassis(scale: float = 0.680, port_dirs: list[tuple[float, float]] | No
     parts = []
 
     # ── Central drum. Flat top and bottom, broad vertical facets. ──
-    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.0, depth=1.0)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=1.0, depth=1.0)
     drum = bpy.context.active_object
     drum.name = "Chassis"
     drum.scale = (RADII[0] * scale, RADII[1] * scale, RADII[2] * scale * 1.02)
@@ -220,7 +225,7 @@ def make_chassis(scale: float = 0.680, port_dirs: list[tuple[float, float]] | No
     # mounting surfaces for the bridge panels. Kept below the panel line so it
     # is only ever seen through the channel and selected gaps.
     for radial, height in ((scale + 0.020, 0.30), (scale + 0.048, 0.185), (scale + 0.072, 0.10)):
-        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.0, depth=height)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=1.0, depth=height)
         step = bpy.context.active_object
         step.name = f"ChassisCollarStep_{radial:.3f}"
         step.scale = (RADII[0] * radial, RADII[1] * radial, 1.0)
