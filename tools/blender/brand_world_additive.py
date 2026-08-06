@@ -40,7 +40,7 @@ PANELS = [
     # name, az_from, az_to, el_from, el_to, thickness, gap_deg, role
     # ── 4 major panels — establish the mass and the silhouette (0.11-0.12) ──
     ("major_upper_front", 315, 425, 2.0, 49, 0.115, 1.5, "major"),
-    ("major_upper_rear", 105, 200, 2.0, 52, 0.118, 1.5, "major"),
+    ("major_upper_rear", 105, 240, 2.0, 52, 0.118, 1.5, "major"),
     ("major_lower_front", 296, 430, -57, -2.0, 0.112, 1.5, "major"),
     ("major_lower_rear", 70, 215, -90, -2.0, 0.110, 1.5, "major"),
     # ── 3 port-surround panels — thinner, so collars read as the thick part ──
@@ -50,12 +50,13 @@ PANELS = [
     # ── 3 structural bridges — thickest; they carry load across the channel ──
     ("bridge_a", 28, 54, CHANNEL_LO, CHANNEL_HI, 0.120, 0.5, "bridge"),
     ("bridge_b", 148, 168, CHANNEL_LO, CHANNEL_HI, 0.118, 0.5, "bridge"),
-    ("bridge_c", 258, 286, CHANNEL_LO, CHANNEL_HI, 0.120, 0.5, "bridge"),
+    ("bridge_c", 240, 278, CHANNEL_LO, 34, 0.120, 0.9, "transition"),
 ]
 
-# Deliberate recessed region: azimuth 200-315 above the channel carries no major
-# panel, exposing the core. This is the "one recessed side region" that breaks
-# the silhouette without hacking chunks out of it.
+# Controlled recess: azimuth 278-315 above the channel (37 degrees) exposes
+# chassis depth as a secondary side detail. The first attempt left 115 degrees
+# open, which read as a missing quarter of the shell rather than a design
+# feature. bridge_c now spans channel-to-upper-shell to close the rest.
 
 PORTS = {
     "maps": (85, 28),        # az, el — on port_maps_panel
@@ -80,7 +81,7 @@ RIBS = [
     # Bridge supports: narrower but structurally continuous across the channel.
     ("rib_bridge_a", 41, 0, 0.070, 0.048, "bridge_a"),
     ("rib_bridge_b", 158, 0, 0.068, 0.046, "bridge_b"),
-    ("rib_bridge_c", 272, 0, 0.070, 0.048, "bridge_c"),
+    ("rib_bridge_c", 259, 14, 0.082, 0.052, "bridge_c"),
 ]
 
 
