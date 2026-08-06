@@ -1,8 +1,10 @@
+import { SceneBackdrop } from "@/components/scene-backdrop";
 import { BoxButton } from "@/components/ui";
 
 export default function NotFound() {
   return (
-    <section className="flex min-h-[80svh] items-center pb-24 pt-40">
+    <section className="relative isolate flex min-h-[80svh] items-center overflow-hidden pb-24 pt-40">
+      <SceneBackdrop density={3} seed={4040} />
       <div className="rail">
         <p className="eyebrow">404</p>
         <div className="measure">

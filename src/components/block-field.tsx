@@ -44,14 +44,34 @@ type Block = {
   drift: number;
 };
 
-function useBlocks(count: number, seed: number, scale: number): Block[] {
+function useBlocks(
+  count: number,
+  seed: number,
+  scale: number,
+  clearCentre: boolean,
+): Block[] {
   return useMemo(() => {
     const rand = rng(seed);
     return Array.from({ length: count }, () => {
       const base = (1.9 + rand() * 1.5) * scale;
+
+      /*
+       * Horizontal placement.
+       *
+       * On pages whose headline runs through the middle of the frame, blocks
+       * are pushed out to either side to leave a corridor. Scrims alone could
+       * not solve this: a face turning to catch the key light goes near-white,
+       * and no amount of overlay makes white type legible on it. Moving the
+       * geometry is the only fix that holds at every frame of the animation.
+       */
+      const spread = (rand() - 0.5) * 11;
+      const x = clearCentre
+        ? Math.sign(spread || 1) * (3.6 + Math.abs(spread) * 0.7)
+        : spread;
+
       return {
         position: [
-          (rand() - 0.5) * 11,
+          x,
           (rand() - 0.5) * 6.5,
           // Spread in depth so some read as near and some as far. Everything at
           // one depth flattens the frame into a pattern.
@@ -65,7 +85,7 @@ function useBlocks(count: number, seed: number, scale: number): Block[] {
         drift: rand() * Math.PI * 2,
       } satisfies Block;
     });
-  }, [count, seed, scale]);
+  }, [count, seed, scale, clearCentre]);
 }
 
 function Blocks({
@@ -142,21 +162,42 @@ function Blocks({
           rotation={block.rotation}
         >
           {/*
-            Metalness is deliberately zero. A metal tints its reflections by
-            its own base colour, so a near-black metal reflects near-black and
-            the whole field disappears — which is exactly what happened on an
-            earlier pass. A black *dielectric* keeps an untinted white specular
-            over an unlit body, which is what polished dark glass actually is.
+            Real transmissive glass — light passes through the solid and
+            refracts, so you see the far faces and whatever sits behind.
+
+            Two things about transmission are counter-intuitive and both bit
+            this scene:
+
+            `color` must stay white. On an opaque surface colour is what you
+            see; on a transmissive one it multiplies the light *coming
+            through*, so a black colour absorbs everything and the block turns
+            into a flat black cutout — which is the exact opposite of glass.
+            The smoke tint has to come from attenuation instead.
+
+            `attenuationColor` with `attenuationDistance` is the physical way
+            to darken it: light is absorbed as it travels through the volume,
+            so thin parts stay clear and thick parts go dark. That gradient
+            across a single block is what makes it read as a solid rather than
+            a tinted sheet.
+
+            Metalness stays zero. A metal tints reflections by its own base
+            colour and admits no transmission at all.
           */}
           <meshPhysicalMaterial
-            color="#000000"
+            color="#ffffff"
             metalness={0}
-            roughness={0.02}
+            roughness={0.05}
+            transmission={1}
+            // Thickness drives how far light travels inside, so it has to
+            // track block size or big blocks read as thin shells.
+            thickness={block.size[0] * 0.9}
+            attenuationColor="#333a47"
+            attenuationDistance={1.0}
+            ior={1.52}
             clearcoat={1}
-            clearcoatRoughness={0.01}
+            clearcoatRoughness={0.02}
             reflectivity={1}
-            ior={1.9}
-            envMapIntensity={2.2}
+            envMapIntensity={1.5}
           />
         </RoundedBox>
       ))}
@@ -195,7 +236,7 @@ function Studio() {
         {/* Key — a tall bright panel high and right. Carries the main sweep. */}
         <Lightformer
           form="rect"
-          intensity={8}
+          intensity={6.5}
           position={[6, 4, 4]}
           rotation={[0, -Math.PI / 3, 0]}
           scale={[11, 17, 1]}
@@ -266,7 +307,7 @@ function Studio() {
         */}
         <Lightformer
           form="rect"
-          intensity={1.15}
+          intensity={0.55}
           position={[0, 0, 12]}
           scale={[34, 22, 1]}
           color="#dfe4ee"
@@ -292,6 +333,7 @@ export function BlockField({
   seed = 20260806,
   scale = 1,
   parallax = 0,
+  clearCentre = false,
 }: {
   className?: string;
   /** Deliberately low. Few large blocks; a crowd of small ones reads as debris. */
@@ -300,8 +342,10 @@ export function BlockField({
   scale?: number;
   /** Enables the scroll-driven camera. Hero only. */
   parallax?: number;
+  /** Leaves a corridor down the middle for pages with centred headlines. */
+  clearCentre?: boolean;
 }) {
-  const blocks = useBlocks(density, seed, scale);
+  const blocks = useBlocks(density, seed, scale, clearCentre);
 
   return (
     <div className={className} aria-hidden>
@@ -313,7 +357,7 @@ export function BlockField({
           // Without tone mapping the specular sweeps clip to a flat white slab
           // and the gradient across each face is lost.
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1;
+          gl.toneMappingExposure = 0.82;
         }}
       >
         <Studio />

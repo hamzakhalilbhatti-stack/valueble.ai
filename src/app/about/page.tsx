@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SceneBackdrop, SceneBreak } from "@/components/scene-backdrop";
 import { Body, BoxButton, Head, Section } from "@/components/ui";
 import { products, site, whatsappUrl } from "@/lib/site";
 
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <section className="pb-20 pt-40 md:pb-28 md:pt-56">
+      <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
+        <SceneBackdrop density={4} seed={3307} />
         <div className="rail">
           <p className="eyebrow reveal">About</p>
           <div className="measure">
@@ -59,6 +61,8 @@ export default function AboutPage() {
           ))}
         </ul>
       </Section>
+
+      <SceneBreak seed={3862} />
 
       <Section label="How I work">
         <Head>Honest scope beats an impressive demo</Head>

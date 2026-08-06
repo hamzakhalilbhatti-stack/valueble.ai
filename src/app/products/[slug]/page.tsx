@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SceneBackdrop, SceneBreak } from "@/components/scene-backdrop";
 import { ArrowUpRight, Body, BoxButton, Head, Section } from "@/components/ui";
 import { getProduct, productCta, products } from "@/lib/site";
 
@@ -33,11 +34,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   return (
     <>
       {/*
-        Product heroes are typographic, not scenic. The block field belongs to
-        the brand as a whole; repeating it on every product page would make
-        three different things look like the same thing.
+        Each product gets the same scene at a different seed, so the arrangement
+        of blocks differs page to page while the material stays identical. Same
+        world, different corner of it.
       */}
-      <section className="pb-20 pt-40 md:pb-28 md:pt-56">
+      <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
+        <SceneBackdrop density={4} seed={product.seed} />
         <div className="rail">
           <p className="eyebrow reveal">
             {product.index} · {product.kind}
@@ -91,6 +93,9 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
           ))}
         </ol>
       </Section>
+
+      {/* Offset seed so the interstitial is not a repeat of the hero above. */}
+      <SceneBreak seed={product.seed + 555} />
 
       <Section label="What you get">
         <Head>Everything it does</Head>

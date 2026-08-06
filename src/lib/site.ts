@@ -74,6 +74,11 @@ export type Product = {
   name: string;
   /** Short kicker used in nav and index rows. */
   kind: string;
+  /**
+   * Seeds the block-field arrangement on this product's hero. Different seed
+   * per product, so each page shows a different corner of the same world.
+   */
+  seed: number;
   tagline: string;
   /** One-paragraph summary used on the home index and in metadata. */
   summary: string;
@@ -104,6 +109,7 @@ export const products: Product[] = [
     index: "01",
     name: "Maps Lead Scraper",
     kind: "Chrome extension",
+    seed: 4021,
     tagline: "Turn any Google Maps search into a scored, contactable lead list.",
     summary:
       "A Chrome extension that reads a Google Maps result set, follows each business to its own website, and pulls out the contact surface — emails, phones, socials — then scores every lead and hands you a spreadsheet instead of forty browser tabs.",
@@ -182,6 +188,7 @@ export const products: Product[] = [
     index: "02",
     name: "OrderRise",
     kind: "WhatsApp AI agent",
+    seed: 7734,
     tagline: "A restaurant's WhatsApp, answered instantly — even at 11pm on a Friday.",
     summary:
       "An AI ordering assistant that lives in the WhatsApp number a restaurant already gives out. It shows the menu, builds the cart, takes delivery details, and drops a finished order onto the kitchen screen.",
@@ -258,6 +265,7 @@ export const products: Product[] = [
     index: "03",
     name: "Custom AI Agents",
     kind: "Built for your business",
+    seed: 1518,
     tagline: "The repetitive part of your operation, handed to something that does not get tired.",
     summary:
       "Agents built around one specific process you already run — qualifying inbound leads, answering the same forty questions, moving data between tools that were never meant to talk. Scoped to a real workflow, not a demo.",

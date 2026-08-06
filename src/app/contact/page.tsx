@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SceneBackdrop, SceneBreak } from "@/components/scene-backdrop";
 import { ArrowUpRight, Body, Head, Section } from "@/components/ui";
 import { contact, products, productCta, whatsappUrl } from "@/lib/site";
 
@@ -45,7 +46,8 @@ const channels = [
 export default function ContactPage() {
   return (
     <>
-      <section className="pb-20 pt-40 md:pb-28 md:pt-56">
+      <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
+        <SceneBackdrop density={4} seed={6190} />
         <div className="rail">
           <p className="eyebrow reveal">Contact</p>
           <div className="measure">
@@ -81,6 +83,8 @@ export default function ContactPage() {
           ))}
         </ul>
       </Section>
+
+      <SceneBreak seed={6745} />
 
       <Section label="What helps">
         <Head>Three things make the first reply useful</Head>

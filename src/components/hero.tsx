@@ -1,51 +1,12 @@
-"use client";
-
-import dynamic from "next/dynamic";
+import { SceneBackdrop } from "@/components/scene-backdrop";
 import { BoxButton } from "@/components/ui";
 import { whatsappUrl } from "@/lib/site";
-
-/**
- * The block field is client-only: it touches WebGL on mount, and server
- * rendering it produces an empty canvas that flashes on hydrate. The fallback
- * is plain black, which is also the scene's background — so a device that
- * cannot run WebGL sees a deliberate empty frame rather than a broken one.
- */
-const BlockField = dynamic(
-  () => import("@/components/block-field").then((m) => m.BlockField),
-  { ssr: false, loading: () => null },
-);
 
 export function Hero() {
   return (
     <section className="relative isolate min-h-[100svh] overflow-hidden">
-      {/* Scene sits behind everything, bleeding past the fold. */}
-      <div className="absolute inset-0 -z-10">
-        <BlockField className="h-full w-full" density={5} parallax={1} />
-      </div>
-
-      {/*
-        Three scrims, because copy sits in two opposite corners and a single
-        vignette can only protect one of them.
-
-        1. A flat wash that drops the whole scene back toward black.
-        2. A radial under the headline, top left.
-        3. A soft one under the supporting paragraph, bottom right.
-
-        Contrast was measured against the brightest frame of the animation, not
-        a still — the blocks turn, and a highlight that is not there on load
-        arrives four seconds later directly behind the text.
-      */}
-      {/* Kept light. A heavy flat wash was crushing the bright end of every
-          specular sweep, which is the only thing in the frame with any life. */}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-black/15" />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(75%_60%_at_12%_28%,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.6)_45%,rgba(0,0,0,0)_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_78%_78%,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.5)_50%,rgba(0,0,0,0)_100%)]"
-      />
+      {/* Copy sits in two opposite corners here, so both get a scrim. */}
+      <SceneBackdrop density={5} parallax={1} focus="split" />
 
       <div className="relative flex min-h-[100svh] flex-col justify-between pb-10 pt-40 md:pb-14 md:pt-48">
         <div className="mx-auto w-full max-w-[96rem] px-6 md:px-[3.25rem]">
@@ -56,8 +17,8 @@ export function Hero() {
 
         {/*
           The supporting paragraph sits low and right, well away from the
-          headline. Two blocks of text in the same corner would read as a
-          normal hero; separated across the frame, the emptiness between them
+          headline. Two blocks of text in the same corner would read as an
+          ordinary hero; separated across the frame, the emptiness between them
           is doing the work.
         */}
         <div className="mx-auto w-full max-w-[96rem] px-6 md:px-[3.25rem]">

@@ -1,12 +1,8 @@
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { Hero } from "@/components/hero";
+import { SceneBreak } from "@/components/scene-backdrop";
 import { ArrowUpRight, Body, BoxButton, Head, List, Section } from "@/components/ui";
 import { contact, products, whatsappUrl } from "@/lib/site";
-
-const BlockField = dynamic(() =>
-  import("@/components/block-field").then((m) => m.BlockField),
-);
 
 /**
  * Home.
@@ -158,30 +154,5 @@ export default function HomePage() {
         </div>
       </Section>
     </>
-  );
-}
-
-/**
- * The scene, full-bleed, as a break between arguments — the same role the
- * reference's video interstitials play. Deliberately shallow: it is punctuation,
- * not a second hero.
- */
-function SceneBreak() {
-  return (
-    <div className="relative h-[45svh] min-h-[18rem] w-full overflow-hidden md:h-[60svh]">
-      {/* Slightly larger than the hero, so the strip reads as a closer pass
-          through the same cluster rather than as a different scene. */}
-      <BlockField className="h-full w-full" density={5} seed={90210} scale={1.15} />
-      {/*
-        Fades the strip into the black above and below it. The stops are pulled
-        well inside the edges because the blocks are bright here — with a narrow
-        fade the canvas boundary showed as a hard horizontal cut across a lit
-        face.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.25)_32%,rgba(0,0,0,0.25)_58%,#000_100%)]"
-      />
-    </div>
   );
 }
