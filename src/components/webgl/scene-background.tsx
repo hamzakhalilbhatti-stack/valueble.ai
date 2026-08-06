@@ -90,7 +90,9 @@ export function SceneBackground({ onReady }: { onReady?: () => void }) {
   if (!enabled) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+    // Demoted to a quiet backdrop. The product demonstrations now carry the
+    // page; the scene supports them rather than competing for attention.
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 opacity-[0.18]">
       <Canvas
         // Capped so high-DPR laptops don't quietly render several times the pixels.
         dpr={compact ? [1, 1.25] : [1, 1.75]}

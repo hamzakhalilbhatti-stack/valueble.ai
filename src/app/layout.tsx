@@ -80,7 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add("js")`,
+            __html: `document.documentElement.classList.add("js");setTimeout(function(){document.documentElement.classList.add("reveal-done")},2500);`,
           }}
         />
       </head>

@@ -22,6 +22,11 @@ export function SmoothScroll() {
       touchMultiplier: 1.6,
     });
 
+    // Browsers restore the previous scroll on reload, which dropped visitors
+    // into the middle of the hero.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
     registerLenis(lenis);
 
     let frame = requestAnimationFrame(function raf(time: number) {

@@ -160,6 +160,18 @@
     opacity: 0;
     transform: translateY(1.75rem);
   }
+
+  /*
+   * Hard safety net. A watchdog adds `.reveal-done` to <html> a few seconds
+   * after load, and from that point nothing can remain hidden for any reason —
+   * a stalled IntersectionObserver, a transition interrupted by WebGL boot, a
+   * throttled tab. Content staying invisible is a far worse failure than a
+   * reveal that does not animate, and this page has hit that repeatedly.
+   */
+  html.reveal-done .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ── View transitions ───────────────────────────────────────────────
