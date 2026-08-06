@@ -25,6 +25,7 @@ export function SceneBackdrop({
   seed,
   scale = 1,
   parallax = 0,
+  formation = 0.72,
   /** Where the copy sits, so the heavy scrim goes under it. */
   focus = "measure",
 }: {
@@ -33,6 +34,12 @@ export function SceneBackdrop({
   seed?: number;
   scale?: number;
   parallax?: number;
+  /**
+   * How resolved the blocks sit. Product and about pages default to mostly
+   * settled — the visitor is already past the pitch, so the scene should read
+   * as the finished system rather than replay the argument for it.
+   */
+  formation?: number;
   /**
    * `split`  — home hero: headline far left, support copy bottom right.
    * `measure`— every other page: copy in the rail's content column, which
@@ -51,6 +58,7 @@ export function SceneBackdrop({
           seed={seed}
           scale={scale}
           parallax={parallax}
+          formation={formation}
           // The home hero puts its headline hard left, so the middle is free.
           // Every other page runs copy through the centre and needs it kept clear.
           clearCentre={focus === "measure"}
@@ -104,10 +112,27 @@ export function SceneBackdrop({
  * reference build gives its video interstitials. Deliberately shallow: this is
  * a breath, not a second hero.
  */
-export function SceneBreak({ seed = 90210 }: { seed?: number }) {
+export function SceneBreak({
+  seed = 90210,
+  /**
+   * Fully resolved by default. On the home page this strip sits between "the
+   * problem" and "the solution", so an aligned formation renders the
+   * argument's turning point rather than stating it.
+   */
+  formation = 1,
+}: {
+  seed?: number;
+  formation?: number;
+}) {
   return (
     <div className="relative h-[45svh] min-h-[18rem] w-full overflow-hidden md:h-[60svh]">
-      <BlockField className="h-full w-full" density={5} seed={seed} scale={1.15} />
+      <BlockField
+        className="h-full w-full"
+        density={5}
+        seed={seed}
+        scale={1.15}
+        formation={formation}
+      />
       {/*
         Fades the strip into the black above and below it. The stops sit well
         inside the edges because the blocks are bright here — with a narrow fade

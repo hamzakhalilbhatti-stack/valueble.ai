@@ -9,9 +9,14 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 /**
  * The block field — the one visual on the site.
  *
- * A few very large cubes of mirror-polished dark glass, tumbling slowly against
- * black. The blocks are the brand mark: separate systems, same material, moving
- * together.
+ * A few very large blocks of dark transmissive glass. It is not decoration: the
+ * scene states the business.
+ *
+ * Blocks begin unsorted, unaligned and tumbling — work as it actually arrives —
+ * and resolve into an even, level row over the first few seconds. Same work, run
+ * as a system. Three of them carry the product accents and land in the same
+ * left-to-right order as the index rows beneath the hero, so once it settles the
+ * picture is literally what is for sale rather than an abstract mood.
  *
  * Proportions were taken off the reference frame by frame rather than guessed.
  * The things that actually carry the look, in order of importance:
@@ -37,13 +42,31 @@ function rng(seed: number) {
   };
 }
 
+type Vec3 = [number, number, number];
+
 type Block = {
-  position: [number, number, number];
-  rotation: [number, number, number];
-  size: [number, number, number];
+  /** Where it starts: unsorted, unaligned, drifting. */
+  chaos: { position: Vec3; rotation: Vec3 };
+  /** Where it ends: placed, level, square to camera. */
+  order: { position: Vec3; rotation: Vec3 };
+  size: Vec3;
   spin: [number, number];
   drift: number;
+  /** Set on the three product blocks. Tints the glass. */
+  accent: string | null;
 };
+
+/**
+ * The three product accents, in the same left-to-right order as the index rows
+ * under the hero. This is the whole reason the scene means anything: once the
+ * blocks settle, the teal one sits above "01 Maps Lead Scraper", the amber
+ * above "02 OrderRise", the violet above "03 Custom AI Agents". The visual
+ * stops being an abstract mood and becomes a picture of what is for sale.
+ */
+const PRODUCT_ACCENTS = ["#128a72", "#9c5a08", "#4a37a8"];
+
+/** Shared resting rotation. Identical across blocks is what reads as "aligned". */
+const RESTING_ROTATION: Vec3 = [0, -0.32, 0];
 
 function useBlocks(
   count: number,
@@ -53,11 +76,16 @@ function useBlocks(
 ): Block[] {
   return useMemo(() => {
     const rand = rng(seed);
-    return Array.from({ length: count }, () => {
-      const base = (1.9 + rand() * 1.5) * scale;
+
+    // The first three are the products and get the accents and the front row.
+    const featured = Math.min(3, count);
+
+    return Array.from({ length: count }, (_, i) => {
+      const isProduct = i < featured;
+      const base = (isProduct ? 2.1 : 1.6 + rand() * 1.2) * scale;
 
       /*
-       * Horizontal placement.
+       * Horizontal placement in the scattered state.
        *
        * On pages whose headline runs through the middle of the frame, blocks
        * are pushed out to either side to leave a corridor. Scrims alone could
@@ -66,52 +94,144 @@ function useBlocks(
        * geometry is the only fix that holds at every frame of the animation.
        */
       const spread = (rand() - 0.5) * 11;
-      const x = clearCentre
+      const chaosX = clearCentre
         ? Math.sign(spread || 1) * (3.6 + Math.abs(spread) * 0.7)
         : spread;
 
-      return {
+      const chaos = {
         position: [
-          x,
+          chaosX,
           (rand() - 0.5) * 6.5,
           // Spread in depth so some read as near and some as far. Everything at
           // one depth flattens the frame into a pattern.
           (rand() - 0.5) * 7 - 1,
-        ],
-        rotation: [rand() * Math.PI, rand() * Math.PI, rand() * Math.PI],
+        ] as Vec3,
+        rotation: [rand() * Math.PI, rand() * Math.PI, rand() * Math.PI] as Vec3,
+      };
+
+      /*
+       * The resolved state.
+       *
+       * Products land in an evenly spaced front row. Everything else retreats
+       * into a calm back rank, out of the way and out of focus — the supporting
+       * blocks exist to give the row depth, not to compete with it.
+       *
+       * Where a corridor is required the row splits either side of it, because
+       * legibility of the copy outranks the tidiness of the formation.
+       */
+      const slot = isProduct ? i - (featured - 1) / 2 : 0;
+      const backX = clearCentre
+        ? Math.sign(spread || 1) * (5.2 + (i % 3) * 1.4)
+        : (rand() - 0.5) * 13;
+
+      const order = {
+        position: (isProduct
+          ? clearCentre
+            ? [Math.sign(slot || 1) * 4.6, slot * 1.9, -0.5]
+            : [slot * 4.3, -0.4, 0]
+          : [backX, (rand() - 0.5) * 5, -5.5 - rand() * 2]) as Vec3,
+        rotation: RESTING_ROTATION,
+      };
+
+      return {
+        chaos,
+        order,
         // Near-cubic. The small variation stops them reading as a tiled set.
-        size: [base, base * (0.86 + rand() * 0.28), base * (0.86 + rand() * 0.28)],
+        size: [base, base * (0.86 + rand() * 0.28), base * (0.86 + rand() * 0.28)] as Vec3,
         // Two independent axes, so no two blocks tumble in step.
         spin: [(rand() - 0.5) * 0.5, (rand() - 0.5) * 0.5],
         drift: rand() * Math.PI * 2,
+        accent: isProduct ? PRODUCT_ACCENTS[i] : null,
       } satisfies Block;
     });
   }, [count, seed, scale, clearCentre]);
 }
 
+/**
+ * Timing of the hero's resolve, in seconds. Long enough to be watched rather
+ * than glimpsed; short enough that it has finished before anyone scrolls.
+ */
+const RESOLVE_DELAY = 0.7;
+const RESOLVE_DURATION = 3.4;
+
+/** Smoothstep — eases both ends, so nothing starts or stops abruptly. */
+function ease(x: number) {
+  const c = Math.min(1, Math.max(0, x));
+  return c * c * (3 - 2 * c);
+}
+
 function Blocks({
   blocks,
   parallax,
+  formation,
 }: {
   blocks: Block[];
   /** 0 disables scroll response — used for the mid-page interstitial. */
   parallax: number;
+  /**
+   * Fixed resolve amount, 0–1, for scenes that should simply sit at a given
+   * state. Ignored on the hero, which plays the resolve on a timer.
+   */
+  formation: number;
 }) {
   const group = useRef<THREE.Group>(null);
   const meshes = useRef<(THREE.Mesh | null)[]>([]);
   const scroll = useRef(0);
 
-  useFrame(({ clock, pointer, camera }, delta) => {
+  useFrame(({ clock, pointer, camera }) => {
     const t = clock.elapsedTime;
-    // Clamp so a backgrounded tab does not resume with one enormous jump.
-    const step = Math.min(delta, 0.05);
+
+    /*
+     * Scroll progress. Read from the DOM in the frame loop rather than from a
+     * scroll event, because Lenis animates scroll position outside the event
+     * loop and a listener would quantise the motion into steps.
+     */
+    if (parallax > 0) {
+      const target = Math.min(1, window.scrollY / window.innerHeight);
+      scroll.current += (target - scroll.current) * 0.06;
+    }
+
+    /*
+     * The resolve — the thing that makes the scene say something.
+     *
+     * Blocks start unsorted, unaligned and tumbling — work as it actually
+     * arrives — and settle into an even, level row: the same work, run as a
+     * system. The three tinted blocks land in the same left-to-right order as
+     * the product index directly beneath them, so what you end up looking at
+     * is a picture of what is for sale.
+     *
+     * It plays on a timer, not on scroll. Tied to scroll it only finished as
+     * the hero was leaving the viewport, which meant nobody ever saw it land —
+     * the entire point of the animation was happening off screen. On a clock
+     * it reads in the first few seconds without the visitor doing anything.
+     *
+     * Everything below derives from this one number, so there is no state to
+     * fall out of sync.
+     */
+    const p =
+      parallax > 0 ? ease((t - RESOLVE_DELAY) / RESOLVE_DURATION) : ease(formation);
+    const chaosAmount = 1 - p;
 
     meshes.current.forEach((mesh, i) => {
       if (!mesh) return;
-      const block = blocks[i];
-      mesh.rotation.x += block.spin[0] * step * 0.14;
-      mesh.rotation.y += block.spin[1] * step * 0.14;
-      mesh.position.y = block.position[1] + Math.sin(t * 0.16 + block.drift) * 0.3;
+      const b = blocks[i];
+
+      // Tumbling decays to nothing as the formation resolves.
+      const tumble = t * 0.14 * chaosAmount;
+      mesh.rotation.set(
+        b.chaos.rotation[0] * chaosAmount + b.order.rotation[0] * p + b.spin[0] * tumble,
+        b.chaos.rotation[1] * chaosAmount + b.order.rotation[1] * p + b.spin[1] * tumble,
+        b.chaos.rotation[2] * chaosAmount + b.order.rotation[2] * p,
+      );
+
+      // Idle drift fades out too — a resolved system should look settled.
+      const drift = Math.sin(t * 0.16 + b.drift) * 0.3 * chaosAmount;
+
+      mesh.position.set(
+        b.chaos.position[0] * chaosAmount + b.order.position[0] * p,
+        b.chaos.position[1] * chaosAmount + b.order.position[1] * p + drift,
+        b.chaos.position[2] * chaosAmount + b.order.position[2] * p,
+      );
     });
 
     if (group.current) {
@@ -124,24 +244,13 @@ function Blocks({
     }
 
     if (parallax > 0) {
-      /*
-       * Scroll-driven camera.
-       *
-       * This is the part a pre-rendered video cannot do: as the page moves the
-       * camera actually travels through the cluster, so near blocks slide past
-       * far ones at different rates. That differential is what reads as depth.
-       *
-       * Read from the DOM rather than from a scroll event, because Lenis
-       * animates scroll position outside the event loop and a listener would
-       * quantise the motion into steps.
-       */
-      const target = Math.min(1, window.scrollY / window.innerHeight);
-      scroll.current += (target - scroll.current) * 0.06;
-      const p = scroll.current;
-
-      camera.position.z = 8.5 - p * 3.2;
-      camera.position.y = p * 1.1;
-      camera.rotation.x = -p * 0.09;
+      // The camera travels through the cluster as the page moves, so near
+      // blocks slide past far ones at different rates. That differential is
+      // the depth cue a pre-rendered video cannot produce.
+      const s = scroll.current;
+      camera.position.z = 8.5 - s * 2.4;
+      camera.position.y = s * 0.8;
+      camera.rotation.x = -s * 0.07;
     }
   });
 
@@ -159,8 +268,6 @@ function Blocks({
           // block size the bevel has to grow with it to stay visible.
           radius={0.09}
           smoothness={3}
-          position={block.position}
-          rotation={block.rotation}
         >
           {/*
             Real transmissive glass — light passes through the solid and
@@ -192,8 +299,10 @@ function Blocks({
             // Thickness drives how far light travels inside, so it has to
             // track block size or big blocks read as thin shells.
             thickness={block.size[0] * 0.9}
-            attenuationColor="#333a47"
-            attenuationDistance={1.0}
+            // Product blocks are tinted; the supporting rank stays neutral so
+            // it recedes rather than competing with them.
+            attenuationColor={block.accent ?? "#333a47"}
+            attenuationDistance={block.accent ? 0.85 : 1.0}
             ior={1.52}
             clearcoat={1}
             clearcoatRoughness={0.02}
@@ -335,6 +444,7 @@ export function BlockField({
   scale = 1,
   parallax = 0,
   clearCentre = false,
+  formation = 1,
 }: {
   className?: string;
   /** Deliberately low. Few large blocks; a crowd of small ones reads as debris. */
@@ -345,6 +455,11 @@ export function BlockField({
   parallax?: number;
   /** Leaves a corridor down the middle for pages with centred headlines. */
   clearCentre?: boolean;
+  /**
+   * How resolved the formation sits, 0 (scattered) to 1 (aligned). Ignored
+   * when `parallax` is on, since the hero animates the resolve on a timer.
+   */
+  formation?: number;
 }) {
   const blocks = useBlocks(density, seed, scale, clearCentre);
   const host = useRef<HTMLDivElement>(null);
@@ -423,7 +538,7 @@ export function BlockField({
           onFallback={() => setDpr(0.75)}
         />
         <Studio />
-        <Blocks blocks={blocks} parallax={parallax} />
+        <Blocks blocks={blocks} parallax={parallax} formation={formation} />
       </Canvas>
     </div>
   );

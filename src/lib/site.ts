@@ -122,7 +122,7 @@ export const products: Product[] = [
     kind: "Chrome extension",
     seed: 4021,
     audience: "For agencies and sales teams",
-    price: "Free sample list first",
+    price: "$200 one-time",
     tagline: "Turn any Google Maps search into a scored, contactable lead list.",
     summary:
       "A Chrome extension that reads a Google Maps result set, follows each business to its own website, and pulls out the contact surface — emails, phones, socials — then scores every lead and hands you a spreadsheet instead of forty browser tabs.",
@@ -183,6 +183,7 @@ export const products: Product[] = [
       },
     ],
     facts: [
+      { label: "Price", value: "$200 one-time — not a subscription" },
       { label: "Platform", value: "Chrome / Chromium" },
       { label: "Version", value: "5.2" },
       { label: "Enriches from", value: "Business websites" },
