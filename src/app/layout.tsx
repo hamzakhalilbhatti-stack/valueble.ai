@@ -1,31 +1,23 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { SiteChrome } from "@/components/site-chrome";
+import { SiteFooter } from "@/components/site-footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { SiteBackdrop } from "@/components/webgl/site-backdrop";
+import { RevealDriver } from "@/components/reveal";
 import { site } from "@/lib/site";
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  display: "swap",
-});
-
-const jetBrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -59,24 +51,21 @@ export const metadata: Metadata = {
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${inter.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <head>
         {/*
-          Marks the document as JS-capable during parsing, before first paint.
-          The scroll-reveal styles key off this class, so content stays visible
-          if scripts never run. See globals.css.
+          Marks the document JS-capable during parsing, before first paint, and
+          arms the reveal watchdog. Content staying invisible is a far worse
+          failure than a reveal that does not animate.
         */}
         <script
           dangerouslySetInnerHTML={{
@@ -84,27 +73,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="text-bone">
-        {/* The asset review route renders bare — no chrome, no production scene. */}
-        <SiteChrome
-          chrome={
-            <>
-              <SmoothScroll />
-              <ScrollProgress />
-
-              {/* Fixed WebGL layer + preloader. z-0; everything below is z-10. */}
-              <SiteBackdrop />
-
-              <div className="relative z-10 flex min-h-screen flex-col">
-                <SiteHeader />
-                <main className="flex-1">{children}</main>
-                <SiteFooter />
-              </div>
-            </>
-          }
+      <body>
+        <SmoothScroll />
+        <RevealDriver />
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[100] focus:bg-paper focus:px-4 focus:py-2 focus:text-ink"
         >
-          {children}
-        </SiteChrome>
+          Skip to main content
+        </a>
+        <SiteHeader />
+        <main id="main">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );

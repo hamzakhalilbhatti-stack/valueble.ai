@@ -6,6 +6,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default function OpengraphImage() {
+  const cell = { width: 20, height: 20, background: "#ffffff" } as const;
+
   return new ImageResponse(
     (
       <div
@@ -15,56 +17,43 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#f7f4ef",
-          color: "#17140f",
+          background: "#000000",
+          color: "#ffffff",
           padding: 72,
           fontFamily: "sans-serif",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            fontSize: 24,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            color: "#8d8578",
-          }}
-        >
-          <div style={{ width: 48, height: 2, background: "#c2551f" }} />
-          AI agents &amp; growth tools
+        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 34 }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              width: 46,
+              gap: 6,
+            }}
+          >
+            <div style={cell} />
+            <div style={cell} />
+            <div style={cell} />
+            <div style={{ ...cell, opacity: 0.32 }} />
+          </div>
+          {site.name}
         </div>
 
         <div
           style={{
             display: "flex",
-            fontSize: 96,
-            lineHeight: 1,
-            letterSpacing: "-0.035em",
-            maxWidth: 940,
+            fontSize: 66,
+            lineHeight: 1.15,
+            letterSpacing: "-0.01em",
+            maxWidth: 900,
           }}
         >
-          Software that does the work nobody has time for.
+          AI that does the work you ran out of hours for
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            borderTop: "1px solid #e2dbd0",
-            paddingTop: 32,
-            fontSize: 34,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          <div style={{ display: "flex" }}>
-            valueble<span style={{ color: "#c2551f" }}>.ai</span>
-          </div>
-          <div style={{ display: "flex", fontSize: 24, color: "#5f584e" }}>
-            {site.founder}
-          </div>
+        <div style={{ display: "flex", fontSize: 26, color: "#a1a1a6" }}>
+          Lead extraction · WhatsApp ordering agents · Custom AI automation
         </div>
       </div>
     ),

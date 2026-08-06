@@ -1,335 +1,180 @@
 import Link from "next/link";
-import { MorphTitle, PageTransition } from "@/components/page-transition";
-import { AnimatedScraperDemo } from "@/components/product/animated-demo";
-import { FounderVideo } from "@/components/product/founder-video";
-import { ScoreBreakdown } from "@/components/product/maps-scraper-demo";
-import { KitchenTicket, WhatsAppThread } from "@/components/product/orderrise-demo";
-import { Reveal, RevealLines } from "@/components/reveal";
-import { Action, Container, Eyebrow, Section } from "@/components/ui";
-import {
-  contact,
-  productCta,
-  products,
-  proofPoints,
-  proofPointsArePlaceholder,
-  site,
-  whatsappUrl,
-} from "@/lib/site";
+import dynamic from "next/dynamic";
+import { Hero } from "@/components/hero";
+import { ArrowUpRight, Body, BoxButton, Head, List, Section } from "@/components/ui";
+import { contact, products, whatsappUrl } from "@/lib/site";
+
+const BlockField = dynamic(() =>
+  import("@/components/block-field").then((m) => m.BlockField),
+);
 
 /**
- * Product-demo led home page.
+ * Home.
  *
- * Every section shows the product doing its job before it explains anything.
- * The previous version led with an abstract 3D object, which meant a visitor
- * could scroll a full screen without learning what is sold here.
+ * Problem → solution → what it is → who builds it → contact. Five sections and
+ * nothing else. The argument has to land for someone who has never heard of
+ * any of this, so it is told in plain business terms first and only names the
+ * products once the reader already wants them.
  */
-
-const principles = [
-  {
-    index: "01",
-    title: "One process at a time",
-    body: "Ambitious roadmaps stall in month two. A single workflow that runs by itself every Monday morning does not.",
-  },
-  {
-    index: "02",
-    title: "Built against your mess",
-    body: "Your real inbox, your real customers typing in three languages, your CRM with the fields nobody filled in. That is where automation breaks, so that is where it gets tested.",
-  },
-  {
-    index: "03",
-    title: "Told what not to automate",
-    body: "Some work should stay human, and some is not worth the build cost. You hear which parts before you spend anything.",
-  },
-  {
-    index: "04",
-    title: "Yours at the end",
-    body: "The system, the data, and the documentation of how it fails. No black box you keep renting access to.",
-  },
-];
-
 export default function HomePage() {
-  const maps = products[0];
-  const orderrise = products[1];
-  const agents = products[2];
-
   return (
-    <PageTransition>
-      {/* ── Hero — the product, working ─────────────────────────── */}
-      <section className="pt-32 pb-20 md:pt-40 md:pb-28">
-        <Container>
-          <div className="grid items-center gap-14 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <Reveal>
-                <Eyebrow>AI agents &amp; growth tools</Eyebrow>
-              </Reveal>
+    <>
+      <Hero />
 
-              <RevealLines
-                as="h1"
-                delay={100}
-                lines={["The repetitive half", "of your business,", "run by software."]}
-                className="font-display text-headline mt-8 text-balance"
-              />
+      <Section label="The problem" id="problem">
+        <Head>Small teams lose the work before they ever get to do it</Head>
 
-              <Reveal delay={220}>
-                <p className="text-lead mt-8 max-w-lg text-bone-soft">
-                  I&rsquo;m {site.founder.split(" ")[0]}. I build the tools that do the repetitive
-                  half of your business — finding leads, answering customers, running the process
-                  nobody has time for.
-                </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Action href={contact.bookingGeneral}>Book a discovery call</Action>
-                  <Action href={whatsappUrl} variant="outline">
-                    Message on WhatsApp
-                  </Action>
-                </div>
-              </Reveal>
-            </div>
+        <div className="mt-8 space-y-6">
+          <Body>
+            The businesses that need help most are the ones with the fewest spare hours. To
+            grow, the same handful of people are expected to:
+          </Body>
 
-            {/* The founder pitch carries the hero. A person making the argument
-                converts better than a product shot for a service business. */}
-            <Reveal delay={320} className="lg:col-span-7">
-              <FounderVideo />
-            </Reveal>
-          </div>
-        </Container>
-      </section>
+          <List
+            items={[
+              "Find and qualify prospects by hand, one browser tab at a time",
+              "Answer every enquiry personally — including the ones at 11pm on a Friday",
+              "Re-key the same information between tools that were never meant to talk",
+              "Repeat all of it tomorrow, at the same volume, without dropping anything",
+            ]}
+          />
 
-      {/* ── The premise ─────────────────────────────────────────── */}
-      <Section tone="surface">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <Reveal className="lg:col-span-3">
-              <Eyebrow index="01">The premise</Eyebrow>
-            </Reveal>
-            <div className="lg:col-span-8 lg:col-start-5">
-              <RevealLines
-                as="p"
-                lines={["Most businesses do not", "have an AI problem."]}
-                className="font-display text-title text-balance"
-              />
-              <Reveal delay={180} className="text-lead mt-8 max-w-2xl space-y-6 text-bone-soft">
-                <p>
-                  They have a volume problem. The same forty questions answered by hand every day.
-                  The lead list nobody has time to build. The order that came in at 11pm and sat
-                  unread until morning.
-                </p>
-                <p>
-                  Those need one specific piece of software that does one specific job, reliably,
-                  without anyone watching it. That is what I build.
-                </p>
-              </Reveal>
-            </div>
-          </div>
-        </Container>
+          <Body>
+            So it gets done badly, or late, or not at all. The lost revenue never shows up on
+            a report, because a customer who was never reached and a message that was never
+            answered leave no record behind.
+          </Body>
+        </div>
       </Section>
 
-      {/* ── 01 · Maps Lead Scraper ──────────────────────────────── */}
-      <Section id="work">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <Reveal>
-                <Eyebrow index="01">{maps.kind}</Eyebrow>
-              </Reveal>
-              <MorphTitle name={`product-${maps.slug}`}>
-                <h2 className="font-display text-headline mt-6 text-balance">{maps.name}</h2>
-              </MorphTitle>
-              <Reveal delay={160}>
-                <p className="text-lead mt-6 max-w-lg text-bone-soft">{maps.hero.sub}</p>
-                <ul className="mt-8 space-y-3">
-                  {[
-                    "Follows each business to its own website for the email Maps never shows",
-                    "Scores every lead 0–100 on how reachable it actually is",
-                    "Keeps working until it hits your target, not until the page stops scrolling",
-                    "No Places API bill, no CAPTCHA solving, no login walls",
-                  ].map((point) => (
-                    <li key={point} className="flex gap-3 text-sm text-bone-soft">
-                      <span aria-hidden className="text-signal">
-                        &rarr;
-                      </span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Action href={productCta[maps.slug].href}>{productCta[maps.slug].label}</Action>
-                  <Action href={`/products/${maps.slug}`} variant="outline">
-                    Full details
-                  </Action>
-                </div>
-              </Reveal>
-            </div>
+      {/* Full-bleed scene break, in place of the reference's video interstitial. */}
+      <SceneBreak />
 
-            <Reveal delay={120} className="lg:col-span-6 lg:col-start-7">
-              <ScoreBreakdown />
-              <p className="label mt-4 text-bone-faint">
-                Actual weighting from the extension&rsquo;s scoring function
-              </p>
-            </Reveal>
-          </div>
+      <Section label="The solution" id="solution">
+        <Head>Systems that hold the line without being asked</Head>
 
-          {/* Scripted run: cursor, typing, live counters, rows arriving scored. */}
-          <Reveal delay={200} className="mt-16">
-            <AnimatedScraperDemo />
-          </Reveal>
-        </Container>
+        <div className="mt-8 space-y-6">
+          <Body>
+            valueble.ai builds the software that absorbs that load. Not advice, not a
+            strategy deck — running systems, pointed at one specific job each, built until
+            they hold up against real customers and real mess.
+          </Body>
+
+          <List
+            items={[
+              "Reach a whole market without opening a single browser tab",
+              "Answer every customer instantly, in the app they already use",
+              "Hand a recurring internal process to something that never forgets it",
+              "Own the system and its data outright — no platform commission, no lock-in",
+            ]}
+          />
+        </div>
       </Section>
 
-      {/* ── 02 · OrderRise ──────────────────────────────────────── */}
-      <Section tone="surface">
-        <Container>
-          <Reveal>
-            <Eyebrow index="02">{orderrise.kind}</Eyebrow>
-          </Reveal>
-          <div className="mt-6 grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <MorphTitle name={`product-${orderrise.slug}`}>
-                <h2 className="font-display text-headline text-balance">{orderrise.name}</h2>
-              </MorphTitle>
-              <Reveal delay={160}>
-                <p className="text-lead mt-6 max-w-lg text-bone-soft">{orderrise.hero.sub}</p>
-                <p className="mt-6 text-sm text-bone-soft">
-                  A customer types the way they always do. The kitchen receives a structured ticket.
-                  Nothing in between is manual.
-                </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Action href={productCta[orderrise.slug].href}>
-                    {productCta[orderrise.slug].label}
-                  </Action>
-                  <Action href={`/products/${orderrise.slug}`} variant="outline">
-                    Full details
-                  </Action>
-                </div>
-              </Reveal>
-            </div>
+      <Section label="How it works" id="work">
+        <Head>Three products, one idea</Head>
+        <Body className="mt-8">
+          Each one started as a real problem in a real business and was built until it
+          worked. Two are live and in use today.
+        </Body>
 
-            <Reveal delay={120} className="lg:col-span-6 lg:col-start-7">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <WhatsAppThread />
-                <KitchenTicket className="self-start" />
-              </div>
-            </Reveal>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 03 · Custom AI Agents ───────────────────────────────── */}
-      <Section>
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <Reveal>
-                <Eyebrow index="03">{agents.kind}</Eyebrow>
-              </Reveal>
-              <MorphTitle name={`product-${agents.slug}`}>
-                <h2 className="font-display text-headline mt-6 text-balance">{agents.name}</h2>
-              </MorphTitle>
-              <Reveal delay={160}>
-                <p className="text-lead mt-6 max-w-lg text-bone-soft">{agents.hero.sub}</p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Action href={productCta[agents.slug].href}>
-                    {productCta[agents.slug].label}
-                  </Action>
-                  <Action href={`/products/${agents.slug}`} variant="outline">
-                    Full details
-                  </Action>
-                </div>
-              </Reveal>
-            </div>
-
-            <Reveal delay={120} className="lg:col-span-6 lg:col-start-7">
-              <div className="border border-rule">
-                {agents.steps.map((step, i) => (
-                  <div
-                    key={step.title}
-                    className="grid gap-2 border-b border-rule p-5 last:border-0 sm:grid-cols-[auto_1fr] sm:gap-5"
-                  >
-                    <span className="label text-violet">0{i + 1}</span>
-                    <div>
-                      <p className="text-sm text-bone">{step.title}</p>
-                      <p className="mt-1.5 text-sm text-bone-soft">{step.body}</p>
-                    </div>
+        <ul className="mt-16 space-y-0">
+          {products.map((product) => (
+            <li key={product.slug} className="hairline reveal">
+              <Link
+                href={`/products/${product.slug}`}
+                className="group block py-10 transition-opacity duration-300 hover:opacity-65"
+              >
+                <div className="flex items-baseline gap-5">
+                  <span className="text-fine text-faint">{product.index}</span>
+                  <div className="flex-1">
+                    <h3 className="flex items-center gap-3 text-sub text-paper">
+                      {product.name}
+                      <ArrowUpRight className="size-3 shrink-0 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </h3>
+                    <p className="mt-1 text-fine text-faint">
+                      {product.kind} · {product.status}
+                    </p>
+                    <p className="mt-4 max-w-[52ch] text-mute">{product.tagline}</p>
                   </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </Container>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Section>
 
-      {/* ── Approach ────────────────────────────────────────────── */}
-      <Section id="approach" tone="surface">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <Reveal>
-                <Eyebrow index="04">Approach</Eyebrow>
-              </Reveal>
-              <RevealLines
-                as="h2"
-                delay={100}
-                lines={["How the work", "actually goes."]}
-                className="font-display text-headline mt-8 text-balance"
-              />
-            </div>
-            <div className="lg:col-span-7 lg:col-start-6">
-              <dl className="border-t border-rule-strong">
-                {principles.map((p, i) => (
-                  <Reveal key={p.index} delay={i * 80}>
-                    <div className="grid gap-3 border-b border-rule-strong py-8 md:grid-cols-12 md:gap-6">
-                      <dt className="md:col-span-4">
-                        <span className="label text-amber">{p.index}</span>
-                        <p className="mt-2 text-lg tracking-tight">{p.title}</p>
-                      </dt>
-                      <dd className="text-bone-soft md:col-span-8">{p.body}</dd>
-                    </div>
-                  </Reveal>
-                ))}
-              </dl>
-            </div>
-          </div>
-        </Container>
-      </Section>
+      <Section label="About us" id="approach">
+        <Head>Built by one person who ships</Head>
 
-      {/* ── Proof ───────────────────────────────────────────────── */}
-      <Section>
-        <Container>
-          <Reveal>
-            <Eyebrow index="05">Where it stands</Eyebrow>
-          </Reveal>
-
-          {proofPointsArePlaceholder && (
-            <Reveal delay={60}>
-              <p className="label mt-6 inline-flex items-center gap-2 border border-amber/40 px-3 py-2 text-amber">
-                <span aria-hidden>&#9888;</span>
-                Placeholder figures &mdash; awaiting verified numbers
-              </p>
-            </Reveal>
-          )}
-
-          <div className="mt-12 grid gap-12 border-t border-rule pt-12 md:grid-cols-3">
-            {proofPoints.map((point, i) => (
-              <Reveal key={point.label} delay={i * 110}>
-                <p className="font-display text-headline leading-none text-amber">{point.value}</p>
-                <p className="mt-4 max-w-xs text-bone-soft">{point.label}</p>
-              </Reveal>
-            ))}
+        <div className="mt-8 space-y-10">
+          <div className="space-y-3">
+            <h3 className="text-paper">Who</h3>
+            <Body>
+              I am Hamza Khalil Bhatti. I build AI agents and growth tools for businesses and
+              agencies, and I do the work myself — scoping, building, and supporting it after
+              it ships. You talk to the person writing the code.
+            </Body>
           </div>
 
-          <Reveal delay={340} className="mt-16">
-            <p className="text-lead max-w-2xl text-bone-soft">
-              The fastest way to judge any of this is to use it. The WhatsApp agent has a live demo
-              you can order from right now — no call, no form, no signup.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Action href={whatsappUrl}>Try the WhatsApp demo</Action>
-              <Action href="/contact" variant="outline">
-                Other ways to reach me
-              </Action>
-            </div>
-          </Reveal>
-        </Container>
+          <div className="space-y-3">
+            <h3 className="text-paper">How</h3>
+            <Body>
+              Every engagement starts with one process, not a platform. We find the task that
+              is high-volume, rules-shaped, and currently eating hours, and I tell you plainly
+              which parts are worth automating and which are not.
+            </Body>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-paper">Why it holds up</h3>
+            <Body>
+              Getting a model to produce something impressive takes an afternoon. Getting a
+              system that runs unattended for six months — through the customer who types in
+              three languages and the API that rate-limits at the worst moment — is the
+              actual job, and it is the one I do.
+            </Body>
+          </div>
+        </div>
       </Section>
-    </PageTransition>
+
+      <Section label="Get started">
+        <Head>Bring the process, not the spec</Head>
+        <Body className="mt-8">
+          You do not need to know how it should be built. You need to know which twenty hours
+          a month you want back. Tell me what those hours go on and I will tell you honestly
+          whether I can take them.
+        </Body>
+
+        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <BoxButton href={whatsappUrl}>Message me on WhatsApp</BoxButton>
+          <Link
+            href={contact.bookingGeneral}
+            className="reveal inline-flex items-center gap-2 py-3.5 text-mute transition-colors duration-200 hover:text-paper"
+          >
+            Or see every way to reach me
+            <ArrowUpRight className="size-3" />
+          </Link>
+        </div>
+      </Section>
+    </>
+  );
+}
+
+/**
+ * The scene, full-bleed, as a break between arguments — the same role the
+ * reference's video interstitials play. Deliberately shallow: it is punctuation,
+ * not a second hero.
+ */
+function SceneBreak() {
+  return (
+    <div className="relative h-[45svh] min-h-[18rem] w-full overflow-hidden md:h-[60svh]">
+      <BlockField className="h-full w-full" density={9} />
+      {/* Fades the strip into the black above and below it so it has no seams. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#000_0%,transparent_22%,transparent_78%,#000_100%)]"
+      />
+    </div>
   );
 }

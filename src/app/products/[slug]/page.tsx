@@ -1,216 +1,138 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MorphTitle, PageTransition } from "@/components/page-transition";
-import { ProductVisual } from "@/components/product-visual";
-import { Reveal, RevealLines } from "@/components/reveal";
-import { Action, Container, Eyebrow, Section } from "@/components/ui";
-import { contact, getProduct, productCta, products } from "@/lib/site";
+import { ArrowUpRight, Body, BoxButton, Head, Section } from "@/components/ui";
+import { getProduct, productCta, products } from "@/lib/site";
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
 }
 
-export async function generateMetadata(
-  props: PageProps<"/products/[slug]">,
-): Promise<Metadata> {
-  const { slug } = await props.params;
+export async function generateMetadata({
+  params,
+}: PageProps<"/products/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
   const product = getProduct(slug);
-
   if (!product) return {};
 
   return {
-    title: `${product.name} — ${product.kind}`,
+    title: product.name,
     description: product.summary,
-    openGraph: {
-      title: `${product.name} — ${product.kind}`,
-      description: product.summary,
-      url: `/products/${product.slug}`,
-    },
+    openGraph: { title: product.name, description: product.summary },
   };
 }
 
-export default async function ProductPage(props: PageProps<"/products/[slug]">) {
-  const { slug } = await props.params;
+export default async function ProductPage({ params }: PageProps<"/products/[slug]">) {
+  const { slug } = await params;
   const product = getProduct(slug);
-
   if (!product) notFound();
 
-  const position = products.findIndex((entry) => entry.slug === product.slug);
-  const next = products[(position + 1) % products.length];
+  const cta = productCta[product.slug];
+  const others = products.filter((p) => p.slug !== product.slug);
 
   return (
-    <PageTransition>
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="pt-32 pb-20 md:pt-48 md:pb-28">
-        <Container>
-          <Reveal>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Eyebrow index={product.index}>{product.kind}</Eyebrow>
-              <span className="label border border-rule-strong px-3 py-1.5 text-amber">
-                {product.status}
-              </span>
+    <>
+      {/*
+        Product heroes are typographic, not scenic. The block field belongs to
+        the brand as a whole; repeating it on every product page would make
+        three different things look like the same thing.
+      */}
+      <section className="pb-20 pt-40 md:pb-28 md:pt-56">
+        <div className="rail">
+          <p className="eyebrow reveal">
+            {product.index} · {product.kind}
+          </p>
+          <div className="measure">
+            <h1 className="reveal text-hero max-w-[16ch] text-balance text-paper">
+              {product.hero.headline}
+            </h1>
+            <p className="reveal mt-8 max-w-[52ch] text-sub text-mute">{product.hero.sub}</p>
+            <div className="reveal mt-10">
+              <BoxButton href={cta.href}>{cta.label}</BoxButton>
             </div>
-          </Reveal>
-
-          {/* Morph pair: arrives from the home index row, so it must not also
-              run a scroll reveal — it is already on screen when the page opens. */}
-          <MorphTitle name={`product-${product.slug}`}>
-            <h1 className="font-display text-display mt-8 leading-none">{product.name}</h1>
-          </MorphTitle>
-
-          <div className="mt-16 grid gap-12 lg:grid-cols-12">
-            <Reveal delay={160} className="lg:col-span-7">
-              <p className="font-display text-title text-balance">{product.hero.headline}</p>
-              <p className="text-lead mt-8 max-w-xl text-bone-soft">{product.hero.sub}</p>
-              <div className="mt-10 flex flex-wrap gap-3">
-                <Action href={productCta[product.slug].href}>{productCta[product.slug].label}</Action>
-                <Action href="/contact" variant="outline">
-                  Ask a question
-                </Action>
-              </div>
-            </Reveal>
-
-            {/* Facts plate — reads as designed rather than as a missing image. */}
-            <Reveal delay={240} className="lg:col-span-4 lg:col-start-9">
-              <dl className="border-t border-bone">
-                {product.facts.map((fact) => (
-                  <div
-                    key={fact.label}
-                    className="flex items-baseline justify-between gap-6 border-b border-rule py-4"
-                  >
-                    <dt className="label text-bone-faint">{fact.label}</dt>
-                    <dd className="text-right text-sm tracking-tight">{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
           </div>
-        </Container>
+        </div>
       </section>
 
-      {/* ── Diagram ──────────────────────────────────────────── */}
-      <Container>
-        <Reveal>
-          <ProductVisual slug={product.slug} />
-        </Reveal>
-      </Container>
-
-      {/* ── The problem ──────────────────────────────────────── */}
-      <Section tone="surface" className="mt-24 md:mt-32">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <Reveal className="lg:col-span-3">
-              <Eyebrow index="01">The problem</Eyebrow>
-            </Reveal>
-            <div className="lg:col-span-8 lg:col-start-5">
-              <RevealLines
-                as="h2"
-                lines={[product.problem.heading]}
-                className="font-display text-title text-balance"
-              />
-              <Reveal delay={180} className="text-lead mt-8 max-w-2xl space-y-6 text-bone-soft">
-                {product.problem.body.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </Reveal>
+      {/* Spec table. Facts only — the things a buyer checks before reading prose. */}
+      <Section label="At a glance">
+        <dl className="grid gap-x-10 sm:grid-cols-2">
+          {product.facts.map((fact) => (
+            <div key={fact.label} className="hairline reveal flex justify-between gap-6 py-4">
+              <dt className="text-faint">{fact.label}</dt>
+              <dd className="text-right text-paper">{fact.value}</dd>
             </div>
-          </div>
-        </Container>
+          ))}
+        </dl>
       </Section>
 
-      {/* ── How it works ─────────────────────────────────────── */}
-      <Section>
-        <Container>
-          <Reveal>
-            <Eyebrow index="02">How it works</Eyebrow>
-          </Reveal>
+      <Section label="The problem">
+        <Head>{product.problem.heading}</Head>
+        <div className="mt-8 space-y-6">
+          {product.problem.body.map((paragraph) => (
+            <Body key={paragraph.slice(0, 40)}>{paragraph}</Body>
+          ))}
+        </div>
+      </Section>
 
-          <div className="mt-16 border-t border-rule">
-            {product.steps.map((step, index) => (
-              <Reveal key={step.title} delay={index * 80}>
-                <div className="grid gap-4 border-b border-rule py-10 md:grid-cols-12 md:gap-8">
-                  <span className="label text-amber md:col-span-1">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="font-display text-2xl leading-tight md:col-span-4 md:text-3xl">
-                    {step.title}
+      <Section label="How it works">
+        <Head>{product.tagline}</Head>
+        <ol className="mt-14 space-y-0">
+          {product.steps.map((step, i) => (
+            <li key={step.title} className="hairline reveal py-8">
+              <div className="flex gap-5">
+                <span className="text-fine text-faint">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3 className="text-sub text-paper">{step.title}</h3>
+                  <p className="mt-3 max-w-[56ch] text-mute">{step.body}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section label="What you get">
+        <Head>Everything it does</Head>
+        <div className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
+          {product.features.map((feature) => (
+            <div key={feature.title} className="reveal">
+              <h3 className="text-paper">{feature.title}</h3>
+              <p className="mt-3 text-mute">{feature.body}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section label="Get started">
+        <Head>{product.cta.heading}</Head>
+        <Body className="mt-8">{product.cta.body}</Body>
+        <div className="reveal mt-10">
+          <BoxButton href={cta.href}>{cta.label}</BoxButton>
+        </div>
+      </Section>
+
+      <Section label="Also">
+        <ul>
+          {others.map((other) => (
+            <li key={other.slug} className="hairline reveal">
+              <Link
+                href={`/products/${other.slug}`}
+                className="group flex items-baseline gap-5 py-8 transition-opacity duration-300 hover:opacity-65"
+              >
+                <span className="text-fine text-faint">{other.index}</span>
+                <div>
+                  <h3 className="flex items-center gap-3 text-sub text-paper">
+                    {other.name}
+                    <ArrowUpRight className="size-3 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
                   </h3>
-                  <p className="max-w-2xl text-bone-soft md:col-span-7">{step.body}</p>
+                  <p className="mt-2 max-w-[52ch] text-mute">{other.tagline}</p>
                 </div>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Section>
-
-      {/* ── What it does ─────────────────────────────────────── */}
-      <Section tone="surface">
-        <Container>
-          <Reveal>
-            <Eyebrow index="03">What it does</Eyebrow>
-          </Reveal>
-
-          <div className="mt-16 grid gap-px border border-rule-strong bg-rule-strong sm:grid-cols-2">
-            {product.features.map((feature, index) => (
-              <Reveal key={feature.title} delay={index * 70} className="bg-surface">
-                <div className="h-full p-8 md:p-10">
-                  <h3 className="font-display text-2xl leading-tight">{feature.title}</h3>
-                  <p className="mt-4 text-bone-soft">{feature.body}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── Product CTA ──────────────────────────────────────── */}
-      <Section>
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <RevealLines
-                as="h2"
-                lines={[product.cta.heading]}
-                className="font-display text-headline text-balance"
-              />
-              <Reveal delay={180}>
-                <p className="text-lead mt-8 max-w-xl text-bone-soft">{product.cta.body}</p>
-                <div className="mt-10 flex flex-wrap gap-3">
-                  <Action href={productCta[product.slug].href}>{productCta[product.slug].label}</Action>
-                  <Action href={contact.bookingGeneral} variant="outline">
-                    Ask something first
-                  </Action>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── Next product ─────────────────────────────────────── */}
-      <Container>
-        <Reveal>
-          <Link
-            href={`/products/${next.slug}`}
-            transitionTypes={["nav-forward"]}
-            className="group flex items-baseline justify-between gap-6 border-t border-rule py-12 md:py-16"
-          >
-            <div>
-              <p className="label text-bone-faint">Next</p>
-              <p className="font-display text-headline mt-3 leading-none transition-colors duration-500 group-hover:text-amber">
-                {next.name}
-              </p>
-            </div>
-            <span
-              aria-hidden
-              className="text-3xl text-bone-faint transition-all duration-500 ease-[var(--ease-editorial)] group-hover:translate-x-2 group-hover:text-amber"
-            >
-              &rarr;
-            </span>
-          </Link>
-        </Reveal>
-      </Container>
-    </PageTransition>
+    </>
   );
 }

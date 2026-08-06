@@ -1,267 +1,169 @@
 @import "tailwindcss";
 
 /*
- * valueble.ai design tokens.
+ * valueble.ai — design tokens.
  *
- * Dark: warm near-black ground, warm off-white type, one restrained amber.
- * The blacks are warm (a trace of red/yellow), never blue-grey — a cold black
- * next to an amber light reads as cheap sci-fi, which is the exact register
- * this brand is avoiding.
+ * The whole system is three colours and one font at one weight. Every value
+ * below was measured off the reference build rather than eyeballed, so the
+ * proportions hold at any viewport.
  *
- * Deliberately single-theme. We opt out of the browser light-mode heuristic
- * rather than ship a second, weaker palette.
+ *   background  #000    pure black, not a soft charcoal
+ *   headings    #fff    pure white
+ *   body        #a1a1a6 grey, so headings read as the only bright thing
+ *
+ * There is no bold anywhere. Hierarchy comes from size and space alone —
+ * introducing a 600 weight is the single fastest way to break the register.
  */
 @theme {
-  /* Deep midnight with a blue bias rather than warm black. Cool ground makes
-     the three accent lights read as *emitted* rather than painted on, which is
-     the whole point of an ecosystem lit from within. */
-  --color-void: #07080f;
-  --color-surface: #0e1019;
-  --color-surface-deep: #04050a;
+  --color-ink: #000000;
+  --color-paper: #ffffff;
+  --color-mute: #a1a1a6;
+  --color-faint: #6b6b70;
+  --color-rule: #1c1c1e;
+  --color-rule-strong: #2e2e32;
 
-  --color-bone: #eef0f6;
-  --color-bone-soft: #9aa0b0;
-  --color-bone-faint: #626878;
+  /* Display scale. Desktop targets: 80/88, 35/45, 16/26. */
+  --text-hero: clamp(2.5rem, 5.6vw, 5rem);
+  --text-hero--line-height: 1.1;
+  --text-hero--letter-spacing: -0.005em;
 
-  --color-rule: #1e2130;
-  --color-rule-strong: #2c3042;
+  --text-head: clamp(1.75rem, 2.6vw, 2.1875rem);
+  --text-head--line-height: 1.28;
 
-  /*
-   * Three accents, one per orbiting object. They are never used
-   * interchangeably: each belongs to one capability, so the visitor learns the
-   * colour and can read the ecosystem at a glance. They converge into
-   * `unified` at Stage 7 when the three signals reach the Brand World.
-   */
-  --color-signal: #35e0c4; /* 01 — Lead Scraper. Discovery, data, precision */
-  --color-amber: #ffa63d; /* 02 — OrderRise. Conversation, warmth, response */
-  --color-violet: #8f7cff; /* 03 — Custom agents. Intelligence, assembly */
-  --color-unified: #ffd39b; /* Stage 7–8 — all three resolved into one light */
+  --text-sub: clamp(1.125rem, 1.4vw, 1.375rem);
+  --text-sub--line-height: 1.4;
 
-  --color-amber-deep: #d97f1f;
-  --color-amber-wash: #1a1410;
+  --text-body: 1rem;
+  --text-body--line-height: 1.625;
 
-  /*
-   * Editorial display scale. The phone-sized floors are deliberately low:
-   * the longest display line ("a month you want back.") is ~8.2px wide per 1px
-   * of font size, so anything above ~33px overflows a 320px screen. Desktop
-   * gets the full scale back via the media query below.
-   */
-  --text-display: clamp(2rem, 9.5vw, 11rem);
-  --text-display--line-height: 0.86;
-  --text-display--letter-spacing: -0.035em;
+  --text-eyebrow: 1rem;
+  --text-eyebrow--line-height: 1.5;
 
-  --text-headline: clamp(2rem, 6.5vw, 5.5rem);
-  --text-headline--line-height: 0.95;
-  --text-headline--letter-spacing: -0.03em;
+  --text-fine: 0.8125rem;
+  --text-fine--line-height: 1.55;
 
-  --text-title: clamp(1.75rem, 3.6vw, 3rem);
-  --text-title--line-height: 1.06;
-  --text-title--letter-spacing: -0.02em;
-
-  --text-lead: clamp(1.125rem, 1.7vw, 1.5rem);
-  --text-lead--line-height: 1.5;
-
-  --text-label: 0.6875rem;
-  --text-label--line-height: 1;
-  --text-label--letter-spacing: 0.16em;
-
-  /* Slow, heavy easing — the references all move like a page turning. */
-  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
-
-  /* Timing scale. Nothing on the site uses a duration outside this set.
-     Exits are always faster than enters — see docs/motion-system.md. */
-  --dur-exit: 160ms;
-  --dur-enter: 220ms;
-  --dur-move: 420ms;
-  --dur-reveal: 850ms;
+  /* One easing, one set of durations. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 200ms;
+  --dur-base: 450ms;
+  --dur-slow: 900ms;
 }
 
 @theme inline {
-  --font-display: var(--font-instrument-serif);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
 }
 
 :root {
-  color-scheme: light;
-}
-
-/* Tablet and up have the room for the full editorial scale. */
-@media (min-width: 768px) {
-  :root {
-    --text-display: clamp(3rem, 12vw, 11rem);
-    --text-headline: clamp(2.5rem, 6.5vw, 5.5rem);
-  }
+  color-scheme: dark;
 }
 
 @layer base {
   html {
-    /* Lenis drives scrolling; native smooth would fight it. */
+    background-color: var(--color-ink);
     scroll-behavior: auto;
-    /* The page colour lives here, not on body: the WebGL canvas sits between
-       the two, so a solid body background would hide the scene entirely. */
-    background-color: var(--color-void);
+    -webkit-font-smoothing: antialiased;
   }
 
   body {
-    background-color: transparent;
-    color: var(--color-bone);
+    background-color: var(--color-ink);
+    color: var(--color-mute);
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    /* Faux-bold would defeat the single-weight rule the moment a browser
+       decided a heading needed synthesising. */
     font-synthesis-weight: none;
-    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-paper);
+    font-weight: 400;
   }
 
   ::selection {
-    background-color: var(--color-amber);
-    color: var(--color-void);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-amber);
-    outline-offset: 3px;
+    outline: 1px solid var(--color-paper);
+    outline-offset: 4px;
   }
 }
 
 @layer components {
-  /* Small caps-ish label used for eyebrows, indices, and meta rows. */
-  .label {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: var(--text-label);
-    letter-spacing: var(--text-label--letter-spacing);
-    text-transform: uppercase;
+  /*
+   * The page grid. Everything on the site sits on these two columns:
+   * a narrow label rail on the left, and the content measure beside it.
+   * The right third stays empty on purpose — that void is most of what
+   * makes the layout read as considered rather than full.
+   */
+  .rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-inline: 1.5rem;
+    max-width: 96rem;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 900px) {
+    .rail {
+      grid-template-columns: 22% minmax(0, 1fr);
+      gap: 3rem;
+      padding-inline: 3.25rem;
+    }
+
+    /* Content stops well short of the right edge. */
+    .rail > .measure {
+      max-width: 46rem;
+    }
+  }
+
+  .eyebrow {
+    color: var(--color-paper);
+    font-size: var(--text-eyebrow);
+    line-height: var(--text-eyebrow--line-height);
+  }
+
+  /* Hairline separator, deliberately barely visible. */
+  .hairline {
+    border-top: 1px solid var(--color-rule);
   }
 }
 
 @layer utilities {
   /*
-   * Reveal primitives. The hidden state is scoped to `html.js`, which an inline
-   * script in the root layout sets during parsing. If that script never runs —
-   * JS disabled, a bundle that failed to load, a crawler that doesn't execute —
-   * nothing is ever hidden and the whole page reads as plain content.
-   * Hiding content by default is how these sites end up blank.
+   * Reveal-on-scroll. The hidden state is scoped to `html.js`, set by an inline
+   * script during parsing, so a failed bundle or a crawler sees plain content
+   * rather than an empty page. `html.reveal-done` is a hard watchdog: after a
+   * few seconds nothing may remain hidden for any reason at all.
    */
   .reveal {
     transition:
-      opacity var(--dur-reveal) var(--ease-editorial),
-      transform var(--dur-reveal) var(--ease-editorial);
+      opacity var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
     transition-delay: var(--reveal-delay, 0ms);
   }
 
-  /* The resolved state is declared explicitly rather than left to revert to the
-     initial value. Booting the WebGL scene saturates the main thread, and a
-     transition interrupted mid-flight was stranding hero copy at opacity 0 —
-     an explicit end state always wins. */
+  .js .reveal:not([data-revealed="true"]) {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
   .js .reveal[data-revealed="true"] {
     opacity: 1;
     transform: none;
   }
 
-  .js .reveal:not([data-revealed="true"]) {
-    opacity: 0;
-    transform: translateY(1.75rem);
-  }
-
-  /*
-   * Hard safety net. A watchdog adds `.reveal-done` to <html> a few seconds
-   * after load, and from that point nothing can remain hidden for any reason —
-   * a stalled IntersectionObserver, a transition interrupted by WebGL boot, a
-   * throttled tab. Content staying invisible is a far worse failure than a
-   * reveal that does not animate, and this page has hit that repeatedly.
-   */
   html.reveal-done .reveal {
     opacity: 1 !important;
     transform: none !important;
   }
-}
-
-/* ── View transitions ───────────────────────────────────────────────
-   Patterns and rationale live in docs/motion-system.md. */
-
-/* The overlay swallows clicks while a transition runs; let them through. */
-::view-transition {
-  pointer-events: none;
-}
-
-/* A. Shared-element morph — the product name travelling from the home
-   index row into the product headline. The blur hides pixel-level
-   interpolation artifacts, which are very visible on type this large. */
-::view-transition-group(.morph) {
-  animation-duration: 480ms;
-  animation-timing-function: var(--ease-editorial);
-}
-
-::view-transition-image-pair(.morph) {
-  animation-name: morph-blur;
-}
-
-@keyframes morph-blur {
-  30% {
-    filter: blur(4px);
-  }
-}
-
-/* B. Directional slides. Forward moves content left, back moves it right. */
-::view-transition-old(.nav-forward) {
-  --slide-offset: -48px;
-  animation:
-    var(--dur-exit) var(--ease-editorial) both vt-fade reverse,
-    var(--dur-move) var(--ease-editorial) both vt-slide reverse;
-}
-
-::view-transition-new(.nav-forward) {
-  --slide-offset: 48px;
-  animation:
-    var(--dur-enter) var(--ease-editorial) var(--dur-exit) both vt-fade,
-    var(--dur-move) var(--ease-editorial) both vt-slide;
-}
-
-::view-transition-old(.nav-back) {
-  --slide-offset: 48px;
-  animation:
-    var(--dur-exit) var(--ease-editorial) both vt-fade reverse,
-    var(--dur-move) var(--ease-editorial) both vt-slide reverse;
-}
-
-::view-transition-new(.nav-back) {
-  --slide-offset: -48px;
-  animation:
-    var(--dur-enter) var(--ease-editorial) var(--dur-exit) both vt-fade,
-    var(--dur-move) var(--ease-editorial) both vt-slide;
-}
-
-@keyframes vt-fade {
-  from {
-    opacity: 0;
-    filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
-@keyframes vt-slide {
-  from {
-    translate: var(--slide-offset);
-  }
-  to {
-    translate: 0;
-  }
-}
-
-/* The header is the visitor's fixed reference point — it must not slide,
-   or the whole viewport reads as moving rather than just the content. */
-::view-transition-group(site-header) {
-  animation: none;
-  z-index: 100;
-}
-
-::view-transition-old(site-header) {
-  display: none;
-}
-
-::view-transition-new(site-header) {
-  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -269,14 +171,5 @@
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
-  }
-
-  /* Directional slides are the strongest motion-sickness trigger here.
-     Removed outright rather than shortened — content simply swaps. */
-  ::view-transition-old(*),
-  ::view-transition-new(*),
-  ::view-transition-group(*) {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
   }
 }

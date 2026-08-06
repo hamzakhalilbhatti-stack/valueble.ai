@@ -1,113 +1,66 @@
 import Link from "next/link";
-import { contact, products, site, whatsappUrl } from "@/lib/site";
-import { Container, Wordmark } from "@/components/ui";
-import { Reveal, RevealLines } from "@/components/reveal";
+import { Logo } from "@/components/logo";
+import { BoxButton } from "@/components/ui";
+import { contact, nav, products, site, whatsappUrl } from "@/lib/site";
 
+/**
+ * Footer. Two bands: the wordmark facing the single primary action, then the
+ * link columns and legal text well below it. The gap between the two bands is
+ * deliberately large — it is what stops the footer reading as a sitemap.
+ */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-surface-deep/60 text-bone backdrop-blur-[3px]">
-      <Container className="py-24 md:py-32 lg:py-40">
-        <RevealLines
-          as="h2"
-          lines={["Tell me which twenty hours", "a month you want back."]}
-          className="font-display text-headline max-w-5xl text-balance"
-        />
+    <footer className="pb-16 pt-24 md:pb-20 md:pt-32">
+      <div className="mx-auto max-w-[96rem] px-6 md:px-[3.25rem]">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+          <Logo />
+          <BoxButton href={whatsappUrl}>Contact us</BoxButton>
+        </div>
 
-        <Reveal delay={220} className="mt-12 flex flex-col gap-4 sm:flex-row">
-          {/* Internal route now, so no new tab. */}
-          <Link
-            href={contact.bookingGeneral}
-            className="group inline-flex items-center justify-between gap-8 bg-bone px-7 py-5 text-void transition-colors duration-500 hover:bg-amber hover:text-void sm:justify-start"
-          >
-            <span className="tracking-tight">Book a discovery call</span>
-            <span
-              aria-hidden
-              className="transition-transform duration-500 ease-[var(--ease-editorial)] group-hover:translate-x-1"
-            >
-              &rarr;
-            </span>
-          </Link>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center justify-between gap-8 border border-white/25 px-7 py-5 transition-colors duration-500 hover:border-bone sm:justify-start"
-          >
-            <span className="tracking-tight">Message on WhatsApp</span>
-            <span
-              aria-hidden
-              className="transition-transform duration-500 ease-[var(--ease-editorial)] group-hover:translate-x-1"
-            >
-              &rarr;
-            </span>
-          </a>
-        </Reveal>
-
-        <div className="mt-24 grid gap-12 border-t border-white/12 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-24 grid gap-10 md:mt-32 md:grid-cols-4">
           <div>
-            <Wordmark className="text-bone" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-bone/55">
-              {site.tagline}
-            </p>
-          </div>
-
-          <nav aria-label="Products">
-            <p className="label text-bone/40">Products</p>
-            <ul className="mt-5 space-y-3">
+            <p className="text-paper">What I build</p>
+            <ul className="mt-4 space-y-2">
               {products.map((product) => (
                 <li key={product.slug}>
                   <Link
                     href={`/products/${product.slug}`}
-                    className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
+                    className="text-mute transition-colors duration-200 hover:text-paper"
                   >
                     {product.name}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
 
-          <nav aria-label="Company">
-            <p className="label text-bone/40">Company</p>
-            <ul className="mt-5 space-y-3">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#approach"
-                  className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
-                >
-                  Approach
-                </Link>
-              </li>
+          <div>
+            <p className="text-paper">Company</p>
+            <ul className="mt-4 space-y-2">
+              {nav.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-mute transition-colors duration-200 hover:text-paper"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </nav>
+          </div>
 
-          <nav aria-label="Elsewhere">
-            <p className="label text-bone/40">Elsewhere</p>
-            <ul className="mt-5 space-y-3">
+          <div>
+            <p className="text-paper">Reach me</p>
+            <ul className="mt-4 space-y-2">
               <li>
                 <a
                   href={whatsappUrl}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
+                  rel="noreferrer"
+                  className="text-mute transition-colors duration-200 hover:text-paper"
                 >
                   WhatsApp
                 </a>
@@ -116,8 +69,8 @@ export function SiteFooter() {
                 <a
                   href={contact.linkedin}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-bone/75 transition-colors duration-300 hover:text-amber"
+                  rel="noreferrer"
+                  className="text-mute transition-colors duration-200 hover:text-paper"
                 >
                   LinkedIn
                 </a>
@@ -125,24 +78,26 @@ export function SiteFooter() {
               <li>
                 <a
                   href={`mailto:${contact.email}`}
-                  className="text-sm break-all text-bone/75 transition-colors duration-300 hover:text-amber"
+                  className="break-all text-mute transition-colors duration-200 hover:text-paper"
                 >
                   {contact.email}
                 </a>
               </li>
             </ul>
-          </nav>
-        </div>
+          </div>
 
-        <div className="mt-16 flex flex-col gap-2 border-t border-white/12 pt-8 text-xs text-bone/40 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            &copy; {year} {site.legalName}. All rights reserved.
-          </p>
-          <p>
-            Built by {site.founder} in Pakistan{/* TODO: confirm location line */}
-          </p>
+          <div className="space-y-4 text-fine text-faint">
+            <p>
+              © {year} {site.legalName}. Built and run by {site.founder}.
+            </p>
+            <p>
+              Maps Lead Scraper reads the public Google Maps interface and public business
+              websites. It uses no paid API and bypasses no access control.
+            </p>
+            <p>Not affiliated with Google or WhatsApp.</p>
+          </div>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

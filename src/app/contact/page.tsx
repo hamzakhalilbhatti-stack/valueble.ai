@@ -1,211 +1,126 @@
 import type { Metadata } from "next";
-import { PageTransition } from "@/components/page-transition";
-import { Reveal, RevealLines } from "@/components/reveal";
-import { Container, Eyebrow, Section } from "@/components/ui";
-import { contact, site, whatsappUrl } from "@/lib/site";
+import { ArrowUpRight, Body, Head, Section } from "@/components/ui";
+import { contact, products, productCta, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Talk to ${site.founder} about an AI agent, a lead engine, or a custom automation build. WhatsApp, a 20-minute call, or email.`,
+  description:
+    "Reach Hamza Khalil Bhatti on WhatsApp, LinkedIn or email — or book a demo of OrderRise.",
 };
 
+/**
+ * Contact.
+ *
+ * Every channel is listed with what it is actually for. The OrderRise booking
+ * link is deliberately kept on its own row rather than promoted to the top: it
+ * is a restaurant-ordering demo, and sending an agency lead there loses them.
+ */
 const channels = [
   {
-    index: "01",
     label: "WhatsApp",
-    heading: "Message me directly",
-    body: "The fastest route. Same number the demo agent runs on, answered by an actual person.",
-    action: "Open WhatsApp",
+    detail: "Fastest. Usually answered same day.",
     href: whatsappUrl,
-    primary: true,
+    value: "+92 300 179 4940",
   },
   {
-    index: "02",
-    label: "Book a call",
-    heading: "Twenty minutes, no deck",
-    body: "You describe the process. I tell you whether it is worth automating and roughly what it takes. No obligation attached.",
-    action: "Pick a time",
-    href: contact.bookingGeneral,
-    primary: false,
-  },
-  {
-    index: "03",
     label: "Email",
-    heading: "Send the long version",
-    body: "Better if you have specifics — volumes, tools you already use, screenshots of the thing that is broken.",
-    action: contact.email,
+    detail: "For anything that needs attachments or detail.",
     href: `mailto:${contact.email}`,
-    primary: false,
+    value: contact.email,
   },
   {
-    index: "04",
     label: "LinkedIn",
-    heading: "See the background first",
-    body: "If you would rather know who you are talking to before you talk to them.",
-    action: "View profile",
+    detail: "If you would rather see who you are talking to first.",
     href: contact.linkedin,
-    primary: false,
-  },
-];
-
-const helpful = [
-  "The task you want handled, in one sentence.",
-  "Roughly how often it happens — per day, per week.",
-  "The tools it currently touches (WhatsApp, a CRM, sheets, your site).",
-  "Who does it today, and how long it takes them.",
-];
-
-const next = [
-  {
-    index: "01",
-    title: "You send the problem",
-    body: "In whatever form you have it. A voice note describing the annoyance is genuinely fine.",
+    value: "hamza-khalil",
   },
   {
-    index: "02",
-    title: "I tell you if it's buildable",
-    body: "Usually within a day, and sometimes the answer is that you do not need me — an existing tool already does it.",
-  },
-  {
-    index: "03",
-    title: "We scope it properly",
-    body: "If it is worth doing, you get a clear scope: what gets automated, what stays manual, how long, what it costs.",
+    label: "Book an OrderRise demo",
+    detail: "Restaurants only — a live walkthrough of the ordering agent.",
+    href: contact.bookingOrderRise,
+    value: "cal.com",
   },
 ];
 
 export default function ContactPage() {
   return (
-    <PageTransition>
-      <section className="pt-32 pb-16 md:pt-48 md:pb-24">
-        <Container>
-          <Reveal>
-            <Eyebrow>Contact</Eyebrow>
-          </Reveal>
-
-          <RevealLines
-            as="h1"
-            delay={100}
-            stagger={100}
-            lines={["Start with a message,", "not a brief."]}
-            className="font-display text-display mt-10 max-w-[16ch] text-balance"
-          />
-
-          <Reveal delay={300} className="mt-12">
-            <p className="text-lead max-w-2xl text-bone-soft">
-              You do not need to know what should be built or how. You need to know which part
-              of the week you would like back. Tell me that part.
+    <>
+      <section className="pb-20 pt-40 md:pb-28 md:pt-56">
+        <div className="rail">
+          <p className="eyebrow reveal">Contact</p>
+          <div className="measure">
+            <h1 className="reveal text-hero max-w-[14ch] text-balance text-paper">
+              Describe the job. I will tell you if I can take it
+            </h1>
+            <p className="reveal mt-8 max-w-[52ch] text-sub text-mute">
+              No form, no funnel, no discovery sequence. Pick whichever of these you already
+              have open.
             </p>
-          </Reveal>
-        </Container>
+          </div>
+        </div>
       </section>
 
-      {/* ── Channels ─────────────────────────────────────────── */}
-      <Container>
-        <div className="border-t border-rule">
-          {channels.map((channel, index) => (
-            <Reveal key={channel.label} delay={index * 90}>
+      <Section label="Channels">
+        <ul>
+          {channels.map((channel) => (
+            <li key={channel.label} className="hairline reveal">
               <a
                 href={channel.href}
-                target={channel.href.startsWith("mailto:") ? undefined : "_blank"}
-                rel="noopener noreferrer"
-                className="group relative block overflow-hidden border-b border-rule"
+                target="_blank"
+                rel="noreferrer"
+                className="group flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 py-7 transition-opacity duration-300 hover:opacity-65"
               >
-                {/* Accent panel that wipes up on hover. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-0 origin-bottom scale-y-0 bg-bone transition-transform duration-700 ease-[var(--ease-editorial)] group-hover:scale-y-100"
-                />
-
-                <div className="relative grid items-baseline gap-4 py-10 transition-colors duration-500 group-hover:text-void md:grid-cols-12 md:gap-8 md:py-14">
-                  <span className="label text-amber md:col-span-1">{channel.index}</span>
-
-                  <div className="md:col-span-5">
-                    <p className="label text-bone-faint transition-colors duration-500 group-hover:text-void/55">
-                      {channel.label}
-                    </p>
-                    <h2 className="font-display text-title mt-3 leading-none">
-                      {channel.heading}
-                    </h2>
-                  </div>
-
-                  <p className="max-w-md text-bone-soft transition-colors duration-500 group-hover:text-void/70 md:col-span-4">
-                    {channel.body}
-                  </p>
-
-                  <span className="flex items-center gap-2 text-sm tracking-tight md:col-span-2 md:justify-self-end">
-                    <span className="truncate">{channel.action}</span>
-                    <span
-                      aria-hidden
-                      className="transition-transform duration-500 ease-[var(--ease-editorial)] group-hover:translate-x-1"
-                    >
-                      &rarr;
-                    </span>
-                  </span>
-                </div>
+                <span className="flex items-center gap-3 text-sub text-paper">
+                  {channel.label}
+                  <ArrowUpRight className="size-3 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </span>
+                <span className="text-fine text-faint">{channel.value}</span>
+                <span className="w-full text-mute">{channel.detail}</span>
               </a>
-            </Reveal>
+            </li>
           ))}
-        </div>
-      </Container>
-
-      {/* ── What helps / what happens next ───────────────────── */}
-      <Section>
-        <Container>
-          <div className="grid gap-16 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <Reveal>
-                <Eyebrow index="01">What helps</Eyebrow>
-              </Reveal>
-              <RevealLines
-                as="h2"
-                delay={100}
-                lines={["Four lines is", "enough to start."]}
-                className="font-display text-title mt-8 text-balance"
-              />
-              <Reveal delay={220}>
-                <ul className="mt-8 border-t border-rule">
-                  {helpful.map((item) => (
-                    <li
-                      key={item}
-                      className="flex gap-4 border-b border-rule py-4 text-bone-soft"
-                    >
-                      <span aria-hidden className="text-amber">
-                        &rarr;
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            </div>
-
-            <div className="lg:col-span-6 lg:col-start-7">
-              <Reveal>
-                <Eyebrow index="02">What happens next</Eyebrow>
-              </Reveal>
-              <div className="mt-8 border-t border-rule">
-                {next.map((step, index) => (
-                  <Reveal key={step.index} delay={index * 90}>
-                    <div className="border-b border-rule py-8">
-                      <span className="label text-amber">{step.index}</span>
-                      <h3 className="font-display mt-2 text-2xl leading-tight md:text-3xl">
-                        {step.title}
-                      </h3>
-                      <p className="mt-3 text-bone-soft">{step.body}</p>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
-
-              <Reveal delay={300} className="mt-8">
-                <p className="label text-bone-faint">
-                  Typical first reply: same day{/* TODO: confirm response time */}
-                </p>
-              </Reveal>
-            </div>
-          </div>
-        </Container>
+        </ul>
       </Section>
-    </PageTransition>
+
+      <Section label="What helps">
+        <Head>Three things make the first reply useful</Head>
+        <div className="mt-8 space-y-6">
+          <Body>
+            <strong className="font-normal text-paper">The process, not the product.</strong>{" "}
+            Describe the task somebody on your team does repeatedly — what triggers it, what
+            they do, and where the output goes.
+          </Body>
+          <Body>
+            <strong className="font-normal text-paper">The volume.</strong> Ten a week and a
+            thousand a week are different problems with different answers.
+          </Body>
+          <Body>
+            <strong className="font-normal text-paper">What you already use.</strong> The
+            tools it has to talk to matter more than any preference about how it is built.
+          </Body>
+        </div>
+      </Section>
+
+      <Section label="Straight to a product">
+        <ul>
+          {products.map((product) => (
+            <li key={product.slug} className="hairline reveal">
+              <a
+                href={productCta[product.slug].href}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 py-6 transition-opacity duration-300 hover:opacity-65"
+              >
+                <span className="text-paper">{product.name}</span>
+                <span className="flex items-center gap-2 text-mute">
+                  {productCta[product.slug].label}
+                  <ArrowUpRight className="size-3 opacity-50 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    </>
   );
 }

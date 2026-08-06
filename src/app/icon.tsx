@@ -3,7 +3,14 @@ import { ImageResponse } from "next/og";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
+/** The 2×2 mark from the wordmark, at favicon size. */
 export default function Icon() {
+  const cell = {
+    width: 12,
+    height: 12,
+    background: "#ffffff",
+  } as const;
+
   return new ImageResponse(
     (
       <div
@@ -11,17 +18,17 @@ export default function Icon() {
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
+          flexWrap: "wrap",
+          alignContent: "center",
           justifyContent: "center",
-          background: "#17140f",
-          color: "#f7f4ef",
-          fontSize: 22,
-          fontWeight: 600,
-          letterSpacing: "-0.05em",
+          gap: 4,
+          background: "#000000",
         }}
       >
-        v
-        <span style={{ color: "#c2551f" }}>.</span>
+        <div style={cell} />
+        <div style={cell} />
+        <div style={cell} />
+        <div style={{ ...cell, opacity: 0.32 }} />
       </div>
     ),
     size,
