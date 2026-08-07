@@ -86,7 +86,7 @@ export function Section({
         {/* Below the rail breakpoint the grid is a single column, so an empty
             placeholder would occupy a row and open a gap. */}
         {label ? (
-          <p className="eyebrow reveal">{label}</p>
+          <p className="eyebrow reveal rail-label">{label}</p>
         ) : (
           <span aria-hidden className="hidden min-[900px]:block" />
         )}

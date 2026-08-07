@@ -150,7 +150,7 @@ function ProductShowcase({
   return (
     <section id={slug} className="py-24 md:py-32">
       <div className="rail">
-        <div className="reveal">
+        <div className="reveal rail-label-ui">
           <p className={`ui-label ${accent.text}`}>{product.index}</p>
           <p className="mt-3 text-mute">{product.audience}</p>
         </div>
@@ -172,11 +172,24 @@ function ProductShowcase({
         </div>
       </div>
 
-      {/* Full width — the demo is the argument, not an illustration beside it. */}
+      {/*
+        The demo breaks out to the page gutter. The rule the whole site follows
+        is that prose lives in the measure column and specimens break out — the
+        panels carry the persuasion and the reading measure would squeeze them.
+      */}
       <div className="mx-auto mt-12 max-w-[96rem] px-6 md:mt-16 md:px-[3.25rem]">
         <div className="reveal">{children}</div>
+      </div>
 
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+      {/*
+        The action returns to the measure column, because it is text and every
+        other call to action on the site sits there. Left at the gutter it made
+        the eye jump 412 → 52 → 412 inside a single section, which was the most
+        visible alignment break on the page.
+      */}
+      <div className="rail mt-10">
+        <span aria-hidden className="hidden min-[900px]:block" />
+        <div className="measure flex flex-col gap-4 sm:flex-row sm:items-center">
           <BoxButton href={cta.href}>{cta.label}</BoxButton>
           <Link
             href={`/products/${product.slug}`}

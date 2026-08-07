@@ -187,6 +187,42 @@
     .rail > .measure {
       max-width: 46rem;
     }
+
+    /*
+     * Baseline alignment for the label in the left rail.
+     *
+     * Grid places the label and the heading at the same *box top*, which is not
+     * the same thing as aligning them. A 17px label and a 35px heading have
+     * different first baselines, so the label ends up floating above the line it
+     * is labelling — measured at 13.8px out on section headings and 22.6px on
+     * the product rows. Close enough to look like a mistake rather than a style.
+     *
+     * The offset is derived rather than hardcoded, because every heading size
+     * here is a clamp and a fixed pixel nudge would only be correct at one
+     * viewport width. For a block of text the first baseline sits at:
+     *
+     *     (lineHeight − fontSize) / 2  +  ascender
+     *
+     * with Geist's ascender at ~0.75em. Folding the line-height factor in gives
+     * a single multiplier per size — 0.88 for `head` at 1.26, 0.78 for `hero` at
+     * 1.06 — so the padding is just the difference between the two baselines.
+     *
+     * Only above 900px. Below it the rail is one column and the label sits above
+     * the heading, where the offset would be meaningless space.
+     */
+    .rail-label {
+      padding-top: calc(0.88 * var(--text-head) - var(--text-eyebrow));
+    }
+
+    /* Same, where the label is a `ui-label`: 11px at line-height 1. */
+    .rail-label-ui {
+      padding-top: calc(0.88 * var(--text-head) - 0.515625rem);
+    }
+
+    /* Page heroes, whose headline is `hero` rather than `head`. */
+    .rail-label-hero {
+      padding-top: calc(0.78 * var(--text-hero) - var(--text-eyebrow));
+    }
   }
 
   .eyebrow {

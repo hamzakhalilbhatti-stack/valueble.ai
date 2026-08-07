@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
       <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
         <SceneBackdrop density={4} seed={product.seed} />
         <div className="rail">
-          <div className="reveal">
+          <div className="reveal rail-label-hero">
             <p className="eyebrow">
               {product.index} · {product.kind}
             </p>

@@ -49,7 +49,7 @@ export default function ContactPage() {
       <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
         <SceneBackdrop density={4} seed={6190} />
         <div className="rail">
-          <p className="eyebrow reveal">Contact</p>
+          <p className="eyebrow reveal rail-label-hero">Contact</p>
           <div className="measure">
             <h1 className="reveal text-hero max-w-[14ch] text-balance text-paper">
               Describe the job. I will tell you if I can take it
