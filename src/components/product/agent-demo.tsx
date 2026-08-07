@@ -129,52 +129,78 @@ export function AgentDemo({ className }: { className?: string }) {
           return (
             <li key={node.step} className="relative flex gap-4 pb-7 last:pb-0">
               {!isLast && (
-                <>
+                /*
+                 * The connector track. Everything below is positioned against
+                 * this wrapper rather than the row, so the travelling head can
+                 * use a percentage offset — a percentage resolves against the
+                 * containing block's height, which is exactly the distance it
+                 * needs to cover. Sizing it off the row instead was the bug in
+                 * the first pass: `translateY(100%)` moves an element by its
+                 * *own* height, so the head shifted ten pixels and stopped.
+                 */
+                <span
+                  aria-hidden
+                  className="absolute left-[0.4375rem] top-5 h-[calc(100%-1.25rem)] w-0.5"
+                >
                   {/* Unlit track, so the shape of the whole flow is visible
                       before the sequence has run through it. */}
+                  <span className="absolute inset-0 bg-rule-strong" />
+
+                  {/* The line itself. Scaled rather than resized so it animates
+                      on the compositor and never triggers layout. */}
                   <span
-                    aria-hidden
-                    className="absolute left-[0.4375rem] top-4 h-full w-px bg-rule"
-                  />
-                  {/* The travelling line. Scaled rather than resized so it
-                      animates on the compositor and never triggers layout. */}
-                  <span
-                    aria-hidden
                     className={cn(
-                      "absolute left-[0.4375rem] top-4 h-full w-px origin-top",
-                      node.tone === "human" ? "bg-mind/70" : "bg-paper/45",
+                      "absolute inset-0 origin-top",
+                      node.tone === "human" ? "bg-mind" : "bg-paper",
                     )}
                     style={{
                       transform: `scaleY(${filled ? 1 : 0})`,
                       transition: `transform ${TRAVEL}ms linear`,
                     }}
                   />
-                </>
+
+                  {/*
+                    A bright head riding the leading edge. The fill alone was
+                    far too quiet to register as motion — a hairline lengthening
+                    against a dark panel is not something the eye catches. A
+                    moving point of light is.
+                  */}
+                  <span
+                    className={cn(
+                      "absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full",
+                      node.tone === "human" ? "bg-mind" : "bg-paper",
+                      active && !filled ? "opacity-100" : "opacity-0",
+                    )}
+                    style={{
+                      top: filled ? "100%" : "0%",
+                      transition: `top ${TRAVEL}ms linear, opacity 220ms linear`,
+                      boxShadow: `0 0 14px 3px ${node.tone === "human" ? "#9b8cff" : "#f4f4f6"}`,
+                    }}
+                  />
+                </span>
               )}
 
               <span
                 aria-hidden
                 className={cn(
-                  "relative mt-1 size-3.5 shrink-0 rounded-full border transition-colors duration-500",
-                  node.tone === "human"
-                    ? active
-                      ? "border-mind bg-mind/30"
-                      : "border-rule-strong bg-ink"
-                    : active
-                      ? "border-paper/70 bg-paper/15"
-                      : "border-rule-strong bg-ink",
+                  "relative mt-1 size-4 shrink-0 rounded-full border-2 transition-all duration-500",
+                  active
+                    ? node.tone === "human"
+                      ? "scale-110 border-mind bg-mind"
+                      : "scale-110 border-paper bg-paper"
+                    : "scale-90 border-rule-strong bg-ink",
                 )}
               >
                 {/* Only while the flow is actually held at the checkpoint. */}
                 {waiting && (
-                  <span className="absolute -inset-1.5 animate-ping rounded-full border border-mind/50" />
+                  <span className="absolute -inset-2 animate-ping rounded-full border-2 border-mind" />
                 )}
               </span>
 
               <div
                 className={cn(
-                  "min-w-0 transition-opacity duration-500",
-                  active ? "opacity-100" : "opacity-35",
+                  "min-w-0 transition-all duration-500",
+                  active ? "translate-x-0 opacity-100" : "translate-x-1 opacity-25",
                 )}
               >
                 <p className={cn("ui-label", node.tone === "human" ? "text-mind" : "text-paper")}>
