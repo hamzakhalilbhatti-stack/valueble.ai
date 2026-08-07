@@ -7,17 +7,19 @@ import { SmoothScroll } from "@/components/smooth-scroll";
 import { RevealDriver } from "@/components/reveal";
 import { site } from "@/lib/site";
 
+// 500 exists solely for inline emphasis and the small UI labels. Nothing on
+// the page uses it at display size — 400 carries every heading.
 const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500"],
   display: "swap",
 });
 

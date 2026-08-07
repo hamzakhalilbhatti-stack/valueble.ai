@@ -152,18 +152,20 @@ function ProductShowcase({
       <div className="rail">
         <div className="reveal">
           <p className={`ui-label ${accent.text}`}>{product.index}</p>
-          <p className="mt-3 text-fine text-faint">{product.audience}</p>
+          <p className="mt-3 text-mute">{product.audience}</p>
         </div>
 
         <div className="measure">
           <h2 className="reveal text-head max-w-[20ch] text-balance">{product.name}</h2>
           <p className="reveal mt-5 max-w-[54ch] text-sub text-mute">{product.tagline}</p>
 
-          <div className="reveal mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-fine">
+          {/* Price sits at reading size. It is the second thing a buyer looks
+              for and does not belong in fine print. */}
+          <div className="reveal mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
             <span className={`border px-3 py-1.5 ${accent.border} ${accent.text}`}>
               {product.price}
             </span>
-            <span className="text-faint">
+            <span className="text-fine text-faint">
               {product.kind} · {product.status}
             </span>
           </div>

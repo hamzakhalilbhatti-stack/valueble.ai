@@ -46,8 +46,8 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             <p className="eyebrow">
               {product.index} · {product.kind}
             </p>
-            <p className="mt-3 text-fine text-faint">{product.audience}</p>
-            <p className="mt-1 text-fine text-paper">{product.price}</p>
+            <p className="mt-3 text-mute">{product.audience}</p>
+            <p className="mt-1 text-paper">{product.price}</p>
           </div>
           <div className="measure">
             <h1 className="reveal text-hero max-w-[16ch] text-balance text-paper">

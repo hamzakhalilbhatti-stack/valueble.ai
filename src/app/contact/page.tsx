@@ -90,16 +90,16 @@ export default function ContactPage() {
         <Head>Three things make the first reply useful</Head>
         <div className="mt-8 space-y-6">
           <Body>
-            <strong className="font-normal text-paper">The process, not the product.</strong>{" "}
+            <strong>The process, not the product.</strong>{" "}
             Describe the task somebody on your team does repeatedly — what triggers it, what
             they do, and where the output goes.
           </Body>
           <Body>
-            <strong className="font-normal text-paper">The volume.</strong> Ten a week and a
+            <strong>The volume.</strong> Ten a week and a
             thousand a week are different problems with different answers.
           </Body>
           <Body>
-            <strong className="font-normal text-paper">What you already use.</strong> The
+            <strong>What you already use.</strong> The
             tools it has to talk to matter more than any preference about how it is built.
           </Body>
         </div>

@@ -3,24 +3,34 @@
 /*
  * valueble.ai — design tokens.
  *
- * The whole system is three colours and one font at one weight. Every value
- * below was measured off the reference build rather than eyeballed, so the
- * proportions hold at any viewport.
+ * Every contrast ratio below is computed against the background, not judged by
+ * eye, and every one of them clears WCAG AA for the size it is used at.
  *
- *   background  #000    pure black, not a soft charcoal
- *   headings    #fff    pure white
- *   body        #a1a1a6 grey, so headings read as the only bright thing
+ *   ink    #08080a  ground
+ *   paper  #f4f4f6  headings          18.2:1
+ *   mute   #a8a8ae  body              8.5:1
+ *   faint  #8a8a90  meta and labels   5.8:1
  *
- * There is no bold anywhere. Hierarchy comes from size and space alone —
- * introducing a 600 weight is the single fastest way to break the register.
+ * Two deliberate departures from the reference build, both corrections:
+ *
+ * The ground is not pure black and the type is not pure white. At 21:1 white
+ * letterforms halate — they glow and shimmer against true black, especially on
+ * OLED — and that fatigues anyone reading more than a line of it. Pulling both
+ * ends a few points off the extremes removes the shimmer and costs nothing that
+ * can be seen side by side.
+ *
+ * `faint` was #6b6b70, which computes to 3.96:1 and fails AA outright. It was
+ * carrying the audience labels — the lines that tell a visitor whether a
+ * product is for them — so the most important small text on the site was also
+ * the least legible thing on it.
  */
 @theme {
-  --color-ink: #000000;
-  --color-paper: #ffffff;
-  --color-mute: #a1a1a6;
-  --color-faint: #6b6b70;
-  --color-rule: #1c1c1e;
-  --color-rule-strong: #2e2e32;
+  --color-ink: #08080a;
+  --color-paper: #f4f4f6;
+  --color-mute: #a8a8ae;
+  --color-faint: #8a8a90;
+  --color-rule: #202024;
+  --color-rule-strong: #34343a;
 
   /*
    * One accent per product, and they are never used interchangeably.
@@ -35,25 +45,41 @@
   --color-warm: #ffab4a; /* 02 — OrderRise. Conversation, response */
   --color-mind: #9b8cff; /* 03 — Custom agents. Assembly, intelligence */
 
-  /* Display scale. Desktop targets: 80/88, 35/45, 16/26. */
+  /*
+   * Type scale.
+   *
+   * Tracking tightens as size grows, which is the single strongest signal that
+   * type has been set rather than merely specified. Letterforms that look
+   * correctly spaced at 17px are visibly loose at 80px, because tracking is
+   * perceived relative to the letter height — so display sizes carry −0.025em
+   * and body carries none at all.
+   */
   --text-hero: clamp(2.5rem, 5.6vw, 5rem);
-  --text-hero--line-height: 1.1;
-  --text-hero--letter-spacing: -0.005em;
+  --text-hero--line-height: 1.06;
+  --text-hero--letter-spacing: -0.025em;
 
   --text-head: clamp(1.75rem, 2.6vw, 2.1875rem);
-  --text-head--line-height: 1.28;
+  --text-head--line-height: 1.26;
+  --text-head--letter-spacing: -0.015em;
 
-  --text-sub: clamp(1.125rem, 1.4vw, 1.375rem);
-  --text-sub--line-height: 1.4;
+  --text-sub: clamp(1.1875rem, 1.45vw, 1.4375rem);
+  --text-sub--line-height: 1.45;
+  --text-sub--letter-spacing: -0.008em;
 
-  --text-body: 1rem;
-  --text-body--line-height: 1.625;
+  /*
+   * 17px, not the 16px browser default. Sixteen reads as an application; this
+   * page is asking people to read several hundred words of argument, and at the
+   * measure used here 17/1.7 is the difference between scanning and reading.
+   */
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.7;
 
-  --text-eyebrow: 1rem;
+  --text-eyebrow: 1.0625rem;
   --text-eyebrow--line-height: 1.5;
 
-  --text-fine: 0.8125rem;
-  --text-fine--line-height: 1.55;
+  /* Meta and legal only. Never qualifying information a buyer needs. */
+  --text-fine: 0.84375rem;
+  --text-fine--line-height: 1.6;
 
   /* One easing, one set of durations. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -84,9 +110,20 @@
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    /* Faux-bold would defeat the single-weight rule the moment a browser
-       decided a heading needed synthesising. */
+    /* Never let a browser fake a weight we did not ship. */
     font-synthesis-weight: none;
+    /* Proportional figures read better in prose; tables opt into tabular. */
+    font-variant-numeric: proportional-nums;
+  }
+
+  /*
+   * Paragraphs get `pretty`, which asks the browser to avoid leaving a single
+   * word alone on the last line. Headings get `balance` at the call site,
+   * because an even two-line heading beats a long line over a short one.
+   */
+  p,
+  li {
+    text-wrap: pretty;
   }
 
   h1,
@@ -95,6 +132,21 @@
   h4 {
     color: var(--color-paper);
     font-weight: 400;
+  }
+
+  /*
+   * Emphasis is 500, and this is a deliberate relaxation of the reference's
+   * single-weight rule.
+   *
+   * With only one weight available, emphasising a phrase mid-paragraph meant
+   * changing its colour instead — which reads as a link, not as stress. One
+   * step up in weight is the correct tool and does not touch the register; 600
+   * and above is what would.
+   */
+  strong,
+  b {
+    color: var(--color-paper);
+    font-weight: 500;
   }
 
   ::selection {
@@ -141,6 +193,7 @@
     color: var(--color-paper);
     font-size: var(--text-eyebrow);
     line-height: var(--text-eyebrow--line-height);
+    letter-spacing: -0.006em;
   }
 
   /* Hairline separator, deliberately barely visible. */
@@ -156,9 +209,12 @@
   .ui-label {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.6875rem;
+    font-weight: 500;
     letter-spacing: 0.14em;
     line-height: 1;
     text-transform: uppercase;
+    /* Aligns digits in the demo panels' counters and score columns. */
+    font-variant-numeric: tabular-nums;
   }
 
   /* Chrome for the demo panels: one surface, one border, used everywhere. */

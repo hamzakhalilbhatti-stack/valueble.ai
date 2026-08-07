@@ -67,7 +67,7 @@ export function Hero() {
                     {product.name}
                     <ArrowUpRight className="size-3 shrink-0 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:-translate-y-1 group-hover:translate-x-1" />
                   </span>
-                  <span className="text-fine text-faint">{product.audience}</span>
+                  <span className="text-mute">{product.audience}</span>
                 </Link>
               </li>
             ))}
