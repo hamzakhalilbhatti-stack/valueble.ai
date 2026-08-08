@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+export const dynamic = "force-static";
 import { site } from "@/lib/site";
 
 export const alt = `${site.name} — ${site.tagline}`;
