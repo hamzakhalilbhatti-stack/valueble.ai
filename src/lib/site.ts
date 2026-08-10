@@ -8,8 +8,8 @@
 export const site = {
   name: "valueble.ai",
   legalName: "Valueble AI",
-  domain: "valueble.ai",
-  url: "https://valueble.ai", // TODO: confirm final domain before deploy
+  domain: "valuebleai.com",
+  url: "https://valuebleai.com", // TODO: confirm final domain before deploy
   tagline: "AI systems that do the work your team runs out of hours for.",
   description:
     "valueble.ai builds AI agents and growth tools for businesses and agencies — lead extraction, WhatsApp ordering agents, and custom automation built around how you already work.",
