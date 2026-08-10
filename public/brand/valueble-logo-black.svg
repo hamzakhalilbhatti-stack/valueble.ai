@@ -1,1 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="520" viewBox="0 0 1800 520">
+  <g transform="translate(110,115) scale(2.7)">
+    <path d="M6,12 L18,12 L44,66 L74,4 L96,4 L46,92 Z" fill="#000000"/>
+  </g>
 
+  <text
+    x="500"
+    y="330"
+    font-family="Noto Sans, Arial, sans-serif"
+    font-size="190"
+    font-weight="500"
+    letter-spacing="-6"
+    fill="#000000"
+  >
+    valueble
+  </text>
+
+  <rect x="1305" y="298" width="24" height="24" fill="#000000"/>
+
+  <text
+    x="1350"
+    y="330"
+    font-family="Noto Sans, Arial, sans-serif"
+    font-size="190"
+    font-weight="500"
+    letter-spacing="-6"
+    fill="#000000"
+  >
+    ai
+  </text>
+</svg>
