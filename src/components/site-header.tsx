@@ -34,7 +34,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
         <div className="pointer-events-auto mx-auto flex max-w-[96rem] items-center justify-between px-6 py-6 md:px-[3.25rem] md:py-8">
           <Logo />
 
