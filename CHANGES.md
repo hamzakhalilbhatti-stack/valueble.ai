@@ -189,3 +189,11 @@ code, copy, artwork or brand: our content, prices and demos are unchanged.
 
 Checked: tsc, eslint, production build pass; 18/18 click tests pass; no
 horizontal scroll at 390 and 1440px; no console errors.
+
+## Hero restore (on dark theme)
+
+- Brought back the QClay-inspired home hero from the polish pass (`src/components/hero-stage.tsx`): framed glass panel, cut-out photo with scan-box labels, floating call / WhatsApp / lead chips, and the real-price rail (24/7, $50, $200).
+- Re-skinned for the dark theme: dark glass frame with dot grid, the spotlight beam, a yellow glow behind the photo, faint coral/violet washes, dark pill chips, yellow italic "instantly.", and masked line-by-line headline entrance.
+- Scroll motion kept: copy lifts and fades, photo pushes in, chips fan outward. Reduced-motion respected.
+- Copy column widened so the headline breaks cleanly at 1280px+. The tilted console hero is removed; everything below the hero is unchanged.
+- The photo is a stock model, not a customer; the chip labels are examples.
