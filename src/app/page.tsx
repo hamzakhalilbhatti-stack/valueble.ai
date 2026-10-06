@@ -8,6 +8,8 @@ import { DemoTabs } from "@/components/product/demo-tabs";
 import { CountUp } from "@/components/motion";
 import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo } from "@/components/product-blocks";
 import { ArrowLink, Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
+import { AppTile, FaqAside, StickyNote, TOOLS, ToolMark, ToolTiles } from "@/components/polish";
+import { Hand, ShieldCheck, UserRound } from "lucide-react";
 import { JsonLd, faqLd } from "@/components/json-ld";
 import { cn } from "@/lib/cn";
 import { pageMeta } from "@/lib/meta";
@@ -52,9 +54,9 @@ export default function HomePage() {
                     href={p.path}
                     className="group flex h-full items-start gap-3 rounded-3xl border border-ink-2/80 bg-ink-2/75 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[transform,box-shadow,background-color] duration-300 ease-[var(--ease-spring)] hover:-translate-y-1.5 hover:bg-ink-2 hover:shadow-[var(--shadow-lift)]"
                   >
-                    <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-xl", ACCENT_TINT[p.accent])}>
-                      <Icon className="size-[1.125rem]" />
-                    </span>
+                    <AppTile size="md" className={cn("transition-transform duration-300 ease-[var(--ease-spring)] group-hover:rotate-[-6deg]", ACCENT_TINT[p.accent].split(" ")[1])}>
+                      <Icon className="size-5" />
+                    </AppTile>
                     <span className="min-w-0">
                       <span className="flex items-center gap-1.5 font-medium text-paper">
                         {p.name}
@@ -112,17 +114,28 @@ export default function HomePage() {
 
       {/* ── Problem ── */}
       <section id="problem" className="section" aria-labelledby="problem-title" data-od-id="home-problem">
-        <div className="container-site grid items-center gap-12 lg:grid-cols-2">
-          <Photo
-            src="/images/restaurant-kitchen.webp"
-            width={960}
-            height={640}
-            alt="A chef working the pass in a busy restaurant kitchen during service"
-            caption="The phone rings during the rush. Nobody can reach it."
-            className="reveal reveal-left order-last lg:order-first"
-          />
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid items-center gap-12 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-2">
+          <div className="relative order-last lg:order-first">
+            <Photo
+              src="/images/restaurant-kitchen.webp"
+              width={960}
+              height={640}
+              alt="A chef working the pass in a busy restaurant kitchen during service"
+              caption="The phone rings during the rush. Nobody can reach it."
+              className="reveal reveal-left"
+            />
+            <StickyNote className="float-a absolute -right-2 -top-8 hidden w-52 rotate-[4deg] sm:block lg:-right-8">
+              A customer who was never reached leaves no record behind.
+            </StickyNote>
+          </div>
           <div>
-            <SectionHeader eyebrow="The problem" title={<span id="problem-title">Small teams lose the work before they ever get to do it</span>} />
+            <SectionHeader
+              eyebrow="The problem"
+              id="problem-title"
+              title="Small teams lose the work"
+              muted={"before they ever get to\u00a0do\u00a0it"}
+            />
             <div className="reveal mt-6 space-y-6 text-[1.0625rem]">
               <p>The businesses that need help most are the ones with the fewest spare hours. To grow, the same handful of people are expected to:</p>
               <CheckList
@@ -140,6 +153,7 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+         </div>
         </div>
       </section>
 
@@ -148,7 +162,9 @@ export default function HomePage() {
         <div className="container-site">
           <SectionHeader
             eyebrow="Products"
-            title={<span id="products-title">Four working systems, each built around one job</span>}
+            id="products-title"
+            title="Four working systems,"
+            muted="each built around one job"
             lede="Who it is for, what it does, what it costs. Every price below is the real price."
           />
           <ProductStack />
@@ -175,12 +191,41 @@ export default function HomePage() {
       {/* ── Try the products ── */}
       <section id="demos" className="section" aria-labelledby="demos-title" data-od-id="home-demos">
         <div className="container-site">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <SectionHeader eyebrow="Try them" title={<span id="demos-title">Don&apos;t read about it. Click it.</span>} lede="Working demos in your browser with sample data. Run a search, place an order, approve an agent's action." />
+         <div className="canvas-panel dot-grid px-4 py-10 md:px-10 md:py-14">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <SectionHeader eyebrow="Try them" id="demos-title" title="Don't read about it." muted="Click it." lede="Working demos in your browser with sample data. Run a search, place an order, approve an agent's action." />
           </div>
           <div className="reveal mt-10">
             <DemoTabs />
           </div>
+         </div>
+        </div>
+      </section>
+
+      {/* ── Works with the tools you already use ── */}
+      <section id="works-with" className="section pt-0 md:pt-0" aria-labelledby="works-title" data-od-id="home-works-with">
+        <div className="container-site grid gap-4 md:grid-cols-[1.1fr_1fr]">
+          <div className="canvas-panel dot-grid reveal flex flex-col justify-between gap-10 p-7 md:p-10">
+            <div>
+              <p className="eyebrow mb-4"><span aria-hidden className="h-px w-6 bg-accent" />Where the work lands</p>
+              <h2 id="works-title" className="text-head">
+                No new app to learn.
+                <span className="head-muted"> Results arrive where you already look.</span>
+              </h2>
+            </div>
+            <ToolTiles />
+          </div>
+          <ul className="grid gap-4">
+            {TOOLS.slice(0, 4).map((t, i) => (
+              <li key={t.name} className="frag reveal flex items-center gap-4 p-4 md:p-5" style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}>
+                <AppTile size="md"><ToolMark src={t.src} className="size-6" /></AppTile>
+                <div>
+                  <p className="font-medium text-paper">{t.name}</p>
+                  <p className="text-sm text-mute">{t.note}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -193,7 +238,7 @@ export default function HomePage() {
       */}
       <section id="built-from-real-problems" className="on-cloud section" aria-labelledby="real-title" data-od-id="home-real-problems">
         <div className="container-site">
-          <SectionHeader eyebrow="Built from real problems" title={<span id="real-title">Nothing here started as a roadmap</span>} lede="Everything here came out of a real business problem rather than a product roadmap. Each one was built until it held." />
+          <SectionHeader eyebrow="Built from real problems" id="real-title" title="Nothing here started" muted="as a roadmap" lede="Everything here came out of a real business problem rather than a product roadmap. Each one was built until it held." />
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
               { slug: "lead-extractor" as const, problem: "Prospecting by hand was eating weekends.", body: "A list of 400 prospects was becoming a weekend of tabs. So the extension reads the Maps results, visits each website and scores the lead." },
@@ -203,7 +248,7 @@ export default function HomePage() {
               const p = getProduct(c.slug)!;
               return (
                 <article key={c.slug} className="card card-hover reveal flex flex-col overflow-hidden">
-                  <Photo src={p.photo.src} width={p.photo.width} height={p.photo.height} alt={p.photo.alt} className="rounded-none border-0 shadow-none" />
+                  <Photo src={p.photo.src} width={p.photo.width} height={p.photo.height} alt={p.photo.alt} className="rounded-none border-0 shadow-none [&_img]:aspect-[3/2] [&_img]:object-cover" />
                   <div className="flex flex-1 flex-col p-6">
                     <p className={cn("ui-label", ACCENT_TEXT[p.accent])}>{p.name}</p>
                     <h3 className="mt-3 text-title">{c.problem}</h3>
@@ -221,25 +266,43 @@ export default function HomePage() {
 
       {/* ── Founder ── */}
       <section id="approach" className="section" aria-labelledby="founder-title" data-od-id="home-founder">
-        <div className="container-site grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid gap-10 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="reveal">
             <p className="eyebrow mb-4">
               <span aria-hidden className="h-px w-6 bg-accent" />
               Who builds it
             </p>
             <h2 id="founder-title" className="text-head">
-              One person, and you talk to him
+              One person,
+              <span className="head-muted"> and you talk to him</span>
             </h2>
             {/* TODO (owner): add a real portrait of Hamza here (next/image, with alt text). */}
-            <div className="card mt-8 flex items-center gap-4 p-5">
-              <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-paper font-display text-lg font-semibold text-ink">
-                HK
-              </span>
+            <div className="frag mt-8 flex items-center gap-4 p-5">
+              <AppTile size="lg" dark>
+                <span className="font-display text-lg font-semibold">HK</span>
+              </AppTile>
               <div>
                 <p className="font-medium text-paper">{site.founder}</p>
                 <p className="text-sm text-mute">{site.founderRole}</p>
               </div>
             </div>
+            {/* Three working rules, each restated from the copy on the right. */}
+            <ul className="mt-4 grid gap-3">
+              {[
+                { Icon: UserRound, t: "No account manager", d: "You talk to the person writing the code." },
+                { Icon: Hand, t: "Says what not to automate", d: "Before anything gets built." },
+                { Icon: ShieldCheck, t: "A human checkpoint", d: "On anything risky or expensive." },
+              ].map(({ Icon, t, d }) => (
+                <li key={t} className="flex items-center gap-3 rounded-2xl border border-rule bg-ink-2/70 p-3.5">
+                  <AppTile size="sm"><Icon className="size-[1.125rem] text-paper" /></AppTile>
+                  <span>
+                    <span className="block text-[0.9375rem] font-medium text-paper">{t}</span>
+                    <span className="block text-sm text-mute">{d}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="reveal space-y-5 text-[1.0625rem]">
             <p>
@@ -258,13 +321,17 @@ export default function HomePage() {
             </p>
             <ArrowLink href="/about">More about how I work</ArrowLink>
           </div>
+         </div>
         </div>
       </section>
 
       {/* ── FAQ ── */}
       <section id="faq" className="on-cloud section" aria-labelledby="faq-title" data-od-id="home-faq">
         <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.6fr]">
-          <SectionHeader eyebrow="FAQ" title={<span id="faq-title">Questions people ask first</span>} />
+          <div>
+            <SectionHeader eyebrow="FAQ" id="faq-title" title="Questions" muted="people ask first" />
+            <FaqAside className="max-lg:hidden" />
+          </div>
           <FaqList faqs={homeFaqs} className="reveal" />
         </div>
       </section>

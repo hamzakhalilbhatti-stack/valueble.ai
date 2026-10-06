@@ -1,7 +1,8 @@
 import { PhoneForwarded } from "lucide-react";
 import { ArrowLink, Badge, Breadcrumbs, Button, FaqList, SectionHeader } from "@/components/ui";
 import { ProductDemo } from "@/components/product/product-demo";
-import { ACCENT_BG, ACCENT_TEXT, CtaBand, HowItWorks3, Photo, PlainFacts, ProductCard } from "@/components/product-blocks";
+import { ACCENT_BG, ACCENT_TEXT, CtaBand, HowItWorks3, PRODUCT_ICON, Photo, PlainFacts, ProductCard } from "@/components/product-blocks";
+import { AppTile, FaqAside, StickyNote } from "@/components/polish";
 import { JsonLd, breadcrumbLd, faqLd, productLd } from "@/components/json-ld";
 import { cn } from "@/lib/cn";
 import { contact, productOrder, type Product } from "@/lib/site";
@@ -19,6 +20,7 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
   ];
   const others = productOrder.filter((s) => s !== product.slug);
   const isVoice = product.slug === "voice-agent";
+  const HeroIcon = PRODUCT_ICON[product.slug];
 
   return (
     <>
@@ -27,12 +29,15 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
       {/* Hero */}
       <section id="overview" className="relative pb-14 pt-3 md:pb-20 md:pt-5" data-od-id="product-hero">
         <div className="container-site !max-w-[84rem]">
-         <div className="hero-frame px-5 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8 lg:px-12">
+         <div className="hero-frame dot-grid px-5 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8 lg:px-12">
           <div aria-hidden className={cn("absolute inset-0 -z-10 opacity-90", HERO_WASH[product.accent])} />
           <Breadcrumbs items={crumbs} />
           <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
             <div>
               <div className="flex flex-wrap items-center gap-2">
+                <AppTile size="md" className={cn("mr-1", ACCENT_TEXT[product.accent])}>
+                  <HeroIcon className="size-5" />
+                </AppTile>
                 {product.status === "Live" ? <Badge tone="live">Live</Badge> : <Badge>{product.status}</Badge>}
                 <Badge tone="price">
                   {product.price}
@@ -62,24 +67,27 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
       {/* Interactive demo */}
       <section id="demo" aria-labelledby="demo-title" className="on-cloud section" data-od-id="product-demo">
         <div className="container-site">
-          <SectionHeader eyebrow="Try it" title={<span id="demo-title">{`See ${product.name} work`}</span>} lede="A working demo in your browser, with sample data. Click through it." />
+         <div className="canvas-panel dot-grid px-4 py-10 md:px-10 md:py-14">
+          <SectionHeader eyebrow="Try it" id="demo-title" title={`See ${product.name} work.`} muted="Click through it." lede="A working demo in your browser, with sample data." />
           <div className="reveal mt-10">
             <ProductDemo slug={product.slug} />
           </div>
+         </div>
         </div>
       </section>
 
       {/* 3-step how it works */}
       <section id="how-it-works" className="section" aria-labelledby="how-title">
         <div className="container-site">
-          <SectionHeader align="center" eyebrow="How it works" title={<span id="how-title">Three steps, no jargon</span>} />
+          <SectionHeader align="center" eyebrow="How it works" id="how-title" title="Three steps," muted="no jargon" />
           <HowItWorks3 product={product} className="mt-14" />
         </div>
       </section>
 
       {/* Problem + photo */}
-      <section id="problem" className="section border-t border-rule" aria-labelledby="problem-title">
-        <div className="container-site grid items-center gap-12 lg:grid-cols-2">
+      <section id="problem" className="section" aria-labelledby="problem-title">
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid items-center gap-12 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-2">
           <div>
             <SectionHeader eyebrow="The problem" title={<span id="problem-title">{product.problem.heading}</span>} />
             <div className="reveal mt-6 space-y-5 text-mute">
@@ -88,7 +96,13 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
               ))}
             </div>
           </div>
-          <Photo {...product.photo} className="reveal reveal-right" />
+          <div className="relative">
+            <Photo {...product.photo} className="reveal reveal-right" />
+            <StickyNote className="float-b absolute -bottom-8 -left-3 hidden w-56 rotate-[-3deg] sm:block lg:-left-8">
+              {NOTE[product.slug]}
+            </StickyNote>
+          </div>
+         </div>
         </div>
       </section>
 
@@ -101,9 +115,11 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
               anything not yet built. Source: products[].features in src/lib/site.ts */}
           <SectionHeader eyebrow="What you get" title={<span id="features-title">{isVoice ? "What the voice agent does" : "Everything it does"}</span>} />
           <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {product.features.map((f) => (
-              <li key={f.title} className="card card-hover reveal p-6">
-                <span aria-hidden className={cn("mb-5 block h-1 w-10 rounded-full", ACCENT_BG[product.accent])} />
+            {product.features.map((f, i) => (
+              <li key={f.title} className="card card-hover reveal group p-6">
+                <AppTile size="md" className={cn("mb-5 transition-transform duration-300 ease-[var(--ease-spring)] group-hover:rotate-[-6deg]", ACCENT_TEXT[product.accent])}>
+                  <span className="font-mono text-sm font-medium">{String(i + 1).padStart(2, "0")}</span>
+                </AppTile>
                 <h3 className="text-[1.0625rem] font-semibold">{f.title}</h3>
                 <p className="mt-2 text-[0.9375rem] text-mute">{f.body}</p>
               </li>
@@ -133,17 +149,22 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
       {extras}
 
       {/* FAQ */}
-      <section id="faq" className="section border-t border-rule" aria-labelledby="faq-title">
+      <section id="faq" className="section" aria-labelledby="faq-title">
         <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.6fr]">
-          <SectionHeader
-            eyebrow="FAQ"
-            title={<span id="faq-title">{product.name} questions</span>}
-            lede={
-              <>
-                Something not covered? <ArrowLink href="/contact">Ask Hamza directly</ArrowLink>
-              </>
-            }
-          />
+          <div>
+            <SectionHeader
+              eyebrow="FAQ"
+              id="faq-title"
+              title={product.name}
+              muted="questions"
+              lede={
+                <span className="lg:hidden">
+                  Something not covered? <ArrowLink href="/contact">Ask Hamza directly</ArrowLink>
+                </span>
+              }
+            />
+            <FaqAside className="max-lg:hidden" />
+          </div>
           <FaqList faqs={product.faqs} className="reveal" />
         </div>
       </section>
@@ -152,7 +173,7 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
       <section id="other-products" className="on-cloud section" aria-labelledby="others-title">
         <div className="container-site">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <SectionHeader eyebrow="Also from valueble.ai" title={<span id="others-title">The other products</span>} />
+            <SectionHeader eyebrow="Also from valueble.ai" id="others-title" title="The other" muted="products" />
             <ArrowLink href="/pricing" className="reveal">
               Compare pricing for all four
             </ArrowLink>
@@ -229,6 +250,14 @@ export function VoiceExtras() {
     </>
   );
 }
+
+/** One real line from each product's own copy, set on the sticky note. */
+const NOTE: Record<Product["slug"], string> = {
+  "voice-agent": "Calls at 11pm, during the dinner rush, or while you're with a customer.",
+  "lead-extractor": "Search once. Export a lead list your sales team can actually work from.",
+  orderrise: "No app to download, no link to trust, no account to make.",
+  "ai-agents": "The gap is never the model. It's everything around it.",
+};
 
 /** Soft colour wash behind each product hero, keyed to the product accent. */
 const HERO_WASH: Record<Product["accent"], string> = {

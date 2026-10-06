@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Breadcrumbs, SectionHeader } from "@/components/ui";
-import { CtaBand } from "@/components/product-blocks";
+import { ACCENT_TEXT, CtaBand, PRODUCT_ICON } from "@/components/product-blocks";
+import { AppTile, StickyNote } from "@/components/polish";
 import { JsonLd, breadcrumbLd } from "@/components/json-ld";
 import { pageMeta } from "@/lib/meta";
 import { getProduct, productOrder, site, whatsappUrl } from "@/lib/site";
@@ -39,9 +40,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section id="what-i-do" className="section border-t border-rule" aria-labelledby="do-title">
-        <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.2fr]">
-          <SectionHeader eyebrow="What I do" title={<span id="do-title">I build the thing, and then I keep it running</span>} />
+      <section id="what-i-do" className="section pt-0 md:pt-0" aria-labelledby="do-title">
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid gap-10 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-[1fr_1.2fr]">
+          <div>
+            <SectionHeader eyebrow="What I do" id="do-title" title="I build the thing," muted="and then I keep it running" />
+            <div className="frag reveal mt-8 flex max-w-sm items-center gap-4 p-5">
+              <AppTile size="lg" dark>
+                <span className="font-display text-lg font-semibold">HK</span>
+              </AppTile>
+              <div>
+                <p className="font-medium text-paper">{site.founder}</p>
+                <p className="text-sm text-mute">{site.founderRole}</p>
+              </div>
+            </div>
+          </div>
           <div className="reveal space-y-5 text-[1.0625rem] lg:pt-10">
             <p>
               valueble.ai is not a team you get assigned to. You talk to me, I scope the work, I build it,
@@ -54,18 +67,22 @@ export default function AboutPage() {
               because restaurants were losing paid orders to an unanswered phone during the dinner rush.
             </p>
           </div>
+         </div>
         </div>
       </section>
 
       <section id="what-i-have-built" className="section border-t border-rule" aria-labelledby="built-title">
         <div className="container-site">
-          <SectionHeader eyebrow="What I have built" title={<span id="built-title">The products</span>} />
-          <ul className="mt-10 divide-y divide-rule border-y border-rule">
+          <SectionHeader eyebrow="What I have built" id="built-title" title="The products" muted="I build and support" />
+          <ul className="mt-10 grid gap-3">
             {productOrder.map((slug) => {
               const p = getProduct(slug)!;
               return (
                 <li key={slug} className="reveal">
-                  <Link href={p.path} className="group grid gap-3 py-7 md:grid-cols-[14rem_1fr_auto] md:gap-8">
+                  <Link href={p.path} className="frag group grid items-center gap-4 p-5 transition-[transform,box-shadow] duration-300 ease-[var(--ease-spring)] hover:-translate-y-1 md:grid-cols-[auto_14rem_1fr_auto] md:gap-8 md:p-6">
+                    <AppTile size="md" className={ACCENT_TEXT[p.accent]}>
+                      <ProductGlyph slug={slug} />
+                    </AppTile>
                     <span>
                       <span className="block font-display text-title font-semibold text-paper">{p.name}</span>
                       <span className="mt-1 block text-sm text-faint">
@@ -73,7 +90,9 @@ export default function AboutPage() {
                       </span>
                     </span>
                     <span className="max-w-[62ch] text-mute">{p.summary}</span>
-                    <ArrowUpRight aria-hidden className="hidden size-5 text-paper transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 md:block" />
+                    <span aria-hidden className="hidden size-10 place-items-center rounded-full border border-rule-strong text-paper transition-[background-color,color,transform] duration-300 group-hover:rotate-45 group-hover:bg-paper group-hover:text-ink md:grid">
+                      <ArrowUpRight className="size-4" />
+                    </span>
                   </Link>
                 </li>
               );
@@ -85,8 +104,11 @@ export default function AboutPage() {
       <section id="how-i-work" className="on-cloud section" aria-labelledby="work-title">
         <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.2fr]">
           <div className="reveal">
-            <p className="eyebrow mb-4">How I work</p>
-            <h2 id="work-title" className="text-head">Honest scope beats an impressive demo</h2>
+            <p className="eyebrow mb-4"><span aria-hidden className="h-px w-6 bg-accent" />How I work</p>
+            <h2 id="work-title" className="text-head">Honest scope beats<span className="head-muted"> an impressive demo</span></h2>
+            <StickyNote className="mt-10 hidden w-60 rotate-[-3deg] lg:block">
+              Eighty percent, reliably, beats a hundred that quietly fails.
+            </StickyNote>
           </div>
           <div className="reveal space-y-5 text-[1.0625rem]">
             <p>
@@ -110,4 +132,9 @@ export default function AboutPage() {
       />
     </>
   );
+}
+
+function ProductGlyph({ slug }: { slug: keyof typeof PRODUCT_ICON }) {
+  const Icon = PRODUCT_ICON[slug];
+  return <Icon className="size-5" />;
 }

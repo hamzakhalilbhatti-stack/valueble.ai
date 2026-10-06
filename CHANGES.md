@@ -127,3 +127,36 @@ demo, facts, problem, steps, features, FAQ, links to the other products and pric
 
 ## Verified
 - `tsc`, `eslint`, `next build` pass. 18/18 click tests pass (nav, dropdown, mobile menu, all four demos, FAQ, keyboard). No horizontal scroll at 390, 768, 1280. No console errors.
+
+## Polish pass (branch `polish-pass`, off `fix-pass`)
+
+Reference: Outcrowd's ChronoTask landing page (Dribbble) for craft, not layout.
+The yellow canvas, hero object, fonts and demos from the flair pass are kept.
+
+What was bland, and what replaced it:
+- **Sections floating on the background** → framed "canvas" panels (frosted
+  white, large radius) with a fine dot-grid texture. Used for the problem,
+  demos, founder, about, contact and every product page's demo and problem.
+- **Flat icon circles** → glossy 3D app tiles (`.app-tile`) on product
+  cards, feature cards, how-it-works steps, about/contact lists.
+- **Single-tone headings** → two-tone headings: the second line recedes
+  (`SectionHeader muted=`). Same words, same single H2.
+- **Empty left column under FAQ headings** → a "Not covered here? Ask Hamza"
+  card with WhatsApp and email (home, product pages, pricing).
+- **Empty space beside photos / headings** → pinned sticky notes quoting a
+  line that already exists in the site copy (no new claims).
+- **Founder block** had a lone HK card → plus three working rules restated
+  from the founder copy (no account manager, says what not to automate,
+  human checkpoint).
+- **New "Where the work lands" block** on home: WhatsApp, Google Maps,
+  Chrome, Sheets/CSV, email inbox — the tools the products already name.
+  Marks from Simple Icons (CC0), credits in `public/logos/CREDITS.txt`.
+  These are tools, not clients or partners; no affiliation is implied.
+- About and contact lists became hoverable cards with product tiles.
+- Section rhythm tightened (5.5rem desktop instead of 7rem); background
+  blooms toned down so the yellow reads clean.
+- Uneven photo heights in "Built from real problems" are now a consistent 3:2.
+
+Checked: tsc, eslint, `next build` pass; 16 click tests pass (dropdown,
+mobile menu, FAQ, demo tabs, every route with one H1); no horizontal
+scroll at 390 and 1440; no console errors.

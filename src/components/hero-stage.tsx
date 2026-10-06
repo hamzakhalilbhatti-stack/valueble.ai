@@ -29,7 +29,7 @@ export function HeroStage() {
     <ScrollScene as="section" mode="exit" id="top" className="relative pt-3 md:pt-5" data-od-id="home-hero">
       <div className="container-site !max-w-[84rem]">
         <div
-          className="hero-frame [transform:scale(calc(1_-_var(--p,0)*0.05))] [transform-origin:50%_0]"
+          className="hero-frame dot-grid [transform:scale(calc(1_-_var(--p,0)*0.05))] [transform-origin:50%_0]"
         >
           {/* soft colour wash inside the frame */}
           <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(45%_60%_at_52%_40%,color-mix(in_oklab,var(--sun)_55%,transparent),transparent_70%),radial-gradient(30%_40%_at_85%_80%,color-mix(in_oklab,var(--coral)_22%,transparent),transparent_70%),radial-gradient(30%_40%_at_10%_90%,color-mix(in_oklab,var(--violet)_16%,transparent),transparent_70%)]" />

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { Badge, Breadcrumbs, Button, FaqList, SectionHeader } from "@/components/ui";
 import { ACCENT_TEXT, CtaBand } from "@/components/product-blocks";
+import { FaqAside } from "@/components/polish";
 import { JsonLd, breadcrumbLd, faqLd } from "@/components/json-ld";
 import { cn } from "@/lib/cn";
 import { pageMeta } from "@/lib/meta";
@@ -112,7 +113,10 @@ export default function PricingPage() {
 
       <section id="faq" className="section border-t border-rule" aria-labelledby="faq-title">
         <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.6fr]">
-          <SectionHeader eyebrow="FAQ" title={<span id="faq-title">Pricing questions</span>} />
+          <div>
+            <SectionHeader eyebrow="FAQ" id="faq-title" title="Pricing" muted="questions" />
+            <FaqAside className="max-lg:hidden" />
+          </div>
           <FaqList faqs={pricingFaqs} className="reveal" />
         </div>
       </section>

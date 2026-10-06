@@ -1,6 +1,8 @@
 import { ArrowUpRight, CalendarCheck, Mail, MessageCircle, UserRound } from "lucide-react";
 import { Breadcrumbs, SectionHeader } from "@/components/ui";
 import { JsonLd, breadcrumbLd } from "@/components/json-ld";
+import { ACCENT_TEXT, PRODUCT_ICON } from "@/components/product-blocks";
+import { AppTile, StickyNote } from "@/components/polish";
 import { pageMeta } from "@/lib/meta";
 import { contact, getProduct, productOrder, whatsappUrl } from "@/lib/site";
 
@@ -94,9 +96,9 @@ export default function ContactPage() {
                     }
                     data-od-id={`contact-channel-${label.split(" ")[0].toLowerCase()}`}
                   >
-                    <span className={"grid size-11 shrink-0 place-items-center rounded-full " + (primary ? "bg-accent text-on-accent" : "border border-rule-strong text-paper")}>
-                      <Icon aria-hidden className="size-5" />
-                    </span>
+                    <AppTile size="md" dark={primary} className={primary ? "" : "text-paper"}>
+                      <Icon className="size-5" />
+                    </AppTile>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2 font-display text-title font-semibold text-paper">
                         {label}
@@ -114,10 +116,14 @@ export default function ContactPage() {
       </section>
 
       <section id="what-helps" className="on-cloud section" aria-labelledby="helps-title">
-        <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid gap-10 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-[1fr_1.4fr]">
           <div className="reveal">
-            <p className="eyebrow mb-4">What helps</p>
-            <h2 id="helps-title" className="text-head">Three things make the first reply useful</h2>
+            <p className="eyebrow mb-4"><span aria-hidden className="h-px w-6 bg-accent" />What helps</p>
+            <h2 id="helps-title" className="text-head">Three things<span className="head-muted"> make the first reply useful</span></h2>
+            <StickyNote className="mt-10 hidden w-60 rotate-[-3deg] lg:block">
+              Bring the process, not the spec.
+            </StickyNote>
           </div>
           <ol className="reveal grid gap-4">
             {[
@@ -125,21 +131,22 @@ export default function ContactPage() {
               ["The volume.", "Ten a week and a thousand a week are different problems with different answers."],
               ["What you already use.", "The tools it has to talk to matter more than any preference about how it is built."],
             ].map(([t, b], i) => (
-              <li key={t} className="card flex gap-4 p-5">
-                <span className="ui-label pt-1 text-accent">0{i + 1}</span>
+              <li key={t} className="frag flex items-start gap-4 p-5">
+                <AppTile size="sm"><span className="font-mono text-xs font-medium text-paper">0{i + 1}</span></AppTile>
                 <p>
                   <strong>{t}</strong> {b}
                 </p>
               </li>
             ))}
           </ol>
+         </div>
         </div>
       </section>
 
       <section id="straight-to-a-product" className="section" aria-labelledby="direct-title">
         <div className="container-site">
-          <SectionHeader eyebrow="Straight to a product" title={<span id="direct-title">Already know which one?</span>} />
-          <ul className="mt-10 divide-y divide-rule border-y border-rule">
+          <SectionHeader eyebrow="Straight to a product" id="direct-title" title="Already know" muted="which one?" />
+          <ul className="mt-10 grid gap-3 md:grid-cols-2">
             {productOrder.map((slug) => {
               const p = getProduct(slug)!;
               const newTab = /^https?:/.test(p.cta.href);
@@ -148,10 +155,13 @@ export default function ContactPage() {
                   <a
                     href={p.cta.href}
                     {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                    className="group flex min-h-16 flex-wrap items-center justify-between gap-x-8 gap-y-1 py-5"
+                    className="frag group flex min-h-16 flex-wrap items-center gap-x-4 gap-y-1 p-4 transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-1"
                   >
-                    <span className="font-medium text-paper">{p.name}</span>
-                    <span className="inline-flex items-center gap-2 text-mute underline-offset-4 group-hover:text-paper group-hover:underline">
+                    <AppTile size="sm" className={ACCENT_TEXT[p.accent]}>
+                      <ProductGlyph slug={slug} />
+                    </AppTile>
+                    <span className="mr-auto font-medium text-paper">{p.name}</span>
+                    <span className="inline-flex items-center gap-2 text-sm text-mute underline-offset-4 group-hover:text-paper group-hover:underline">
                       {p.cta.label}
                       <ArrowUpRight aria-hidden className="size-4" />
                     </span>
@@ -164,4 +174,9 @@ export default function ContactPage() {
       </section>
     </>
   );
+}
+
+function ProductGlyph({ slug }: { slug: keyof typeof PRODUCT_ICON }) {
+  const Icon = PRODUCT_ICON[slug];
+  return <Icon className="size-[1.125rem]" />;
 }
