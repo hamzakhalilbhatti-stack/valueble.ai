@@ -95,4 +95,9 @@ demo, facts, problem, steps, features, FAQ, links to the other products and pric
 - Served `out/` locally and screenshotted every page at 360, 768 and 1280px: no horizontal
   scroll, one H1 per page. Checked the Products dropdown (opens, closes on Escape), mobile
   menu, FAQ accordion, and that all JSON-LD parses.
-- Lighthouse was not run in this pass; run it against the deployed site.
+- Lighthouse (local, simulated mobile, Edge): accessibility 100, SEO 100, best practices 96
+  on every page tested. Performance ranged 82–95 between runs on a loaded machine; CLS is 0.
+  Re-run against the deployed site. The 96 best-practices score comes from 404s on Next's
+  client prefetch `.txt` files under a plain static server; check it on the real host.
+- Mobile: below 640px the hero visual is hidden. It sat below the fold, shifted on font load
+  and duplicated the voice banner directly underneath.
