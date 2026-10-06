@@ -25,9 +25,10 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
       <JsonLd data={[productLd(product), faqLd(product.faqs), breadcrumbLd(crumbs)]} />
 
       {/* Hero */}
-      <section id="overview" className="relative isolate pb-14 pt-10 md:pb-20 md:pt-14" data-od-id="product-hero">
-        <div className="atmosphere" />
-        <div className="container-site">
+      <section id="overview" className="relative pb-14 pt-3 md:pb-20 md:pt-5" data-od-id="product-hero">
+        <div className="container-site !max-w-[84rem]">
+         <div className="hero-frame px-5 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8 lg:px-12">
+          <div aria-hidden className={cn("absolute inset-0 -z-10 opacity-90", HERO_WASH[product.accent])} />
           <Breadcrumbs items={crumbs} />
           <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
             <div>
@@ -38,9 +39,9 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
                   {product.priceNote && <span className="text-faint">· {product.priceNote}</span>}
                 </Badge>
               </div>
-              <h1 className="mt-6 max-w-[18ch] text-display md:text-[clamp(2.5rem,4.6vw,3.75rem)]">
+              <h1 className="word-in mt-6 max-w-[18ch] text-display md:text-[clamp(2.5rem,4.6vw,3.75rem)]">
                 <span className={cn("eyebrow mb-4 flex font-sans", ACCENT_TEXT[product.accent])}>{product.hero.eyebrow}</span>
-                {product.hero.headline}
+                <span style={{ ["--i" as string]: 1 }}>{product.hero.headline}</span>
               </h1>
               <p className="mt-6 max-w-[54ch] text-sub text-mute">{product.hero.sub}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -54,6 +55,7 @@ export function ProductPage({ product, extras }: { product: Product; extras?: Re
             </div>
             <PlainFacts product={product} className="h-fit lg:mt-12" />
           </div>
+         </div>
         </div>
       </section>
 
@@ -227,3 +229,11 @@ export function VoiceExtras() {
     </>
   );
 }
+
+/** Soft colour wash behind each product hero, keyed to the product accent. */
+const HERO_WASH: Record<Product["accent"], string> = {
+  voice: "bg-[radial-gradient(50%_70%_at_85%_20%,oklch(0.85_0.08_250/0.55),transparent_70%),radial-gradient(40%_60%_at_10%_100%,oklch(0.89_0.17_95/0.5),transparent_70%)]",
+  scan: "bg-[radial-gradient(50%_70%_at_85%_20%,oklch(0.86_0.1_172/0.55),transparent_70%),radial-gradient(40%_60%_at_10%_100%,oklch(0.89_0.17_95/0.5),transparent_70%)]",
+  warm: "bg-[radial-gradient(50%_70%_at_85%_20%,oklch(0.82_0.12_45/0.45),transparent_70%),radial-gradient(40%_60%_at_10%_100%,oklch(0.89_0.17_95/0.55),transparent_70%)]",
+  mind: "bg-[radial-gradient(50%_70%_at_85%_20%,oklch(0.82_0.1_300/0.45),transparent_70%),radial-gradient(40%_60%_at_10%_100%,oklch(0.89_0.17_95/0.5),transparent_70%)]",
+};

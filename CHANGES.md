@@ -101,3 +101,29 @@ demo, facts, problem, steps, features, FAQ, links to the other products and pric
   client prefetch `.txt` files under a plain static server; check it on the real host.
 - Mobile: below 640px the hero visual is hidden. It sat below the fold, shifted on font load
   and duplicated the voice banner directly underneath.
+
+
+---
+
+# Fix pass (branch `fix-pass`)
+
+## What was broken and how it was fixed
+- **Mobile menu did nothing.** The header's `backdrop-filter` created a containing block, so the fixed mobile sheet was squashed to zero height inside the 64px bar. The blur now lives on its own layer; the sheet is a fixed overlay.
+- **Products dropdown** now opens on hover (with a grace delay), click, Enter or Arrow Down; Esc closes and returns focus; it closes on every navigation.
+- **Scroll animations never played.** The reveal observer ran once from the root layout (new pages after client navigation were never observed) and a 2.5s watchdog force-showed everything. Replaced with `RevealDriver`, which re-scans on route change and DOM insertion.
+- **Fake demo videos and the kitchen display** were removed. Replaced with working in-browser demos (OrderRise chat, scraper with CSV export, voice call player with human handoff, custom agent with approve/reject checkpoint). Each is labelled as a demo with sample data.
+
+## Flair pass (yellow, colour, hero object, scroll motion)
+- **Palette:** butter-yellow canvas, white frosted cards, near-black ink. Primary buttons are ink-on-yellow. Product colours (blue voice, teal scraper, orange OrderRise, violet agents) tint each product card and hero.
+- **Living background:** a fixed `.aurora` layer of four slow-drifting colour blooms (sun, coral, violet, mint) plus fine grain. Transform-only animation; disabled under reduced motion. Tinted section bands were removed so the background reads as one continuous canvas.
+- **Hero object (style reference: QClay "AI Skincare" shot):** a framed glass "window" with a real CC0 photo of a customer on her phone, background removed (`public/images/hero-caller.webp`, credited in `CREDITS.json`). Scan-box annotations ("Customer, 11pm Friday", "New WhatsApp order"), floating product chips, and a right-hand rail of real prices/hours (24/7, $50, $200). Headline is two-tone with one serif italic word.
+- **Scroll-driven motion:** `ScrollScene` writes scroll progress to a CSS variable; as the hero leaves, the copy lifts and fades, the photo pushes in, and the chips fan out at different depths. Products are now a stack of sticky cards that slide over each other. Word-by-word headline entrance, gradient scroll-progress bar, capability marquee (words only, no logos).
+- **Type:** Instrument Sans (display) + Instrument Serif italic (one flair word) + Geist body, all via next/font.
+- **Removed:** `hero-visual.tsx` (replaced by `hero-stage.tsx`).
+
+## Owner TODOs added in this pass
+- Replace the hero photo with your own (a real customer or your team) if you have one; the current one is a CC0 stock model.
+- The scan-box labels and hero chips are illustrative of the products, not real orders.
+
+## Verified
+- `tsc`, `eslint`, `next build` pass. 18/18 click tests pass (nav, dropdown, mobile menu, all four demos, FAQ, keyboard). No horizontal scroll at 390, 768, 1280. No console errors.

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { ArrowUpRight, Mail, MessageCircle } from "lucide-react";
-import { HeroVisual } from "@/components/hero-visual";
+import { HeroStage } from "@/components/hero-stage";
+import { Marquee } from "@/components/marquee";
+import { ProductStack } from "@/components/product-stack";
 import { VoiceDemo } from "@/components/product/voice-demo";
 import { DemoTabs } from "@/components/product/demo-tabs";
 import { CountUp } from "@/components/motion";
-import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo, ProductCard } from "@/components/product-blocks";
+import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo } from "@/components/product-blocks";
 import { ArrowLink, Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
 import { JsonLd, faqLd } from "@/components/json-ld";
 import { cn } from "@/lib/cn";
@@ -33,45 +35,22 @@ export default function HomePage() {
     <>
       <JsonLd data={[websiteLd, faqLd(homeFaqs)]} />
 
-      {/* ── Hero ── */}
-      <section id="top" className="relative isolate overflow-hidden" data-od-id="home-hero">
-        <div className="atmosphere" />
-        <div className="container-site grid items-center gap-10 pb-12 pt-10 md:pt-16 lg:grid-cols-[1.1fr_1fr] lg:pb-16">
-          <div>
-            <h1 className="text-hero">
-              <span className="eyebrow mb-6 flex font-sans">
-                <span aria-hidden className="pulse-dot size-1.5 rounded-full bg-accent" />
-                AI agents and automation for small teams
-              </span>
-              {site.headline}
-            </h1>
-            <p className="mt-6 max-w-[36ch] text-sub text-mute md:text-[1.375rem]">{site.tagline}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href={contact.bookingGeneral} data-od-id="hero-book-call">
-                Book a call
-              </Button>
-              <Button href="#products" variant="secondary" data-od-id="hero-see-products">
-                See the products
-              </Button>
-            </div>
-          </div>
-          <div className="hidden md:block">
-            <HeroVisual />
-          </div>
-        </div>
+      <HeroStage />
 
-        {/* What I build, in one glance */}
+      {/* ── What I build, in one glance ── */}
+      <section aria-label="What valueble.ai builds" className="relative pt-10 md:pt-14" data-od-id="home-glance">
         <div className="container-site pb-14 md:pb-20">
-          <p className="eyebrow mb-4">What I build</p>
+          <Marquee />
+          <p className="eyebrow mb-4 mt-10">What I build</p>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Products at a glance">
             {productOrder.map((slug) => {
               const p = getProduct(slug)!;
               const Icon = PRODUCT_ICON[slug];
               return (
-                <li key={slug}>
+                <li key={slug} className="reveal">
                   <Link
                     href={p.path}
-                    className="group flex h-full items-start gap-3 rounded-2xl border border-rule bg-ink-2/80 p-4 shadow-[var(--shadow-card)] backdrop-blur transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-rule-strong hover:shadow-[var(--shadow-lift)]"
+                    className="group flex h-full items-start gap-3 rounded-3xl border border-ink-2/80 bg-ink-2/75 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[transform,box-shadow,background-color] duration-300 ease-[var(--ease-spring)] hover:-translate-y-1.5 hover:bg-ink-2 hover:shadow-[var(--shadow-lift)]"
                   >
                     <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-xl", ACCENT_TINT[p.accent])}>
                       <Icon className="size-[1.125rem]" />
@@ -95,8 +74,9 @@ export default function HomePage() {
       {/* ── Featured: AI Voice Agent (dark band, interactive) ── */}
       {/* TODO (owner): voice agent capabilities on this site are draft marketing
           copy. Confirm each against the actual product before publishing. */}
-      <section id="voice-agent" aria-labelledby="voice-banner-title" className="theme-dark section relative isolate overflow-hidden" data-od-id="voice-banner">
-        <div aria-hidden className="absolute -right-40 -top-40 -z-10 size-[36rem] rounded-full bg-voice/15 blur-3xl" />
+      <section id="voice-agent" aria-labelledby="voice-banner-title" className="theme-dark section relative isolate mx-2 overflow-hidden rounded-[2rem] sm:mx-4 md:rounded-[2.5rem] lg:mx-6" data-od-id="voice-banner">
+        <div aria-hidden className="absolute -right-40 -top-40 -z-10 size-[36rem] rounded-full bg-voice/20 blur-3xl" />
+        <div aria-hidden className="absolute -bottom-48 -left-32 -z-10 size-[30rem] rounded-full bg-sun/15 blur-3xl" />
         <div className="container-site grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="reveal">
             <div className="flex flex-wrap items-center gap-2">
@@ -164,18 +144,14 @@ export default function HomePage() {
       </section>
 
       {/* ── Products overview ── */}
-      <section id="products" className="on-cloud section" aria-labelledby="products-title" data-od-id="home-products">
+      <section id="products" className="section" aria-labelledby="products-title" data-od-id="home-products">
         <div className="container-site">
           <SectionHeader
             eyebrow="Products"
             title={<span id="products-title">Four working systems, each built around one job</span>}
             lede="Who it is for, what it does, what it costs. Every price below is the real price."
           />
-          <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {productOrder.map((slug) => (
-              <ProductCard key={slug} slug={slug} className="reveal" />
-            ))}
-          </div>
+          <ProductStack />
           {/* Real numbers from the offers above, not invented metrics. */}
           <dl className="reveal mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-4">
             {[
