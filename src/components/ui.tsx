@@ -1,132 +1,215 @@
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
+import type { Faq } from "@/lib/site";
+
+const isExternalHref = (href: string) => /^(https?:|mailto:|tel:)/.test(href);
 
 /**
- * The boxed action. One button style on the whole site — a thin outlined box
- * with a split arrow cell, inverting to solid white on hover.
+ * Button. Three variants:
+ *  - primary   solid accent, one per viewport
+ *  - secondary outlined, for the second action in a pair
+ *  - ghost     text link with an arrow
+ * Hover moves the background, never lightens the text.
  */
-export function BoxButton({
+export function Button({
   href,
   children,
+  variant = "primary",
+  size = "md",
   className,
-  external,
+  ariaLabel,
+  "data-od-id": odId,
 }: {
   href: string;
   children: React.ReactNode;
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md";
   className?: string;
-  external?: boolean;
+  ariaLabel?: string;
+  "data-od-id"?: string;
 }) {
-  const isExternal = external ?? /^(https?:|mailto:|tel:)/.test(href);
-
+  const external = isExternalHref(href);
+  const classes = cn(
+    "group inline-flex items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap",
+    "transition-[background-color,border-color,transform] duration-200 ease-[var(--ease-out)] active:translate-y-px",
+    size === "md" ? "min-h-12 px-6 text-[0.9375rem]" : "min-h-10 px-4 text-sm",
+    variant === "primary" &&
+      "bg-accent text-ink shadow-[0_0_0_1px_rgb(95_232_200/0.4),0_10px_30px_-10px_rgb(95_232_200/0.55)] hover:bg-accent-strong",
+    variant === "secondary" &&
+      "border border-rule-strong bg-white/[0.03] text-paper hover:border-faint hover:bg-white/[0.08]",
+    variant === "ghost" && "min-h-0 px-0 text-paper underline-offset-4 hover:underline",
+    className,
+  );
+  const Icon = external ? ArrowUpRight : ArrowRight;
   const inner = (
     <>
-      <span className="px-6 py-3.5">{children}</span>
-      <span className="grid w-[3.25rem] shrink-0 place-items-center self-stretch border-l border-current">
-        <ArrowUpRight />
-      </span>
+      {children}
+      <Icon
+        aria-hidden
+        className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+      />
     </>
   );
 
-  const classes = cn(
-    "group inline-flex items-stretch border border-paper text-paper",
-    "transition-colors duration-300 ease-[var(--ease-out)]",
-    "hover:bg-paper hover:text-ink",
-    className,
-  );
-
-  if (isExternal) {
+  if (external) {
+    const newTab = /^https?:/.test(href);
     return (
-      <a href={href} target="_blank" rel="noreferrer" className={classes}>
+      <a
+        href={href}
+        className={classes}
+        aria-label={ariaLabel}
+        data-od-id={odId}
+        {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
         {inner}
       </a>
     );
   }
-
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} aria-label={ariaLabel} data-od-id={odId}>
       {inner}
     </Link>
   );
 }
 
-export function ArrowUpRight({ className }: { className?: string }) {
+/** Small status / price chip. */
+export function Badge({
+  children,
+  tone = "neutral",
+  className,
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "live" | "price" | "accent";
+  className?: string;
+}) {
   return (
-    <svg
-      viewBox="0 0 14 14"
-      className={cn("size-3.5", className)}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      aria-hidden
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium leading-none",
+        tone === "neutral" && "border-rule-strong bg-white/[0.03] text-mute",
+        tone === "live" && "border-accent/30 bg-accent/10 text-accent",
+        tone === "price" && "border-rule-strong bg-ink-3 text-paper",
+        tone === "accent" && "border-voice/30 bg-voice/10 text-voice",
+        className,
+      )}
     >
-      <path d="M3 11L11 3M11 3H4.5M11 3V9.5" />
-    </svg>
+      {tone === "live" && <span aria-hidden className="pulse-dot size-1.5 rounded-full bg-accent" />}
+      {children}
+    </span>
   );
 }
 
-/**
- * The page's structural unit: a label on the left rail, content beside it.
- * Every section on the site is one of these, which is what keeps the vertical
- * rhythm identical from the top of the page to the bottom.
- */
-export function Section({
-  label,
-  children,
+/** Section header: eyebrow, H2, optional lede. */
+export function SectionHeader({
+  eyebrow,
+  title,
+  lede,
+  align = "left",
   className,
+  as: Tag = "h2",
   id,
 }: {
-  label?: string;
-  children: React.ReactNode;
+  eyebrow?: string;
+  title: React.ReactNode;
+  lede?: React.ReactNode;
+  align?: "left" | "center";
   className?: string;
+  as?: "h1" | "h2";
   id?: string;
 }) {
   return (
-    <section id={id} className={cn("py-24 md:py-36", className)}>
-      <div className="rail">
-        {/* Below the rail breakpoint the grid is a single column, so an empty
-            placeholder would occupy a row and open a gap. */}
-        {label ? (
-          <p className="eyebrow reveal rail-label">{label}</p>
-        ) : (
-          <span aria-hidden className="hidden min-[900px]:block" />
-        )}
-        <div className="measure">{children}</div>
-      </div>
-    </section>
+    <div
+      className={cn(
+        "reveal max-w-3xl",
+        align === "center" && "mx-auto text-center",
+        className,
+      )}
+    >
+      {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+      <Tag id={id} className={Tag === "h1" ? "text-display" : "text-head"}>
+        {title}
+      </Tag>
+      {lede && (
+        <p className={cn("mt-5 text-sub text-mute", align === "center" && "mx-auto max-w-2xl")}>
+          {lede}
+        </p>
+      )}
+    </div>
   );
 }
 
-/** Section headline. 35/45 on desktop — never larger, never bolder. */
-export function Head({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+/** FAQ accordion. Native <details> so it works without JS and with the keyboard. */
+export function FaqList({ faqs, className }: { faqs: Faq[]; className?: string }) {
   return (
-    <h2 className={cn("text-head reveal max-w-[19ch] text-balance", className)}>{children}</h2>
+    <div className={cn("divide-y divide-rule border-y border-rule", className)}>
+      {faqs.map((faq, i) => (
+        <details key={faq.q} className="faq group" data-od-id={`faq-item-${i + 1}`}>
+          <summary className="flex min-h-14 items-center justify-between gap-6 py-5 text-left text-paper transition-colors hover:text-accent-strong">
+            <h3 className="font-sans text-base font-medium md:text-[1.0625rem]">{faq.q}</h3>
+            <span className="faq-icon grid size-8 shrink-0 place-items-center rounded-full border border-rule-strong">
+              <Plus aria-hidden className="size-4" />
+            </span>
+          </summary>
+          <p className="max-w-3xl pb-6 pr-12 text-mute">{faq.a}</p>
+        </details>
+      ))}
+    </div>
   );
 }
 
-/** Body copy at the reading measure. */
-export function Body({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <p className={cn("reveal max-w-[62ch] text-mute", className)}>{children}</p>;
+/** Visible breadcrumb trail for inner pages. Pair with BreadcrumbJsonLd. */
+export function Breadcrumbs({ items }: { items: { name: string; href: string }[] }) {
+  return (
+    <nav aria-label="Breadcrumb" className="mb-8">
+      <ol className="flex flex-wrap items-center gap-1.5 text-fine text-faint">
+        {items.map((item, i) => {
+          const last = i === items.length - 1;
+          return (
+            <li key={item.href} className="flex items-center gap-1.5">
+              {last ? (
+                <span aria-current="page" className="text-mute">
+                  {item.name}
+                </span>
+              ) : (
+                <>
+                  <Link href={item.href} className="transition-colors hover:text-paper">
+                    {item.name}
+                  </Link>
+                  <ChevronRight aria-hidden className="size-3.5" />
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
 }
 
-/** The reference's list style: plain discs, generous leading, no icons. */
-export function List({ items, className }: { items: string[]; className?: string }) {
+/** Check-mark list used for capabilities and the problem bullets. */
+export function CheckList({
+  items,
+  className,
+  tone = "accent",
+}: {
+  items: string[];
+  className?: string;
+  tone?: "accent" | "voice" | "warm" | "mind" | "scan";
+}) {
+  const dot = {
+    accent: "bg-accent",
+    voice: "bg-voice",
+    warm: "bg-warm",
+    mind: "bg-mind",
+    scan: "bg-scan",
+  }[tone];
   return (
-    <ul className={cn("reveal ml-5 max-w-[62ch] list-disc space-y-1.5 text-mute", className)}>
+    <ul className={cn("space-y-3", className)}>
       {items.map((item) => (
-        <li key={item} className="pl-1.5">
-          {item}
+        <li key={item} className="flex gap-3">
+          <span aria-hidden className={cn("mt-[0.6rem] size-1.5 shrink-0 rounded-full", dot)} />
+          <span>{item}</span>
         </li>
       ))}
     </ul>

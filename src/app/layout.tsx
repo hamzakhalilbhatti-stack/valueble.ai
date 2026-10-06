@@ -1,14 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { SmoothScroll } from "@/components/smooth-scroll";
 import { RevealDriver } from "@/components/reveal";
+import { JsonLd, organizationLd, personLd } from "@/components/json-ld";
 import { site } from "@/lib/site";
 
-// 500 exists solely for inline emphasis and the small UI labels. Nothing on
-// the page uses it at display size — 400 carries every heading.
+// Display: Bricolage Grotesque — characterful, tight at large sizes.
+// Body: Geist. Mono: Geist Mono for UI labels inside product mocks.
+// All self-hosted by next/font at build time; no request to Google at runtime.
+const display = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+
 const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
@@ -26,48 +34,39 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.tagline}`,
-    template: `%s — ${site.name}`,
+    default: "Valueble AI | AI Agents, WhatsApp Ordering and Lead Tools",
+    template: `%s | ${site.name}`,
   },
   description: site.description,
-  keywords: [
-    "AI agents",
-    "WhatsApp AI agent",
-    "Google Maps scraper",
-    "lead generation tools",
-    "business automation",
-    "AI agency",
-  ],
-  authors: [{ name: site.founder }],
+  applicationName: site.name,
+  authors: [{ name: site.founder, url: `${site.url}/about` }],
   creator: site.founder,
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: site.url,
-    siteName: site.name,
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
-  },
+  publisher: site.legalName,
+  openGraph: { type: "website", locale: "en_US", siteName: site.name, url: site.url },
+  twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#07080d",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`${display.variable} ${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <head>
         {/*
-          Marks the document JS-capable during parsing, before first paint, and
-          arms the reveal watchdog. Content staying invisible is a far worse
-          failure than a reveal that does not animate.
+          Marks the document JS-capable before first paint and arms the reveal
+          watchdog: content staying invisible is far worse than a reveal that
+          does not animate. Crawlers and no-JS visitors see everything.
         */}
         <script
           dangerouslySetInnerHTML={{
@@ -76,11 +75,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body>
-        <SmoothScroll />
+        <JsonLd data={[organizationLd, personLd]} />
         <RevealDriver />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[100] focus:bg-paper focus:px-4 focus:py-2 focus:text-ink"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-ink"
         >
           Skip to main content
         </a>
