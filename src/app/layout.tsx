@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RevealDriver } from "@/components/reveal";
-import { ScrollProgress } from "@/components/motion";
+import { GlowTracker, ScrollProgress } from "@/components/motion";
 import { JsonLd, organizationLd, personLd } from "@/components/json-ld";
 import { site } from "@/lib/site";
 
@@ -59,8 +59,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbf3c9",
-  colorScheme: "light",
+  themeColor: "#0b0b0e",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };
@@ -96,6 +96,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <JsonLd data={[organizationLd, personLd]} />
         <RevealDriver />
         <ScrollProgress />
+        <GlowTracker />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent"

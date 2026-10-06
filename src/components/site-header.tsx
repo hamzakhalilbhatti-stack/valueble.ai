@@ -113,23 +113,19 @@ export function SiteHeader() {
   const productActive = menuProducts.some((p) => p.path === pathname);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50 px-3 pt-3 md:pt-4">
       {/*
-        The translucent blur lives on its own layer, NOT on <header>.
-        backdrop-filter on an element makes it the containing block for
-        position:fixed descendants, which squashed the fixed mobile sheet to
-        zero height inside the 64px bar (the "mobile menu does nothing" bug).
+        Floating pill bar. The blur lives on the inner pill, never on <header>:
+        backdrop-filter on an ancestor becomes the containing block for the
+        fixed mobile sheet (the old "mobile menu does nothing" bug).
       */}
       <div
-        aria-hidden
         className={cn(
-          "absolute inset-0 -z-10 border-b transition-[background-color,border-color,box-shadow] duration-300",
-          scrolled || open
-            ? "border-ink-2/70 bg-ink-2/85 shadow-[0_10px_40px_-24px_oklch(0.35_0.08_60/0.5)] backdrop-blur-2xl backdrop-saturate-150"
-            : "border-transparent bg-transparent",
+          "nav-pill mx-auto flex h-14 max-w-[56rem] items-center justify-between gap-4 rounded-2xl pl-4 pr-2 transition-[max-width,box-shadow,background-color] duration-500 ease-[var(--ease-spring)] md:h-16 md:pl-5",
+          scrolled && "max-w-[50rem]",
+          open && "rounded-b-none",
         )}
-      />
-      <div className="container-site flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
+      >
         <Logo />
 
         <nav aria-label="Main" className="hidden lg:block">
@@ -153,7 +149,7 @@ export function SiteHeader() {
                   onClick={() => setProducts(!productsOpen)}
                   onKeyDown={onTriggerKey}
                   className={cn(
-                    "inline-flex min-h-11 items-center gap-1 rounded-full px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-expanded:bg-ink-3 aria-expanded:text-paper",
+                    "inline-flex min-h-10 items-center gap-1 rounded-xl px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-expanded:bg-ink-3 aria-expanded:text-paper",
                     productActive && "text-paper",
                   )}
                 >
@@ -162,7 +158,7 @@ export function SiteHeader() {
                 </button>
                 {productsOpen && (
                   // pt-2 is an invisible hover bridge between trigger and panel.
-                  <div className="absolute left-0 top-full z-10 pt-2" onKeyDown={onMenuKey}>
+                  <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 pt-4" onKeyDown={onMenuKey}>
                     <div id="products-menu" className="menu-in w-[26rem] rounded-2xl border border-rule bg-ink-2 p-2 shadow-[var(--shadow-lift)]">
                       <ul>
                         {menuProducts.map((p) => {
@@ -214,7 +210,7 @@ export function SiteHeader() {
                   <Link
                     href={item.href}
                     aria-current={isActive(item.href) ? "page" : undefined}
-                    className="relative inline-flex min-h-11 items-center rounded-full px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-[current=page]:font-medium aria-[current=page]:text-paper"
+                    className="relative inline-flex min-h-10 items-center rounded-xl px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-[current=page]:font-medium aria-[current=page]:text-paper"
                   >
                     {item.label}
                   </Link>
@@ -226,7 +222,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href={contact.bookingGeneral}
-            className="inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-on-accent transition-[background-color,transform] hover:-translate-y-px hover:bg-accent-strong"
+            className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 text-sm font-semibold text-on-accent shadow-[0_8px_24px_-10px_var(--accent)] transition-[background-color,transform] hover:-translate-y-px hover:bg-accent-strong md:min-h-11"
           >
             Book a call
           </Link>
@@ -236,7 +232,7 @@ export function SiteHeader() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid size-11 place-items-center rounded-full border border-rule-strong bg-ink-2 text-paper transition-colors hover:bg-ink-3 lg:hidden"
+            className="grid size-10 place-items-center rounded-xl border border-rule-strong bg-ink-2 md:size-11 text-paper transition-colors hover:bg-ink-3 lg:hidden"
           >
             {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
           </button>
@@ -245,7 +241,7 @@ export function SiteHeader() {
 
       {/* Mobile sheet: fixed below the bar, scrolls on its own. */}
       {open && (
-        <div id="mobile-menu" className="menu-in fixed inset-x-0 bottom-0 top-16 overflow-y-auto border-t border-rule bg-ink-2 md:top-[4.5rem] lg:hidden">
+        <div id="mobile-menu" className="menu-in fixed inset-x-3 bottom-3 top-[4.25rem] overflow-y-auto rounded-b-2xl border border-t-0 border-rule bg-ink-2 md:top-20 lg:hidden">
           <nav aria-label="Mobile" className="container-site py-6">
             <p className="eyebrow mb-3">Products</p>
             <ul className="grid gap-2">

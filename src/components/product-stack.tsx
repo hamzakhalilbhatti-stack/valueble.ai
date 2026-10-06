@@ -8,10 +8,10 @@ import { getProduct, productOrder, type Product } from "@/lib/site";
 
 /** One soft colour field per product — the "theme colour" of each card. */
 const FIELD: Record<Product["accent"], string> = {
-  voice: "bg-[linear-gradient(140deg,oklch(0.93_0.05_250),oklch(0.97_0.03_290)_60%,oklch(0.99_0.01_98))]",
-  scan: "bg-[linear-gradient(140deg,oklch(0.93_0.06_172),oklch(0.97_0.04_140)_60%,oklch(0.99_0.01_98))]",
-  warm: "bg-[linear-gradient(140deg,oklch(0.93_0.06_55),oklch(0.97_0.05_85)_60%,oklch(0.99_0.01_98))]",
-  mind: "bg-[linear-gradient(140deg,oklch(0.93_0.05_300),oklch(0.97_0.04_330)_60%,oklch(0.99_0.01_98))]",
+  voice: "bg-[radial-gradient(90%_120%_at_0%_0%,oklch(0.3_0.07_250),oklch(0.17_0.008_270)_60%)]",
+  scan: "bg-[radial-gradient(90%_120%_at_0%_0%,oklch(0.3_0.06_172),oklch(0.17_0.008_270)_60%)]",
+  warm: "bg-[radial-gradient(90%_120%_at_0%_0%,oklch(0.32_0.07_55),oklch(0.17_0.008_270)_60%)]",
+  mind: "bg-[radial-gradient(90%_120%_at_0%_0%,oklch(0.3_0.08_300),oklch(0.17_0.008_270)_60%)]",
 };
 
 /**
@@ -30,7 +30,7 @@ export function ProductStack() {
               <article
                 data-od-id={`product-card-${p.slug}`}
                 className={cn(
-                  "group relative grid overflow-hidden rounded-[2rem] border border-ink-2 shadow-[var(--shadow-lift)] md:grid-cols-[1.05fr_1fr]",
+                  "group relative grid overflow-hidden rounded-[2rem] border border-rule-strong shadow-[var(--shadow-lift)] md:grid-cols-[1.05fr_1fr]",
                   FIELD[p.accent],
                 )}
               >
@@ -70,7 +70,7 @@ export function ProductStack() {
                       <p className="font-display text-[1.75rem] font-semibold leading-none tracking-[-0.03em] text-paper">{p.price}</p>
                       {p.priceNote && <p className="mt-1 text-sm text-faint">{p.priceNote}</p>}
                     </div>
-                    <span className="inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-5 text-sm font-medium text-ink transition-transform duration-300 ease-[var(--ease-spring)] group-hover:-translate-y-0.5">
+                    <span className="inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-ink transition-transform duration-300 ease-[var(--ease-spring)] group-hover:-translate-y-0.5">
                       See {p.name}
                       <ArrowUpRight aria-hidden className="size-4 transition-transform duration-300 group-hover:rotate-45" />
                     </span>
@@ -85,7 +85,7 @@ export function ProductStack() {
                     sizes="(min-width: 768px) 560px, 100vw"
                     className="object-cover transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.04]"
                   />
-                  <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.99_0.01_98/0.25),transparent_30%)] max-md:hidden" />
+                  <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.17_0.008_270),transparent_35%)] max-md:hidden" />
                 </div>
                 <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[2rem] ring-paper group-has-[a:focus-visible]:ring-2" />
               </article>

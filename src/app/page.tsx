@@ -5,7 +5,7 @@ import { Marquee } from "@/components/marquee";
 import { ProductStack } from "@/components/product-stack";
 import { VoiceDemo } from "@/components/product/voice-demo";
 import { DemoTabs } from "@/components/product/demo-tabs";
-import { CountUp } from "@/components/motion";
+import { CountUp, ScrollWords } from "@/components/motion";
 import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo } from "@/components/product-blocks";
 import { ArrowLink, Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
 import { AppTile, FaqAside, StickyNote, TOOLS, ToolMark, ToolTiles } from "@/components/polish";
@@ -38,6 +38,17 @@ export default function HomePage() {
       <JsonLd data={[websiteLd, faqLd(homeFaqs)]} />
 
       <HeroStage />
+
+      {/* ── Statement: words light up as you scroll (founder's own line) ── */}
+      <section aria-label="How valueble.ai works" className="relative py-24 md:py-36" data-od-id="home-statement">
+        <div className="container-site max-w-[60rem] text-center">
+          <p className="eyebrow mb-8 justify-center"><span aria-hidden className="h-px w-6 bg-accent" />How I work</p>
+          <ScrollWords
+            className="font-display text-[clamp(1.75rem,4.2vw,3.25rem)] font-medium leading-[1.12] tracking-[-0.03em]"
+            text="The first thing I do on any project is tell you which parts are not worth automating. Then I build the rest, and support it after it ships."
+          />
+        </div>
+      </section>
 
       {/* ── What I build, in one glance ── */}
       <section aria-label="What valueble.ai builds" className="relative pt-10 md:pt-14" data-od-id="home-glance">
@@ -169,18 +180,22 @@ export default function HomePage() {
           />
           <ProductStack />
           {/* Real numbers from the offers above, not invented metrics. */}
-          <dl className="reveal mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-4">
+          <dl className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { v: <CountUp to={200} prefix="$" />, k: "one-time for the Maps Lead Scraper" },
               { v: <CountUp to={50} prefix="$" />, k: "a month per restaurant for OrderRise" },
               { v: <CountUp to={24} suffix="/7" />, k: "call answering with the voice agent" },
               { v: <CountUp to={1} />, k: "person, from scoping to support" },
             ].map((s, i) => (
-              <div key={i} className="bg-ink-2 p-5 md:p-6">
+              <div
+                key={i}
+                className="glow-card reveal reveal-tilt p-6 md:p-7 lg:odd:mt-10"
+                style={{ ["--tilt" as string]: i % 2 ? "4deg" : "-4deg" }}
+              >
                 <dt className="sr-only">{s.k}</dt>
                 <dd>
-                  <span className="block font-display text-[2.25rem] font-semibold leading-none text-paper md:text-[2.75rem]">{s.v}</span>
-                  <span className="mt-2 block text-sm text-mute">{s.k}</span>
+                  <span className="text-sheen block font-display text-[3rem] font-semibold leading-none tracking-[-0.04em] md:text-[3.75rem]">{s.v}</span>
+                  <span className="mt-10 block text-[0.9375rem] text-mute">{s.k}</span>
                 </dd>
               </div>
             ))}

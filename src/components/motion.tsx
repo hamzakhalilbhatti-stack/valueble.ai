@@ -119,7 +119,7 @@ export function ScrollProgress() {
       cancelAnimationFrame(raf);
     };
   }, []);
-  return <div ref={ref} aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-[linear-gradient(90deg,var(--sun),var(--coral),var(--violet))]" />;
+  return <div ref={ref} aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left scale-x-0 bg-accent" />;
 }
 
 /**
@@ -200,4 +200,66 @@ export function ScrollScene({
       {children}
     </Tag>
   );
+}
+
+/**
+ * Statement text whose words light up one by one as it scrolls through the
+ * viewport (dim -> full). Writes --lit (0/1) per word from a single rAF-
+ * throttled listener; the full sentence is always in the DOM for readers.
+ */
+export function ScrollWords({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const words = Array.from(el.querySelectorAll<HTMLElement>("span"));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      words.forEach((w) => w.style.setProperty("--lit", "1"));
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+      const n = p * words.length;
+      words.forEach((w, i) => w.style.setProperty("--lit", Math.min(1, Math.max(0, n - i)).toFixed(2)));
+    };
+    const on = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", on, { passive: true });
+    window.addEventListener("resize", on);
+    return () => {
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("resize", on);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  return (
+    <p ref={ref} className={`scroll-words ${className ?? ""}`}>
+      {text.split(" ").map((w, i) => (
+        <span key={i}>{w} </span>
+      ))}
+    </p>
+  );
+}
+
+/** Cursor-following glow for .glow-card children (writes --mx/--my). */
+export function GlowTracker() {
+  useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const on = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest?.(".glow-card") as HTMLElement | null;
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    };
+    window.addEventListener("pointermove", on, { passive: true });
+    return () => window.removeEventListener("pointermove", on);
+  }, []);
+  return null;
 }

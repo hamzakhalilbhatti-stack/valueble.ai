@@ -130,7 +130,7 @@ export function SectionHeader({
   id?: string;
 }) {
   return (
-    <div className={cn("reveal max-w-3xl", align === "center" && "mx-auto text-center", className)}>
+    <div className={cn("reveal reveal-blur max-w-3xl", align === "center" && "mx-auto text-center", className)}>
       {eyebrow && (
         <p className="eyebrow mb-4">
           <span aria-hidden className="h-px w-6 bg-accent" />

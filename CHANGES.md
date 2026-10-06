@@ -160,3 +160,32 @@ What was bland, and what replaced it:
 Checked: tsc, eslint, `next build` pass; 16 click tests pass (dropdown,
 mobile menu, FAQ, demo tabs, every route with one H1); no horizontal
 scroll at 390 and 1440; no console errors.
+
+## Dark pass (branch `dark-pass`, off `polish-pass`)
+
+Reference: outcrowd.io (dark agency site). Its *patterns* were reused, not its
+code, copy, artwork or brand: our content, prices and demos are unchanged.
+
+- **Dark canvas.** Site-wide tokens flipped to near-black with butter yellow as
+  the single accent. Drifting colour embers (violet, sun, coral, sky) and film
+  grain replace the yellow aurora. Every existing component reads through the
+  same tokens, so all pages switched together. Text contrast on the canvas:
+  paper ~17:1, mute ~9:1, faint ~6:1.
+- **Floating pill navbar.** Centred, frosted pill that narrows when you scroll.
+  Menu logic, keyboard handling and the mobile sheet fix are unchanged.
+- **New hero.** Spotlight beam from the top, faint grid, headline lines slide up
+  out of a mask, "instantly." in the yellow serif. Below it, a product console
+  (sample data, labelled) sits tilted back and straightens as you scroll, with
+  floating call, order and $200 widgets drifting apart at different speeds.
+- **Scroll-lit statement.** Hamza's own line ("The first thing I do on any
+  project is tell you which parts are not worth automating…") lights up word
+  by word as you scroll.
+- **Tilted stat cards.** The four real-number cards ($200, $50, 24/7, 1) start
+  tilted and settle flat on reveal, with a cursor-following glow.
+- **Section headers** now reveal with a blur-to-sharp transition.
+- **Product stack cards** recoloured to dark gradients per product.
+- All motion is transform/opacity only and switches off under
+  prefers-reduced-motion.
+
+Checked: tsc, eslint, production build pass; 18/18 click tests pass; no
+horizontal scroll at 390 and 1440px; no console errors.
