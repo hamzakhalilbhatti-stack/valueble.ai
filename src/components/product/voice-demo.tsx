@@ -197,7 +197,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
               </button>
             </div>
             <div className="mt-3 pl-[3.25rem]">
-              <DemoLabel>Demo call · AI voices</DemoLabel>
+              <DemoLabel>Demo call</DemoLabel>
             </div>
           </div>
 
