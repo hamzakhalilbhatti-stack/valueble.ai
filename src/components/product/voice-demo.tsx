@@ -15,6 +15,9 @@ import { cn } from "@/lib/cn";
  * answer (insurance cover) and the call is handed to a person.
  *
  * The voices are AI text-to-speech performing a scripted, illustrative call.
+ * Two fixed voices (agent: "Bella", caller: "Chris") generated with one model,
+ * fixed seed, fixed voice settings and request stitching, then loudness-
+ * normalised to -16 LUFS and trimmed so every clip sounds like the same call.
  * It is labelled "Demo call" and is not a recording of a live customer call.
  * TODO (owner): replace with audio from a real demo call of the actual
  * product once one exists.
@@ -22,27 +25,27 @@ import { cn } from "@/lib/cn";
 
 type Line = { from: "agent" | "caller" | "system"; text: string; audio?: string; ms: number };
 const CALL: Line[] = [
-  { from: "agent", text: "Good evening, Smile Studio Dental. This is the after-hours assistant. How can I help?", audio: "line-1-agent", ms: 4876 },
-  { from: "caller", text: "Hi, I chipped a tooth at dinner. Can I get in this week?", audio: "line-2-caller", ms: 3019 },
-  { from: "agent", text: "Sorry to hear that. Dr. Malik has Thursday at 10:30 or Friday at 4:15. Which works better?", audio: "line-3-agent", ms: 6177 },
-  { from: "caller", text: "Thursday, please. It's Sara Ahmed.", audio: "line-4-caller", ms: 2229 },
-  { from: "agent", text: "Booked: Thursday at 10:30 with Dr. Malik, for Sara Ahmed. I'll send a WhatsApp confirmation to this number.", audio: "line-5-agent", ms: 7012 },
-  { from: "caller", text: "Great. Will the repair be covered by my insurance plan?", audio: "line-6-caller", ms: 3297 },
-  { from: "agent", text: "That depends on your plan, and I don't want to guess. I'm transferring you to a member of the team now.", audio: "line-7-agent", ms: 5433 },
+  { from: "agent", text: "Good evening, Smile Studio Dental. This is the after-hours assistant. How can I help?", audio: "line-1-agent", ms: 4599 },
+  { from: "caller", text: "Hi, I chipped a tooth at dinner. Can I get in this week?", audio: "line-2-caller", ms: 2668 },
+  { from: "agent", text: "Sorry to hear that. Dr. Malik has Thursday at 10:30 or Friday at 4:15. Which works better?", audio: "line-3-agent", ms: 5922 },
+  { from: "caller", text: "Thursday, please. It's Sam Ahmed.", audio: "line-4-caller", ms: 1573 },
+  { from: "agent", text: "Booked: Thursday at 10:30 with Dr. Malik, for Sam Ahmed. I'll send a WhatsApp confirmation to this number.", audio: "line-5-agent", ms: 6585 },
+  { from: "caller", text: "Great. Will the repair be covered by my insurance plan?", audio: "line-6-caller", ms: 2697 },
+  { from: "agent", text: "That depends on your plan, and I don't want to guess. I'm transferring you to a member of the team now.", audio: "line-7-agent", ms: 4743 },
   { from: "system", text: "Transferred to front desk · call summary sent", ms: 1200 },
 ];
 
 /** Fields on the call card, revealed after the given transcript line finishes. */
 const CARD: { k: string; v: string; after: number }[] = [
-  { k: "Caller", v: "Sara Ahmed", after: 3 },
+  { k: "Caller", v: "Sam Ahmed", after: 3 },
   { k: "Reason", v: "Chipped tooth", after: 1 },
   { k: "Booked", v: "Thu 10:30 · Dr. Malik", after: 4 },
   { k: "Confirmation", v: "WhatsApp sent", after: 4 },
   { k: "Handoff", v: "Insurance question → front desk", after: 6 },
 ];
 
-const BARS = 36;
-const GAP = 550; // pause between turns, ms
+const BARS = 28;
+const GAP = 450; // pause between turns, ms
 
 /** Each line occupies [start, end) on one timeline measured in milliseconds. */
 const TIMELINE = (() => {
@@ -154,46 +157,48 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
   const handoff = line >= 7;
 
   return (
-    <div className={cn("theme-dark overflow-hidden rounded-[1.75rem] border border-rule shadow-[0_40px_80px_-40px_oklch(0.2_0.02_265/0.6)]", className)} data-od-id="voice-demo">
-      <div className="grid lg:grid-cols-[1fr_18rem]">
+    <div className={cn("@container theme-dark overflow-hidden rounded-[1.75rem] border border-rule shadow-[0_40px_80px_-40px_oklch(0.2_0.02_265/0.6)]", className)} data-od-id="voice-demo">
+      {CALL.map((l, i) =>
+        l.audio ? (
+          <audio
+            key={l.audio}
+            ref={(el) => {
+              audios.current[i] = el;
+            }}
+            src={`/audio/voice-demo/${l.audio}.mp3`}
+            preload="none"
+            hidden
+          />
+        ) : null,
+      )}
+      <div className="grid @3xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-w-0 flex-col">
           {/* Call bar */}
-          <div className="flex flex-wrap items-center gap-3 border-b border-rule px-5 py-4">
-            <span className={cn("grid size-10 place-items-center rounded-full", handoff ? "bg-warm/15 text-warm" : "bg-voice/15 text-voice")}>
-              {handoff ? <PhoneForwarded aria-hidden className="size-[1.125rem]" /> : <PhoneCall aria-hidden className="size-[1.125rem]" />}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-paper">Inbound call · Smile Studio Dental</p>
-              <p className="ui-label mt-1 text-voice" aria-live="polite">
-                {!started ? "Ready" : finished ? "Handed to a person" : speaking === "caller" ? "Caller speaking" : speaking === "agent" ? "AI agent speaking" : playing ? "…" : "Paused"}
-                <span className="ml-2 text-faint">
-                  0:{String(Math.min(elapsed, 59)).padStart(2, "0")}
-                </span>
-              </p>
+          <div className="border-b border-rule px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className={cn("grid size-10 shrink-0 place-items-center rounded-full", handoff ? "bg-warm/15 text-warm" : "bg-voice/15 text-voice")}>
+                {handoff ? <PhoneForwarded aria-hidden className="size-[1.125rem]" /> : <PhoneCall aria-hidden className="size-[1.125rem]" />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-paper">Inbound call · Smile Studio Dental</p>
+                <p className="ui-label mt-1 flex items-center gap-2 whitespace-nowrap text-voice" aria-live="polite">
+                  <span>{!started ? "Ready" : finished ? "Handed to a person" : speaking === "caller" ? "Caller speaking" : speaking === "agent" ? "AI agent speaking" : playing ? "On the line" : "Paused"}</span>
+                  <span className="tabular-nums text-faint">0:{String(Math.min(elapsed, 59)).padStart(2, "0")}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMuted((m) => !m)}
+                aria-pressed={muted}
+                aria-label={muted ? "Turn demo call sound on" : "Mute demo call"}
+                className="grid size-11 shrink-0 place-items-center rounded-full border border-rule text-paper transition-colors hover:bg-ink-3"
+              >
+                {muted ? <VolumeX aria-hidden className="size-4" /> : <Volume2 aria-hidden className="size-4" />}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setMuted((m) => !m)}
-              aria-pressed={muted}
-              aria-label={muted ? "Turn demo call sound on" : "Mute demo call"}
-              className="grid size-11 place-items-center rounded-full border border-rule text-paper transition-colors hover:bg-ink-3"
-            >
-              {muted ? <VolumeX aria-hidden className="size-4" /> : <Volume2 aria-hidden className="size-4" />}
-            </button>
-            <DemoLabel>Demo call · AI voices</DemoLabel>
-            {CALL.map((l, i) =>
-              l.audio ? (
-                <audio
-                  key={l.audio}
-                  ref={(el) => {
-                    audios.current[i] = el;
-                  }}
-                  src={`/audio/voice-demo/${l.audio}.mp3`}
-                  preload="none"
-                  hidden
-                />
-              ) : null,
-            )}
+            <div className="mt-3 pl-[3.25rem]">
+              <DemoLabel>Demo call · AI voices</DemoLabel>
+            </div>
           </div>
 
           {/* Waveform + controls */}
@@ -206,7 +211,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
             >
               {playing ? <Pause aria-hidden className="size-6" /> : finished ? <RotateCcw aria-hidden className="size-6" /> : <Play aria-hidden className="ml-0.5 size-6" />}
             </button>
-            <div aria-hidden className="flex h-12 flex-1 items-center gap-[3px] overflow-hidden">
+            <div aria-hidden className="flex h-12 min-w-0 flex-1 items-center justify-between gap-[3px] overflow-hidden">
               {Array.from({ length: BARS }, (_, i) => {
                 const h = Math.round((0.3 + 0.7 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6))) * 100) / 100;
                 return (
@@ -263,12 +268,12 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
         </div>
 
         {/* Call card */}
-        <aside className="border-t border-rule bg-ink-2 p-5 lg:border-l lg:border-t-0" aria-label="What the agent logged">
+        <aside className="border-t border-rule bg-ink-2 p-5 @3xl:border-l @3xl:border-t-0" aria-label="What the agent logged">
           <div className="flex items-center justify-between">
             <span className="ui-label text-paper">Logged to your CRM</span>
             <span className={cn("ui-label", finished ? "text-accent" : "text-faint")}>{finished ? "Saved" : started ? "Live" : "Waiting"}</span>
           </div>
-          <dl className="mt-4 space-y-3">
+          <dl className="mt-4 grid gap-3 @md:grid-cols-2 @3xl:grid-cols-1">
             {CARD.map((f) => {
               const on = pos >= TIMELINE[f.after].end;
               return (

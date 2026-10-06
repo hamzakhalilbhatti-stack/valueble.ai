@@ -200,8 +200,13 @@ horizontal scroll at 390 and 1440px; no console errors.
 
 ## Voice demo audio
 
-- The /voice-agent call player now plays real AI-generated speech: 7 clips in `public/audio/voice-demo/` (ElevenLabs TTS, agent voice "Bella", caller voice "Sarah", ~42s total, ~260 KB, loaded only when Play is pressed).
+- The /voice-agent call player now plays real AI-generated speech: 7 clips in `public/audio/voice-demo/` (ElevenLabs TTS, agent voice "Bella", caller voice "Sarah" (since replaced, see below), loaded only when Play is pressed).
 - The transcript and the CRM card stay in sync with the audio clock. There is a mute button, and if the browser blocks sound the demo keeps running silently.
 - Labelled "Demo call · AI voices": it is a scripted text-to-speech call, not a recording of a real customer call.
 - The API key is not stored anywhere in the repo.
 - TODO (owner): rotate the ElevenLabs key that was shared in chat, and swap in a real demo call of the product once one exists.
+
+## Voice demo fix
+
+- **Inconsistent voices:** clips were regenerated as one call. Fixed model (eleven_multilingual_v2), fixed seed and voice settings, and ElevenLabs request stitching so each speaker keeps the same tone line to line. The caller is now "Chris" (male) so the two speakers are easy to tell apart, and the caller's name in the script and CRM card is "Sam Ahmed" to match. Every clip is trimmed of dead air and loudness-normalised to -16 LUFS, so no line is louder or quieter than the rest. ~35s total, ~350 KB, still loaded only on Play.
+- **Broken layout in the home column:** the call header crammed the title, mute button and demo badge into one row, so "Inbound call · Smile Studio Dental" wrapped one word per line under the mute icon. The player now uses container queries: title truncates on one line, status and timer never wrap, the demo badge sits on its own row, the CRM panel moves beside the transcript only when the player itself is wide enough (two-column card grid when it sits below), and the waveform spreads evenly across its width.
