@@ -155,7 +155,7 @@ export function OrderRiseDemo({ className }: { className?: string }) {
             >
               <div
                 className={cn(
-                  "max-w-[85%] whitespace-pre-line px-3 py-2 text-xs leading-relaxed",
+                  "max-w-[85%] whitespace-pre-line rounded-xl px-3 py-2 text-xs leading-relaxed",
                   m.from === "customer" ? "bg-white/[0.04] text-mute" : "bg-warm/[0.12] text-paper",
                 )}
               >
@@ -167,7 +167,7 @@ export function OrderRiseDemo({ className }: { className?: string }) {
 
           {view.typing && (
             <div className="flex justify-end">
-              <span className="flex gap-1 bg-warm/[0.12] px-3 py-3" aria-label="Typing">
+              <span className="flex gap-1 rounded-xl bg-warm/[0.12] px-3 py-3" aria-label="Typing">
                 {[0, 1, 2].map((d) => (
                   <span
                     key={d}

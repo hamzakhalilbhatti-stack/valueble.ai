@@ -167,7 +167,7 @@ export function ScraperDemo({ className }: { className?: string }) {
               <p className="ui-label mb-2 text-faint">Search query</p>
               <div
                 data-target="query"
-                className="min-h-[2.25rem] border border-rule bg-black px-3 py-2 text-xs text-paper"
+                className="min-h-[2.25rem] rounded-md border border-rule bg-ink px-3 py-2 text-xs text-paper"
               >
                 {view.typed}
                 {view.typed.length > 0 && view.typed.length < QUERY.length && (
@@ -184,7 +184,7 @@ export function ScraperDemo({ className }: { className?: string }) {
               ].map(([l, v]) => (
                 <div key={l}>
                   <p className="ui-label mb-2 truncate text-faint">{l}</p>
-                  <div className="border border-rule bg-black px-2 py-1.5 text-center text-xs tabular-nums text-paper">
+                  <div className="rounded-md border border-rule bg-ink px-2 py-1.5 text-center text-xs tabular-nums text-paper">
                     {v}
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export function ScraperDemo({ className }: { className?: string }) {
               <span
                 data-target="enrich"
                 className={cn(
-                  "ui-label border px-2 py-1.5 transition-colors duration-300",
+                  "ui-label rounded-full border px-2.5 py-1.5 transition-colors duration-300",
                   view.toggles.enrich ? "border-scan/50 text-scan" : "border-rule text-faint",
                 )}
               >
@@ -204,7 +204,7 @@ export function ScraperDemo({ className }: { className?: string }) {
               <span
                 data-target="email"
                 className={cn(
-                  "ui-label border px-2 py-1.5 transition-colors duration-300",
+                  "ui-label rounded-full border px-2.5 py-1.5 transition-colors duration-300",
                   view.toggles.email ? "border-scan/50 text-scan" : "border-rule text-faint",
                 )}
               >
@@ -215,7 +215,7 @@ export function ScraperDemo({ className }: { className?: string }) {
             <div
               data-target="start"
               className={cn(
-                "w-full border px-3 py-2 text-center text-xs transition-colors duration-300",
+                "w-full rounded-md border px-3 py-2 text-center text-xs transition-colors duration-300",
                 view.running ? "border-scan/40 text-scan" : "border-paper bg-paper text-ink",
               )}
             >

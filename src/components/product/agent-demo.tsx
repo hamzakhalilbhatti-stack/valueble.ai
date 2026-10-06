@@ -174,7 +174,7 @@ export function AgentDemo({ className }: { className?: string }) {
                     style={{
                       top: filled ? "100%" : "0%",
                       transition: `top ${TRAVEL}ms linear, opacity 220ms linear`,
-                      boxShadow: `0 0 14px 3px ${node.tone === "human" ? "#9b8cff" : "#f4f4f6"}`,
+                      boxShadow: `0 0 14px 3px ${node.tone === "human" ? "#a99cff" : "#f3f4f8"}`,
                     }}
                   />
                 </span>
