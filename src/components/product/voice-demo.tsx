@@ -1,34 +1,35 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, PhoneCall, PhoneForwarded, Play, RotateCcw } from "lucide-react";
+import { Pause, PhoneCall, PhoneForwarded, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { DemoLabel } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
 /**
- * AI Voice Agent — an interactive call player.
+ * AI Voice Agent — an interactive call player with real synthesised audio.
  *
- * Press play: the waveform animates for whoever is speaking, the transcript
- * types out live, and the call card on the right fills as the agent books an
+ * Press play: each turn plays its own voice clip (public/audio/voice-demo),
+ * the waveform animates for whoever is speaking, the transcript types out in
+ * step with the audio, and the call card fills as the agent books an
  * appointment. At the end the caller asks something the agent should not
- * answer (a price for a specific treatment) and the call is handed to a person.
+ * answer (insurance cover) and the call is handed to a person.
  *
- * Illustrative call, labelled as such. There is no audio file pretending to be
- * the product.
- * TODO (owner): replace with a transcript from a real demo call, and add the
- * real recording as an optional "listen" button once one exists.
+ * The voices are AI text-to-speech performing a scripted, illustrative call.
+ * It is labelled "Demo call" and is not a recording of a live customer call.
+ * TODO (owner): replace with audio from a real demo call of the actual
+ * product once one exists.
  */
 
-type Line = { from: "agent" | "caller" | "system"; text: string };
+type Line = { from: "agent" | "caller" | "system"; text: string; audio?: string; ms: number };
 const CALL: Line[] = [
-  { from: "agent", text: "Good evening, Smile Studio Dental. This is the after-hours assistant. How can I help?" },
-  { from: "caller", text: "Hi, I chipped a tooth at dinner. Can I get in this week?" },
-  { from: "agent", text: "Sorry to hear that. Dr. Malik has Thursday at 10:30 or Friday at 4:15. Which works better?" },
-  { from: "caller", text: "Thursday, please. It's Sara Ahmed." },
-  { from: "agent", text: "Booked: Thursday at 10:30 with Dr. Malik, for Sara Ahmed. I'll send a WhatsApp confirmation to this number." },
-  { from: "caller", text: "Great. Will the repair be covered by my insurance plan?" },
-  { from: "agent", text: "That depends on your plan, and I don't want to guess. I'm transferring you to a member of the team now." },
-  { from: "system", text: "Transferred to front desk · call summary sent" },
+  { from: "agent", text: "Good evening, Smile Studio Dental. This is the after-hours assistant. How can I help?", audio: "line-1-agent", ms: 4876 },
+  { from: "caller", text: "Hi, I chipped a tooth at dinner. Can I get in this week?", audio: "line-2-caller", ms: 3019 },
+  { from: "agent", text: "Sorry to hear that. Dr. Malik has Thursday at 10:30 or Friday at 4:15. Which works better?", audio: "line-3-agent", ms: 6177 },
+  { from: "caller", text: "Thursday, please. It's Sara Ahmed.", audio: "line-4-caller", ms: 2229 },
+  { from: "agent", text: "Booked: Thursday at 10:30 with Dr. Malik, for Sara Ahmed. I'll send a WhatsApp confirmation to this number.", audio: "line-5-agent", ms: 7012 },
+  { from: "caller", text: "Great. Will the repair be covered by my insurance plan?", audio: "line-6-caller", ms: 3297 },
+  { from: "agent", text: "That depends on your plan, and I don't want to guess. I'm transferring you to a member of the team now.", audio: "line-7-agent", ms: 5433 },
+  { from: "system", text: "Transferred to front desk · call summary sent", ms: 1200 },
 ];
 
 /** Fields on the call card, revealed after the given transcript line finishes. */
@@ -41,53 +42,89 @@ const CARD: { k: string; v: string; after: number }[] = [
 ];
 
 const BARS = 36;
-const CPS = 42; // characters per second while "speaking"
-const GAP = 26; // pause between turns, in character-time (~0.6s)
+const GAP = 550; // pause between turns, ms
 
-/** Each line occupies [start, end) on one timeline measured in characters. */
+/** Each line occupies [start, end) on one timeline measured in milliseconds. */
 const TIMELINE = (() => {
   let t = 0;
   return CALL.map((l) => {
     const start = t;
-    t += l.text.length + (l.from === "system" ? 0 : GAP);
-    return { start, end: start + l.text.length };
+    t += l.ms + (l.from === "system" ? 0 : GAP);
+    return { start, end: start + l.ms };
   });
 })();
 const TOTAL = TIMELINE[TIMELINE.length - 1].end;
+const lineAt = (p: number) => {
+  let line = 0;
+  TIMELINE.forEach((seg, i) => {
+    if (p >= seg.start) line = i;
+  });
+  return line;
+};
 
 export function VoiceDemo({ className, compact = false }: { className?: string; compact?: boolean }) {
   const [pos, setPos] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
   const raf = useRef<number | undefined>(undefined);
   const posRef = useRef(0);
   const scroller = useRef<HTMLDivElement>(null);
+  const audios = useRef<(HTMLAudioElement | null)[]>([]);
+  const current = useRef<number>(-1);
+
+  const stopAudio = () => {
+    audios.current.forEach((a) => a && !a.paused && a.pause());
+    current.current = -1;
+  };
 
   useEffect(() => {
-    if (!playing) return;
+    audios.current.forEach((a) => a && (a.muted = muted));
+  }, [muted]);
+
+  useEffect(() => {
+    if (!playing) {
+      stopAudio();
+      return;
+    }
     let last = 0;
     const tick = (t: number) => {
       const dt = last ? t - last : 0;
       last = t;
-      const n = Math.min(TOTAL, posRef.current + (dt / 1000) * CPS);
+      let n = posRef.current + dt;
+      const i = lineAt(n);
+      const seg = TIMELINE[i];
+      const a = audios.current[i];
+      const inSpeech = n < seg.end;
+      if (a && inSpeech) {
+        if (current.current !== i) {
+          stopAudio();
+          current.current = i;
+          a.currentTime = Math.max(0, (n - seg.start) / 1000);
+          a.play().catch(() => setMuted(true)); // autoplay blocked: keep going silently
+        } else if (!a.paused && !a.ended && !a.muted && a.currentTime > 0) {
+          // Keep the transcript locked to the real audio clock.
+          n = seg.start + a.currentTime * 1000;
+        }
+      }
+      n = Math.min(TOTAL, n);
       posRef.current = n;
       setPos(n);
-      const ended = n >= TOTAL;
-      if (ended) setPlaying(false);
+      if (n >= TOTAL) setPlaying(false);
       else raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current!);
   }, [playing]);
 
+  useEffect(() => () => stopAudio(), []);
+
   // Index of the line currently being spoken (or the last one started).
-  let line = 0;
-  TIMELINE.forEach((seg, i) => {
-    if (pos >= seg.start) line = i;
-  });
-  const chars = Math.max(0, pos - TIMELINE[line].start);
+  const line = lineAt(pos);
+  const seg = TIMELINE[line];
+  const chars = Math.min(CALL[line].text.length, Math.max(0, ((pos - seg.start) / CALL[line].ms) * CALL[line].text.length * 1.08));
   const finished = pos >= TOTAL;
   const started = pos > 0;
-  const inSpeech = pos < TIMELINE[line].end;
+  const inSpeech = pos < seg.end;
   const speaking = playing && inSpeech ? CALL[line].from : null;
 
   useEffect(() => {
@@ -105,13 +142,15 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
     setPlaying((p) => !p);
   };
   const restart = () => {
+    stopAudio();
     posRef.current = 0;
     setPos(0);
-    setPlaying(true);
+    setPlaying(false);
+    requestAnimationFrame(() => setPlaying(true));
   };
 
   const shownLines = CALL.slice(0, line + 1);
-  const elapsed = Math.round(pos / 14);
+  const elapsed = Math.floor(pos / 1000);
   const handoff = line >= 7;
 
   return (
@@ -132,7 +171,29 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
                 </span>
               </p>
             </div>
-            <DemoLabel>Demo call</DemoLabel>
+            <button
+              type="button"
+              onClick={() => setMuted((m) => !m)}
+              aria-pressed={muted}
+              aria-label={muted ? "Turn demo call sound on" : "Mute demo call"}
+              className="grid size-11 place-items-center rounded-full border border-rule text-paper transition-colors hover:bg-ink-3"
+            >
+              {muted ? <VolumeX aria-hidden className="size-4" /> : <Volume2 aria-hidden className="size-4" />}
+            </button>
+            <DemoLabel>Demo call · AI voices</DemoLabel>
+            {CALL.map((l, i) =>
+              l.audio ? (
+                <audio
+                  key={l.audio}
+                  ref={(el) => {
+                    audios.current[i] = el;
+                  }}
+                  src={`/audio/voice-demo/${l.audio}.mp3`}
+                  preload="none"
+                  hidden
+                />
+              ) : null,
+            )}
           </div>
 
           {/* Waveform + controls */}
@@ -167,7 +228,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
             {!started && (
               <div className="grid h-full place-items-center text-center">
                 <p className="max-w-xs text-sm text-mute">
-                  Press play to hear how the agent handles an after-hours call, including the moment it hands off to a person.
+                  Press play to hear how the agent handles an after-hours call, including the moment it hands off to a person. Sound on.
                 </p>
               </div>
             )}

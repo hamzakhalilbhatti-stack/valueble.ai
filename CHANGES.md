@@ -197,3 +197,11 @@ horizontal scroll at 390 and 1440px; no console errors.
 - Scroll motion kept: copy lifts and fades, photo pushes in, chips fan outward. Reduced-motion respected.
 - Copy column widened so the headline breaks cleanly at 1280px+. The tilted console hero is removed; everything below the hero is unchanged.
 - The photo is a stock model, not a customer; the chip labels are examples.
+
+## Voice demo audio
+
+- The /voice-agent call player now plays real AI-generated speech: 7 clips in `public/audio/voice-demo/` (ElevenLabs TTS, agent voice "Bella", caller voice "Sarah", ~42s total, ~260 KB, loaded only when Play is pressed).
+- The transcript and the CRM card stay in sync with the audio clock. There is a mute button, and if the browser blocks sound the demo keeps running silently.
+- Labelled "Demo call · AI voices": it is a scripted text-to-speech call, not a recording of a real customer call.
+- The API key is not stored anywhere in the repo.
+- TODO (owner): rotate the ElevenLabs key that was shared in chat, and swap in a real demo call of the product once one exists.
