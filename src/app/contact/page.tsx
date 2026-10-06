@@ -90,7 +90,7 @@ export default function ContactPage() {
                     {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     className={
                       "card card-link group flex h-full items-start gap-4 p-6 " +
-                      (primary ? "border-accent/40 bg-accent/5" : "")
+                      (primary ? "bloom-ring shadow-[var(--shadow-lift)]" : "")
                     }
                     data-od-id={`contact-channel-${label.split(" ")[0].toLowerCase()}`}
                   >

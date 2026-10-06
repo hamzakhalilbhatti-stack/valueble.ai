@@ -20,9 +20,9 @@
  * previous pass, which measured 6:1+ for every text token.
  */
 @theme {
-  --text-hero: clamp(2.5rem, 6vw, 4.75rem);
-  --text-hero--line-height: 1.02;
-  --text-hero--letter-spacing: -0.035em;
+  --text-hero: clamp(2.75rem, 6.2vw, 5.5rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.045em;
 
   --text-display: clamp(2rem, 4.4vw, 3.5rem);
   --text-display--line-height: 1.06;
@@ -66,58 +66,75 @@
   --color-warm: var(--warm);
   --color-mind: var(--mind);
   --color-voice: var(--voice);
+  --color-sun: var(--sun);
+  --color-coral: var(--coral);
+  --color-violet: var(--violet);
+  --color-sky: var(--sky);
   --color-wa: var(--wa);
 
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-bricolage);
+  --font-display: var(--font-display-face);
+  --font-serif: var(--font-serif-face);
 }
 
+/*
+ * Flair pass: butter-yellow canvas, white frosted cards, near-black ink.
+ * Colour comes from a drifting aurora layer (coral / violet / mint / sun)
+ * behind translucent sections, not from flat fills. Text tokens measured on
+ * --ink (yellow): paper ~15:1, mute ~8.5:1, faint ~5.8:1; product accents 5:1+.
+ */
 :root {
   color-scheme: light;
-  --ink: oklch(0.982 0.004 250);
-  --ink-2: oklch(1 0 0);
-  --ink-3: oklch(0.958 0.007 250);
-  --paper: oklch(0.2 0.025 265);
-  --mute: oklch(0.42 0.022 265);
-  --faint: oklch(0.5 0.02 265);
-  --rule: oklch(0.915 0.008 260);
-  --rule-strong: oklch(0.85 0.012 260);
+  --ink: oklch(0.965 0.062 98);
+  --ink-2: oklch(0.995 0.006 98);
+  --ink-3: oklch(0.94 0.08 96);
+  --paper: oklch(0.19 0.012 75);
+  --mute: oklch(0.39 0.02 75);
+  --faint: oklch(0.47 0.022 75);
+  --rule: oklch(0.89 0.045 95);
+  --rule-strong: oklch(0.8 0.06 90);
 
-  --accent: oklch(0.5 0.1 178);
-  --accent-strong: oklch(0.43 0.09 178);
-  --on-accent: oklch(1 0 0);
+  --accent: oklch(0.19 0.012 75);
+  --accent-strong: oklch(0.32 0.016 75);
+  --on-accent: oklch(0.99 0.01 98);
   --mint: oklch(0.86 0.13 172);
 
-  --scan: oklch(0.5 0.1 178);
-  --warm: oklch(0.55 0.14 52);
-  --mind: oklch(0.5 0.2 287);
-  --voice: oklch(0.52 0.15 248);
-  --wa: oklch(0.55 0.13 152);
+  --sun: oklch(0.89 0.17 95);
+  --coral: oklch(0.74 0.16 38);
+  --violet: oklch(0.7 0.16 300);
+  --sky: oklch(0.8 0.11 230);
 
-  --shadow-card: 0 1px 2px oklch(0.2 0.02 265 / 0.06), 0 12px 32px -16px oklch(0.2 0.02 265 / 0.18);
-  --shadow-lift: 0 2px 4px oklch(0.2 0.02 265 / 0.06), 0 28px 60px -24px oklch(0.2 0.02 265 / 0.28);
+  --scan: oklch(0.47 0.1 178);
+  --warm: oklch(0.52 0.15 45);
+  --mind: oklch(0.48 0.2 290);
+  --voice: oklch(0.48 0.16 258);
+  --wa: oklch(0.5 0.13 152);
+
+  --shadow-card: 0 1px 2px oklch(0.3 0.04 80 / 0.06), 0 18px 40px -22px oklch(0.35 0.06 70 / 0.35);
+  --shadow-lift: 0 2px 6px oklch(0.3 0.04 80 / 0.08), 0 36px 70px -28px oklch(0.35 0.08 60 / 0.45);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Dark bands: the voice feature, closing CTA, footer, phone bezels. */
 .theme-dark {
   color-scheme: dark;
-  --ink: oklch(0.14 0.012 270);
-  --ink-2: oklch(0.175 0.014 270);
-  --ink-3: oklch(0.21 0.016 270);
-  --paper: oklch(0.97 0.005 265);
-  --mute: oklch(0.78 0.016 265);
-  --faint: oklch(0.69 0.018 265);
-  --rule: oklch(0.27 0.02 268);
-  --rule-strong: oklch(0.36 0.024 268);
+  --ink: oklch(0.17 0.01 75);
+  --ink-2: oklch(0.215 0.012 75);
+  --ink-3: oklch(0.25 0.014 75);
+  --paper: oklch(0.98 0.01 98);
+  --mute: oklch(0.8 0.02 90);
+  --faint: oklch(0.7 0.02 90);
+  --rule: oklch(0.3 0.014 75);
+  --rule-strong: oklch(0.4 0.018 75);
 
-  --accent: oklch(0.86 0.13 172);
-  --accent-strong: oklch(0.92 0.09 172);
-  --on-accent: oklch(0.16 0.012 270);
+  --accent: oklch(0.9 0.16 96);
+  --accent-strong: oklch(0.95 0.11 98);
+  --on-accent: oklch(0.19 0.012 75);
 
   --scan: oklch(0.86 0.13 172);
-  --warm: oklch(0.82 0.13 68);
-  --mind: oklch(0.76 0.12 287);
+  --warm: oklch(0.82 0.13 60);
+  --mind: oklch(0.78 0.12 295);
   --voice: oklch(0.8 0.1 240);
   --wa: oklch(0.78 0.15 152);
 
@@ -137,7 +154,7 @@
   }
 
   body {
-    background-color: var(--ink);
+    background-color: transparent;
     color: var(--mute);
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     font-size: var(--text-body);
@@ -158,6 +175,7 @@
     color: var(--paper);
     font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
     font-weight: 600;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
@@ -242,9 +260,9 @@
 
   .card {
     position: relative;
-    border: 1px solid var(--rule);
-    border-radius: 1.25rem;
-    background: var(--ink-2);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 70%, var(--rule));
+    border-radius: 1.5rem;
+    background: color-mix(in oklab, var(--ink-2) 88%, transparent);
     box-shadow: var(--shadow-card);
     transition:
       border-color 300ms var(--ease-out),
@@ -271,8 +289,8 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(50% 55% at 88% 8%, color-mix(in oklab, var(--mint) 32%, transparent), transparent 70%),
-      radial-gradient(40% 45% at 4% 0%, color-mix(in oklab, var(--voice) 10%, transparent), transparent 70%);
+      radial-gradient(50% 55% at 88% 8%, color-mix(in oklab, var(--coral) 22%, transparent), transparent 70%),
+      radial-gradient(40% 45% at 4% 0%, color-mix(in oklab, var(--violet) 14%, transparent), transparent 70%);
   }
   .atmosphere::after {
     content: "";
@@ -282,12 +300,15 @@
       linear-gradient(to right, color-mix(in oklab, var(--paper) 6%, transparent) 1px, transparent 1px),
       linear-gradient(to bottom, color-mix(in oklab, var(--paper) 6%, transparent) 1px, transparent 1px);
     background-size: 56px 56px;
+    opacity: 0.6;
     mask-image: radial-gradient(70% 60% at 50% 20%, #000 10%, transparent 80%);
   }
 
   /* Tinted band to separate white sections. */
+  /* Former tinted band. Hard-edged bands cut the living background into
+     stripes, so sections now share one continuous canvas. */
   .on-cloud {
-    background-color: var(--ink-3);
+    background-color: transparent;
   }
 
   .prose-post h2 {
@@ -517,4 +538,142 @@ details.faq[open] .faq-icon {
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ───────── Flair layer ───────── */
+@layer components {
+  /* Page-wide living background: soft colour blooms drifting over the
+     yellow canvas, plus fine film grain. Fixed, behind everything,
+     transform-only animation so it stays on the compositor. */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .aurora > i {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(70px);
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .aurora > i:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: -14vmax; background: var(--sun); animation: drift-a 28s ease-in-out infinite; }
+  .aurora > i:nth-child(2) { width: 36vmax; height: 36vmax; right: -10vmax; top: 4vmax; background: var(--coral); opacity: 0.32; animation: drift-b 34s ease-in-out infinite; }
+  .aurora > i:nth-child(3) { width: 34vmax; height: 34vmax; left: 30vw; bottom: -16vmax; background: var(--violet); opacity: 0.22; animation: drift-c 40s ease-in-out infinite; }
+  .aurora > i:nth-child(4) { width: 26vmax; height: 26vmax; left: -6vmax; bottom: 8vmax; background: var(--mint); opacity: 0.26; animation: drift-b 46s ease-in-out -12s infinite reverse; }
+  .aurora::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.22;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .35  0 0 0 0 .2  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* Framed hero shell (the rounded white "window" in the reference). */
+  .hero-frame {
+    position: relative;
+    isolation: isolate;
+    border-radius: 2rem;
+    background: color-mix(in oklab, var(--ink-2) 78%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 80%, transparent);
+    box-shadow: var(--shadow-lift);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    overflow: hidden;
+  }
+  @media (min-width: 768px) {
+    .hero-frame { border-radius: 2.5rem; }
+  }
+
+  /* Two-tone display headline: second half recedes, like the reference. */
+  .tone-2 { color: color-mix(in oklab, var(--paper) 55%, var(--ink-2)); }
+  .serif-flair {
+    font-family: var(--font-serif), Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* Scan-box annotation (corner brackets + label) drawn over the hero object. */
+  .scan-box {
+    position: absolute;
+    border: 1.5px solid oklch(1 0 0 / 0.95);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 1px oklch(0.19 0.012 75 / 0.12), 0 10px 30px -10px oklch(0.19 0.012 75 / 0.4);
+    pointer-events: none;
+  }
+  .scan-box > span {
+    position: absolute;
+    left: -1.5px;
+    top: calc(100% + 6px);
+    white-space: nowrap;
+    border-radius: 9999px;
+    background: oklch(0.19 0.012 75 / 0.88);
+    color: oklch(0.99 0.01 98);
+    padding: 0.2rem 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .scan-box::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 0.3rem;
+    background: linear-gradient(180deg, oklch(1 0 0 / 0.0), oklch(1 0 0 / 0.22));
+    animation: scan-sweep 2.8s var(--ease-out) infinite;
+  }
+
+  /* Glass pill (Arc secondary). */
+  .glass {
+    background: color-mix(in oklab, var(--ink-2) 72%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+
+  /* Infinite marquee of plain capability words (no logos, no fake proof). */
+  .marquee { display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .marquee > ul { display: flex; flex-shrink: 0; gap: 0.75rem; padding-right: 0.75rem; animation: marquee 38s linear infinite; }
+  .marquee:hover > ul { animation-play-state: paused; }
+
+  /* Gradient ring used on the featured voice card and step numbers. */
+  .bloom-ring {
+    background:
+      linear-gradient(var(--ink-2), var(--ink-2)) padding-box,
+      conic-gradient(from 200deg, var(--sun), var(--coral), var(--violet), var(--mint), var(--sun)) border-box;
+    border: 1.5px solid transparent;
+  }
+}
+
+@layer utilities {
+  /* Scroll-linked transforms are written as CSS variables by ScrollScene. */
+  .scroll-y { transform: translate3d(0, calc(var(--sp, 0) * var(--sy, 0px)), 0); }
+  .js .reveal.reveal-blur:not([data-revealed="true"]) {
+    filter: blur(8px);
+    transform: translate3d(0, 1.5rem, 0);
+  }
+  .reveal.reveal-blur { transition-property: opacity, transform, filter; }
+  .word-in > span {
+    display: inline-block;
+    animation: word-in 900ms var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 120ms);
+  }
+}
+
+@keyframes drift-a { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(10vw, 8vh, 0) scale(1.12); } }
+@keyframes drift-b { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(-8vw, 12vh, 0) scale(0.9); } }
+@keyframes drift-c { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(6vw, -10vh, 0) scale(1.15); } }
+@keyframes scan-sweep { 0% { transform: translateY(-30%); opacity: 0; } 40% { opacity: 1; } 100% { transform: translateY(30%); opacity: 0; } }
+@keyframes marquee { to { transform: translate3d(-100%, 0, 0); } }
+@keyframes word-in { from { opacity: 0; transform: translate3d(0, 0.5em, 0); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora > i, .marquee > ul, .scan-box::before { animation: none !important; }
+  .word-in > span { animation: none !important; opacity: 1; }
+  .js .reveal.reveal-blur { filter: none !important; }
 }

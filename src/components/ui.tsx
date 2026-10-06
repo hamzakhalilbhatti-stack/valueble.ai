@@ -85,14 +85,14 @@ export function Badge({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium leading-none",
         tone === "neutral" && "border-rule-strong bg-ink-2 text-mute",
-        tone === "live" && "border-accent/30 bg-accent/10 text-accent-strong",
+        tone === "live" && "border-wa/30 bg-wa/10 text-[oklch(0.42_0.11_152)]",
         tone === "price" && "border-rule-strong bg-ink-2 text-paper",
         tone === "accent" && "border-voice/30 bg-voice/10 text-voice",
         tone === "demo" && "border-warm/35 bg-warm/10 text-warm",
         className,
       )}
     >
-      {tone === "live" && <span aria-hidden className="pulse-dot size-1.5 rounded-full bg-accent" />}
+      {tone === "live" && <span aria-hidden className="pulse-dot size-1.5 rounded-full bg-wa" />}
       {children}
     </span>
   );

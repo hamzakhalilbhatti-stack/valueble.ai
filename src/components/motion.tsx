@@ -119,5 +119,85 @@ export function ScrollProgress() {
       cancelAnimationFrame(raf);
     };
   }, []);
-  return <div ref={ref} aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-accent" />;
+  return <div ref={ref} aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-[linear-gradient(90deg,var(--sun),var(--coral),var(--violet))]" />;
+}
+
+/**
+ * Scroll-linked scene. Writes a 0→1 progress value to `--p` on its own
+ * element every animation frame while it is on screen, so children can
+ * drive transforms from CSS with calc(var(--p) * …). Transform/opacity only,
+ * one passive listener, nothing runs while off screen.
+ *
+ * mode "exit":    0 when the top of the scene hits the top of the viewport,
+ *                 1 when the scene has fully scrolled away (hero parallax).
+ * mode "through": 0 when the scene enters at the bottom, 1 when it leaves.
+ * mode "pin":     0→1 across a tall section with a sticky child.
+ */
+export function ScrollScene({
+  children,
+  className,
+  mode = "exit",
+  steps,
+  onStep,
+  as: Tag = "div",
+  ...rest
+}: {
+  children: React.ReactNode;
+  className?: string;
+  mode?: "exit" | "through" | "pin";
+  steps?: number;
+  onStep?: (i: number) => void;
+  as?: "div" | "section";
+} & Omit<React.HTMLAttributes<HTMLElement>, "children" | "className">) {
+  const ref = useRef<HTMLElement>(null);
+  const stepRef = useRef(-1);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    let visible = true;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let p: number;
+      if (mode === "exit") p = -r.top / Math.max(1, r.height);
+      else if (mode === "through") p = (vh - r.top) / (vh + r.height);
+      else p = -r.top / Math.max(1, r.height - vh);
+      p = Math.min(1, Math.max(0, p));
+      if (!reduce) el.style.setProperty("--p", p.toFixed(4));
+      if (steps && onStep) {
+        const i = Math.min(steps - 1, Math.floor(p * steps));
+        if (i !== stepRef.current) {
+          stepRef.current = i;
+          onStep(i);
+        }
+      }
+    };
+    const on = () => {
+      if (visible && !raf) raf = requestAnimationFrame(update);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) on();
+    });
+    io.observe(el);
+    update();
+    window.addEventListener("scroll", on, { passive: true });
+    window.addEventListener("resize", on);
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("resize", on);
+      cancelAnimationFrame(raf);
+    };
+  }, [mode, steps, onStep]);
+
+  return (
+    <Tag ref={ref as React.Ref<HTMLDivElement>} className={className} {...rest}>
+      {children}
+    </Tag>
+  );
 }

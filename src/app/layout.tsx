@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,13 +8,22 @@ import { ScrollProgress } from "@/components/motion";
 import { JsonLd, organizationLd, personLd } from "@/components/json-ld";
 import { site } from "@/lib/site";
 
-// Display: Bricolage Grotesque — characterful, tight at large sizes.
+// Display: Instrument Sans, tight and machined at large sizes (Apple-style
+// compression). Instrument Serif italic is the single flair word per headline.
 // Body: Geist. Mono: Geist Mono for UI labels inside product mocks.
 // All self-hosted by next/font at build time; no request to Google at runtime.
-const display = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const display = Instrument_Sans({
+  variable: "--font-display-face",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+  display: "swap",
+});
+
+const serif = Instrument_Serif({
+  variable: "--font-serif-face",
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
   display: "swap",
 });
 
@@ -50,7 +59,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f8f9fb",
+  themeColor: "#fbf3c9",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -60,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${geist.variable} ${geistMono.variable}`}
+      className={`${display.variable} ${serif.variable} ${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -78,6 +87,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body>
+        <div aria-hidden className="aurora">
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
         <JsonLd data={[organizationLd, personLd]} />
         <RevealDriver />
         <ScrollProgress />

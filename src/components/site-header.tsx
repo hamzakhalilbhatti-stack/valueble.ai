@@ -125,8 +125,8 @@ export function SiteHeader() {
         className={cn(
           "absolute inset-0 -z-10 border-b transition-[background-color,border-color,box-shadow] duration-300",
           scrolled || open
-            ? "border-rule bg-ink-2/85 shadow-[0_8px_30px_-20px_oklch(0.2_0.02_265/0.35)] backdrop-blur-xl"
-            : "border-transparent bg-ink/70 backdrop-blur-md",
+            ? "border-ink-2/70 bg-ink-2/85 shadow-[0_10px_40px_-24px_oklch(0.35_0.08_60/0.5)] backdrop-blur-2xl backdrop-saturate-150"
+            : "border-transparent bg-transparent",
         )}
       />
       <div className="container-site flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
