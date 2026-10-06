@@ -219,11 +219,11 @@
   }
 
   .section {
-    padding-block: 5rem;
+    padding-block: 4rem;
   }
   @media (min-width: 768px) {
     .section {
-      padding-block: 7rem;
+      padding-block: 5.5rem;
     }
   }
 
@@ -556,8 +556,8 @@ details.faq[open] .faq-icon {
   .aurora > i {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(70px);
-    opacity: 0.55;
+    filter: blur(80px);
+    opacity: 0.45;
     will-change: transform;
   }
   .aurora > i:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: -14vmax; background: var(--sun); animation: drift-a 28s ease-in-out infinite; }
@@ -676,4 +676,90 @@ details.faq[open] .faq-icon {
   .aurora > i, .marquee > ul, .scan-box::before { animation: none !important; }
   .word-in > span { animation: none !important; opacity: 1; }
   .js .reveal.reveal-blur { filter: none !important; }
+}
+
+/* ───────── Polish layer (ChronoTask-style craft) ─────────
+   Sections sit in framed "canvas" panels with a fine dot texture instead of
+   floating on the blurred background. Icons are glossy 3D tiles. Empty
+   corners are filled with small, real product fragments, not decoration. */
+@layer components {
+  .canvas-panel {
+    position: relative;
+    isolation: isolate;
+    border-radius: 2rem;
+    background-color: color-mix(in oklab, var(--ink-2) 86%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 70%, var(--rule));
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    overflow: hidden;
+  }
+  @media (min-width: 768px) { .canvas-panel { border-radius: 2.5rem; } }
+  .dot-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(color-mix(in oklab, var(--paper) 13%, transparent) 1px, transparent 1.2px);
+    background-size: 14px 14px;
+    mask-image: radial-gradient(85% 80% at 50% 45%, #000 35%, transparent 100%);
+  }
+
+  /* Glossy 3D app tile. */
+  .app-tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 28%;
+    background: linear-gradient(160deg, oklch(1 0 0), oklch(0.955 0.006 95));
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0),
+      inset 0 -3px 6px oklch(0.6 0.02 90 / 0.12),
+      0 1px 2px oklch(0.3 0.03 80 / 0.12),
+      0 14px 28px -12px oklch(0.3 0.05 70 / 0.38);
+    border: 1px solid oklch(0.92 0.01 95);
+  }
+  .app-tile-dark {
+    background: linear-gradient(160deg, oklch(0.3 0.012 75), oklch(0.17 0.01 75));
+    border-color: oklch(0.32 0.012 75);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.14),
+      0 1px 2px oklch(0 0 0 / 0.3),
+      0 16px 30px -12px oklch(0.2 0.03 70 / 0.6);
+    color: oklch(0.98 0.01 98);
+  }
+
+  /* Pinned sticky note. */
+  .sticky-note {
+    position: relative;
+    background: linear-gradient(170deg, oklch(0.93 0.13 98), oklch(0.89 0.15 95));
+    color: oklch(0.24 0.03 80);
+    border-radius: 0.25rem 0.25rem 0.25rem 1.25rem;
+    box-shadow: 0 2px 4px oklch(0.4 0.06 80 / 0.15), 0 22px 40px -18px oklch(0.4 0.08 70 / 0.55);
+  }
+  .sticky-note::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, oklch(0.78 0.16 25), oklch(0.5 0.19 27));
+    box-shadow: 0 3px 5px oklch(0.3 0.08 30 / 0.4);
+  }
+
+  /* Two-tone headline: second line recedes (ChronoTask headline treatment). */
+  .head-muted { display: block; color: color-mix(in oklab, var(--paper) 48%, var(--ink-2)); }
+  .theme-dark .head-muted { color: color-mix(in oklab, var(--paper) 60%, var(--ink)); }
+
+  /* Little "app window" chip for floating fragments. */
+  .frag {
+    border-radius: 1.125rem;
+    background: color-mix(in oklab, var(--ink-2) 94%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 60%, var(--rule));
+    box-shadow: var(--shadow-lift);
+  }
 }

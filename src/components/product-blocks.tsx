@@ -87,10 +87,10 @@ export function PlainFacts({ product, className }: { product: Product; className
 export function HowItWorks3({ product, className }: { product: Product; className?: string }) {
   return (
     <ol className={cn("relative grid gap-4 md:grid-cols-3 md:gap-6", className)}>
-      <span aria-hidden className="absolute left-[16.6%] right-[16.6%] top-8 hidden h-px bg-rule-strong md:block" />
+      <span aria-hidden className="absolute left-[16.6%] right-[16.6%] top-8 hidden border-t-2 border-dashed border-rule-strong md:block" />
       {product.how3.map((s, i) => (
         <li key={s.title} className="reveal reveal-scale relative text-center" data-od-id={`how3-${product.slug}-${i + 1}`}>
-          <span className={cn("relative z-[1] mx-auto grid size-16 place-items-center rounded-2xl border border-rule bg-ink-2 font-display text-2xl font-semibold shadow-[var(--shadow-card)]", ACCENT_TEXT[product.accent])}>
+          <span className={cn("app-tile relative z-[1] mx-auto size-16 font-display text-2xl font-semibold transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-1 hover:rotate-[-4deg]", ACCENT_TEXT[product.accent])}>
             {i + 1}
           </span>
           <h3 className="mt-5 text-title">{s.title}</h3>

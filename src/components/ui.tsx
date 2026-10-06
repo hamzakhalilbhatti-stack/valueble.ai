@@ -117,9 +117,12 @@ export function SectionHeader({
   className,
   as: Tag = "h2",
   id,
+  muted,
 }: {
   eyebrow?: string;
   title: React.ReactNode;
+  /** Optional second line that recedes (two-tone headline). Part of the same heading. */
+  muted?: React.ReactNode;
   lede?: React.ReactNode;
   align?: "left" | "center";
   className?: string;
@@ -136,6 +139,7 @@ export function SectionHeader({
       )}
       <Tag id={id} className={Tag === "h1" ? "text-display" : "text-head"}>
         {title}
+        {muted && <span className="head-muted"> {muted}</span>}
       </Tag>
       {lede && <p className={cn("mt-5 text-sub text-mute", align === "center" && "mx-auto max-w-2xl")}>{lede}</p>}
     </div>
