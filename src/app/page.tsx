@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { ArrowUpRight, Mail, MessageCircle, PhoneCall } from "lucide-react";
+import { ArrowUpRight, Mail, MessageCircle } from "lucide-react";
 import { HeroVisual } from "@/components/hero-visual";
-import { Waveform } from "@/components/product/voice-demo";
-import { ScraperDemo } from "@/components/product/scraper-demo";
-import { OrderRiseDemo } from "@/components/product/orderrise-demo";
-import { AgentDemo } from "@/components/product/agent-demo";
-import { ACCENT_BG, ACCENT_TEXT, CtaBand, ProductCard } from "@/components/product-blocks";
-import { Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
+import { VoiceDemo } from "@/components/product/voice-demo";
+import { DemoTabs } from "@/components/product/demo-tabs";
+import { CountUp } from "@/components/motion";
+import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo, ProductCard } from "@/components/product-blocks";
+import { ArrowLink, Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
 import { JsonLd, faqLd } from "@/components/json-ld";
 import { cn } from "@/lib/cn";
 import { pageMeta } from "@/lib/meta";
@@ -37,7 +36,7 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section id="top" className="relative isolate overflow-hidden" data-od-id="home-hero">
         <div className="atmosphere" />
-        <div className="container-site grid items-start gap-12 pb-16 pt-12 md:pb-24 md:pt-20 lg:grid-cols-[1.15fr_1fr]">
+        <div className="container-site grid items-center gap-10 pb-12 pt-10 md:pt-16 lg:grid-cols-[1.1fr_1fr] lg:pb-16">
           <div>
             <h1 className="text-hero">
               <span className="eyebrow mb-6 flex font-sans">
@@ -46,10 +45,8 @@ export default function HomePage() {
               </span>
               {site.headline}
             </h1>
-            <p className="mt-6 max-w-[34ch] text-sub text-mute md:text-[1.375rem]">
-              {site.tagline}
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <p className="mt-6 max-w-[36ch] text-sub text-mute md:text-[1.375rem]">{site.tagline}</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href={contact.bookingGeneral} data-od-id="hero-book-call">
                 Book a call
               </Button>
@@ -57,107 +54,117 @@ export default function HomePage() {
                 See the products
               </Button>
             </div>
-            <ul className="mt-10 flex flex-wrap gap-x-5 gap-y-2 text-sm text-faint" aria-label="Products">
-              {productOrder.map((slug) => {
-                const p = getProduct(slug)!;
-                return (
-                  <li key={slug}>
-                    <Link href={p.path} className="inline-flex min-h-8 items-center gap-2 transition-colors hover:text-paper">
-                      <span aria-hidden className={cn("size-1.5 rounded-full", ACCENT_BG[p.accent])} />
-                      {p.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
           </div>
-          {/* Hidden below 640px: on phones it sat below the fold, shifted on font
-              load, and repeated the voice banner directly underneath. */}
-          <div className="hidden sm:block lg:pt-10">
+          <div className="hidden md:block">
             <HeroVisual />
           </div>
         </div>
+
+        {/* What I build, in one glance */}
+        <div className="container-site pb-14 md:pb-20">
+          <p className="eyebrow mb-4">What I build</p>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Products at a glance">
+            {productOrder.map((slug) => {
+              const p = getProduct(slug)!;
+              const Icon = PRODUCT_ICON[slug];
+              return (
+                <li key={slug}>
+                  <Link
+                    href={p.path}
+                    className="group flex h-full items-start gap-3 rounded-2xl border border-rule bg-ink-2/80 p-4 shadow-[var(--shadow-card)] backdrop-blur transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-rule-strong hover:shadow-[var(--shadow-lift)]"
+                  >
+                    <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-xl", ACCENT_TINT[p.accent])}>
+                      <Icon className="size-[1.125rem]" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 font-medium text-paper">
+                        {p.name}
+                        <ArrowUpRight aria-hidden className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
+                      </span>
+                      <span className="mt-0.5 block text-sm leading-snug text-mute">{HERO_LINES[slug]}</span>
+                      <span className="mt-1.5 block text-xs font-semibold text-paper">{p.price}</span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </section>
 
-      {/* ── Featured: AI Voice Agent ── */}
+      {/* ── Featured: AI Voice Agent (dark band, interactive) ── */}
       {/* TODO (owner): voice agent capabilities on this site are draft marketing
           copy. Confirm each against the actual product before publishing. */}
-      <section id="voice-agent" aria-labelledby="voice-banner-title" className="pb-8" data-od-id="voice-banner">
-        <div className="container-site">
-          <div className="reveal relative isolate overflow-hidden rounded-[1.75rem] border border-voice/25 bg-[linear-gradient(120deg,rgb(124_200_255/0.12),rgb(124_200_255/0.02)_45%,transparent)] p-6 md:p-10">
-            <div aria-hidden className="absolute -right-24 -top-24 -z-10 size-80 rounded-full bg-voice/15 blur-3xl" />
-            <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="accent">New</Badge>
-                  <span className="ui-label text-voice">AI voice agent for business</span>
-                </div>
-                <h2 id="voice-banner-title" className="mt-5 text-head">
-                  {voice.tagline}
-                </h2>
-                <p className="mt-4 max-w-[52ch] text-mute">{voice.hero.sub}</p>
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Button href={voice.path} variant="secondary">
-                    Explore the AI voice agent
-                  </Button>
-                  <Link href={voice.cta.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 px-2 text-paper hover:text-voice">
-                    Hear a demo call <ArrowUpRight aria-hidden className="size-4" />
-                  </Link>
-                </div>
-              </div>
-              <div className="panel p-5">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-9 place-items-center rounded-full bg-voice/15 text-voice">
-                    <PhoneCall aria-hidden className="size-4" />
-                  </span>
-                  <div>
-                    <p className="text-sm text-paper">Inbound call · answered</p>
-                    <p className="ui-label mt-1 text-voice">24/7 · no hold music</p>
-                  </div>
-                </div>
-                <Waveform className="mt-5 h-12" />
-                <ul className="mt-5 grid grid-cols-2 gap-2 text-xs text-mute">
-                  {["Books appointments", "Takes orders", "Qualifies leads", "Hands off to a human"].map((t) => (
-                    <li key={t} className="rounded-lg border border-rule bg-ink/60 px-3 py-2">
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+      <section id="voice-agent" aria-labelledby="voice-banner-title" className="theme-dark section relative isolate overflow-hidden" data-od-id="voice-banner">
+        <div aria-hidden className="absolute -right-40 -top-40 -z-10 size-[36rem] rounded-full bg-voice/15 blur-3xl" />
+        <div className="container-site grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="reveal">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="accent">New</Badge>
+              <span className="ui-label text-voice">AI voice agent for business</span>
             </div>
+            <h2 id="voice-banner-title" className="mt-5 text-display">
+              {voice.tagline}
+            </h2>
+            <p className="mt-5 max-w-[48ch] text-sub text-mute">{voice.hero.sub}</p>
+            <ul className="mt-7 grid grid-cols-2 gap-2 text-sm text-paper">
+              {["Answers 24/7", "Books and takes orders", "Qualifies leads", "Hands off to a human"].map((t) => (
+                <li key={t} className="rounded-xl border border-rule bg-ink-2 px-3.5 py-2.5">
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm text-mute">
+              <span className="font-medium text-paper">Price:</span> {voice.plain.cost}
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button href={voice.path} variant="secondary">
+                Explore the AI voice agent
+              </Button>
+              <ArrowLink href={voice.cta.href}>Hear a demo call</ArrowLink>
+            </div>
+          </div>
+          <div className="reveal reveal-right">
+            <VoiceDemo compact className="shadow-none" />
           </div>
         </div>
       </section>
 
       {/* ── Problem ── */}
       <section id="problem" className="section" aria-labelledby="problem-title" data-od-id="home-problem">
-        <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.1fr]">
-          <SectionHeader eyebrow="The problem" title={<span id="problem-title">Small teams lose the work before they ever get to do it</span>} />
-          <div className="reveal space-y-6 text-[1.0625rem] lg:pt-10">
-            <p>
-              The businesses that need help most are the ones with the fewest spare hours. To grow, the
-              same handful of people are expected to:
-            </p>
-            <CheckList
-              className="rounded-2xl border border-rule bg-ink-2 p-6 text-paper"
-              items={[
-                "Find and qualify prospects by hand, one browser tab at a time",
-                "Answer every enquiry personally — including the ones at 11pm on a Friday",
-                "Re-key the same information between tools that were never meant to talk",
-                "Repeat all of it tomorrow, at the same volume, without dropping anything",
-              ]}
-            />
-            <p>
-              So it gets done badly, or late, or not at all. The lost revenue never shows up on a report,
-              because a customer who was never reached and a message that was never answered leave no
-              record behind.
-            </p>
+        <div className="container-site grid items-center gap-12 lg:grid-cols-2">
+          <Photo
+            src="/images/restaurant-kitchen.webp"
+            width={960}
+            height={640}
+            alt="A chef working the pass in a busy restaurant kitchen during service"
+            caption="The phone rings during the rush. Nobody can reach it."
+            className="reveal reveal-left order-last lg:order-first"
+          />
+          <div>
+            <SectionHeader eyebrow="The problem" title={<span id="problem-title">Small teams lose the work before they ever get to do it</span>} />
+            <div className="reveal mt-6 space-y-6 text-[1.0625rem]">
+              <p>The businesses that need help most are the ones with the fewest spare hours. To grow, the same handful of people are expected to:</p>
+              <CheckList
+                className="card p-6 text-paper"
+                items={[
+                  "Find and qualify prospects by hand, one browser tab at a time",
+                  "Answer every enquiry personally — including the ones at 11pm on a Friday",
+                  "Re-key the same information between tools that were never meant to talk",
+                  "Repeat all of it tomorrow, at the same volume, without dropping anything",
+                ]}
+              />
+              <p>
+                So it gets done badly, or late, or not at all. The lost revenue never shows up on a report, because a customer who
+                was never reached and a message that was never answered leave no record behind.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── Products overview ── */}
-      <section id="products" className="section border-t border-rule" aria-labelledby="products-title" data-od-id="home-products">
+      <section id="products" className="on-cloud section" aria-labelledby="products-title" data-od-id="home-products">
         <div className="container-site">
           <SectionHeader
             eyebrow="Products"
@@ -169,13 +176,37 @@ export default function HomePage() {
               <ProductCard key={slug} slug={slug} className="reveal" />
             ))}
           </div>
+          {/* Real numbers from the offers above, not invented metrics. */}
+          <dl className="reveal mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-4">
+            {[
+              { v: <CountUp to={200} prefix="$" />, k: "one-time for the Maps Lead Scraper" },
+              { v: <CountUp to={50} prefix="$" />, k: "a month per restaurant for OrderRise" },
+              { v: <CountUp to={24} suffix="/7" />, k: "call answering with the voice agent" },
+              { v: <CountUp to={1} />, k: "person, from scoping to support" },
+            ].map((s, i) => (
+              <div key={i} className="bg-ink-2 p-5 md:p-6">
+                <dt className="sr-only">{s.k}</dt>
+                <dd>
+                  <span className="block font-display text-[2.25rem] font-semibold leading-none text-paper md:text-[2.75rem]">{s.v}</span>
+                  <span className="mt-2 block text-sm text-mute">{s.k}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
-      {/* ── Product showcases, each shown working ── */}
-      <Showcase slug="lead-extractor" demo={<ScraperDemo />} />
-      <Showcase slug="orderrise" demo={<OrderRiseDemo />} />
-      <Showcase slug="ai-agents" demo={<AgentDemo className="mx-auto max-w-3xl" />} />
+      {/* ── Try the products ── */}
+      <section id="demos" className="section" aria-labelledby="demos-title" data-od-id="home-demos">
+        <div className="container-site">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <SectionHeader eyebrow="Try them" title={<span id="demos-title">Don&apos;t read about it. Click it.</span>} lede="Working demos in your browser with sample data. Run a search, place an order, approve an agent's action." />
+          </div>
+          <div className="reveal mt-10">
+            <DemoTabs />
+          </div>
+        </div>
+      </section>
 
       {/* ── Built from real problems (proof block) ── */}
       {/*
@@ -186,90 +217,76 @@ export default function HomePage() {
       */}
       <section id="built-from-real-problems" className="on-cloud section" aria-labelledby="real-title" data-od-id="home-real-problems">
         <div className="container-site">
-          <div className="reveal max-w-3xl">
-            <p className="eyebrow mb-4">Built from real problems</p>
-            <h2 id="real-title" className="text-head">Nothing here started as a roadmap</h2>
-            <p className="mt-5 text-sub">
-              Everything here came out of a real business problem rather than a product roadmap. Each one
-              was built until it held.
-            </p>
-          </div>
+          <SectionHeader eyebrow="Built from real problems" title={<span id="real-title">Nothing here started as a roadmap</span>} lede="Everything here came out of a real business problem rather than a product roadmap. Each one was built until it held." />
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
-              {
-                tag: "Maps Lead Scraper",
-                problem: "Prospecting by hand was eating weekends.",
-                body: "A list of 400 prospects was becoming a weekend of tabs. So the extension reads the Maps results, visits each website and scores the lead.",
-                href: "/maps-lead-scraper",
-              },
-              {
-                tag: "OrderRise",
-                problem: "Restaurants were losing paid orders to a phone nobody could reach during the dinner rush.",
-                body: "So the WhatsApp number on the door now answers, builds the cart and sends a clean ticket to the kitchen.",
-                href: "/orderrise",
-              },
-              {
-                tag: "Custom AI Agents",
-                problem: "The gap is never the model. It's everything around it.",
-                body: "So every build starts with one process and an honest list of what should stay manual.",
-                href: "/custom-ai-agents",
-              },
-            ].map((c) => (
-              <article key={c.tag} className="reveal flex flex-col rounded-[1.25rem] border border-cloud-2 bg-white p-6 shadow-[0_1px_0_rgb(0_0_0/0.04)]">
-                <p className="ui-label text-slate">{c.tag}</p>
-                <h3 className="mt-4 text-title">{c.problem}</h3>
-                <p className="mt-3 flex-1 text-[0.9375rem]">{c.body}</p>
-                <Link href={c.href} className="mt-6 inline-flex min-h-11 items-center gap-1 font-medium text-ink underline-offset-4 hover:underline">
-                  How {c.tag} works <ArrowUpRight aria-hidden className="size-4" />
-                </Link>
-              </article>
-            ))}
+              { slug: "lead-extractor" as const, problem: "Prospecting by hand was eating weekends.", body: "A list of 400 prospects was becoming a weekend of tabs. So the extension reads the Maps results, visits each website and scores the lead." },
+              { slug: "orderrise" as const, problem: "Restaurants were losing paid orders to a phone nobody could reach during the dinner rush.", body: "So the WhatsApp number on the door now answers, builds the cart and sends a clean ticket to the restaurant." },
+              { slug: "ai-agents" as const, problem: "The gap is never the model. It's everything around it.", body: "So every build starts with one process and an honest list of what should stay manual." },
+            ].map((c) => {
+              const p = getProduct(c.slug)!;
+              return (
+                <article key={c.slug} className="card card-hover reveal flex flex-col overflow-hidden">
+                  <Photo src={p.photo.src} width={p.photo.width} height={p.photo.height} alt={p.photo.alt} className="rounded-none border-0 shadow-none" />
+                  <div className="flex flex-1 flex-col p-6">
+                    <p className={cn("ui-label", ACCENT_TEXT[p.accent])}>{p.name}</p>
+                    <h3 className="mt-3 text-title">{c.problem}</h3>
+                    <p className="mt-3 flex-1 text-[0.9375rem] text-mute">{c.body}</p>
+                    <ArrowLink href={p.path} className="mt-5">
+                      How {p.name} works
+                    </ArrowLink>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ── Founder ── */}
-      <section id="approach" className="section defer-render" aria-labelledby="founder-title" data-od-id="home-founder">
+      <section id="approach" className="section" aria-labelledby="founder-title" data-od-id="home-founder">
         <div className="container-site grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="reveal">
-            <p className="eyebrow mb-4">Who builds it</p>
-            <h2 id="founder-title" className="text-head">One person, and you talk to him</h2>
+            <p className="eyebrow mb-4">
+              <span aria-hidden className="h-px w-6 bg-accent" />
+              Who builds it
+            </p>
+            <h2 id="founder-title" className="text-head">
+              One person, and you talk to him
+            </h2>
             {/* TODO (owner): add a real portrait of Hamza here (next/image, with alt text). */}
-            <div className="mt-8 flex items-center gap-4 rounded-2xl border border-rule bg-ink-2 p-5">
-              <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#5fe8c8,#7cc8ff)] font-display text-lg font-semibold text-ink">
+            <div className="card mt-8 flex items-center gap-4 p-5">
+              <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-paper font-display text-lg font-semibold text-ink">
                 HK
               </span>
               <div>
                 <p className="font-medium text-paper">{site.founder}</p>
-                <p className="text-sm text-faint">{site.founderRole}</p>
+                <p className="text-sm text-mute">{site.founderRole}</p>
               </div>
             </div>
           </div>
           <div className="reveal space-y-5 text-[1.0625rem]">
             <p>
-              I am Hamza Khalil Bhatti. I scope the work, build it, and support it after it ships — there is
-              no account manager between you and the person writing the code. That is a hard limit on how
-              much I take on, and it is the reason the work holds.
+              I am Hamza Khalil Bhatti. I scope the work, build it, and support it after it ships — there is no account manager
+              between you and the person writing the code. That is a hard limit on how much I take on, and it is the reason the work
+              holds.
             </p>
             <p>
-              Everything here came out of a real business problem rather than a product roadmap. The
-              scraper exists because prospecting by hand was eating weekends. OrderRise exists because
-              restaurants were losing paid orders to a phone nobody could reach during the dinner rush.
+              Everything here came out of a real business problem rather than a product roadmap. The scraper exists because
+              prospecting by hand was eating weekends. OrderRise exists because restaurants were losing paid orders to a phone nobody
+              could reach during the dinner rush.
             </p>
             <p>
-              The first thing I do on any project is tell you which parts are not worth automating. A system
-              that handles eighty percent of a process reliably is worth more than one that claims all of it
-              and quietly fails on the cases that matter.
+              The first thing I do on any project is tell you which parts are not worth automating. A system that handles eighty
+              percent of a process reliably is worth more than one that claims all of it and quietly fails on the cases that matter.
             </p>
-            <Link href="/about" className="inline-flex min-h-11 items-center gap-1.5 font-medium text-paper hover:text-accent-strong">
-              More about how I work <ArrowUpRight aria-hidden className="size-4" />
-            </Link>
+            <ArrowLink href="/about">More about how I work</ArrowLink>
           </div>
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="section defer-render border-t border-rule" aria-labelledby="faq-title" data-od-id="home-faq">
+      <section id="faq" className="on-cloud section" aria-labelledby="faq-title" data-od-id="home-faq">
         <div className="container-site grid gap-10 lg:grid-cols-[1fr_1.6fr]">
           <SectionHeader eyebrow="FAQ" title={<span id="faq-title">Questions people ask first</span>} />
           <FaqList faqs={homeFaqs} className="reveal" />
@@ -284,7 +301,7 @@ export default function HomePage() {
         primary={{ href: whatsappUrl, label: "Message me on WhatsApp" }}
         secondary={{ href: contact.bookingGeneral, label: "Or see every way to reach me" }}
       />
-      <div className="container-site -mt-12 pb-20 md:-mt-20">
+      <div className="container-site -mt-10 pb-20 md:-mt-16">
         <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm" aria-label="Contact links">
           <li>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 text-mute hover:text-paper">
@@ -307,37 +324,10 @@ export default function HomePage() {
   );
 }
 
-/** Alternating split: copy + price + CTA, then the product running full width. */
-function Showcase({ slug, demo }: { slug: "lead-extractor" | "orderrise" | "ai-agents"; demo: React.ReactNode }) {
-  const p = getProduct(slug)!;
-  return (
-    <section id={`showcase-${p.path.slice(1)}`} className="section defer-render border-t border-rule" aria-labelledby={`${slug}-title`} data-od-id={`showcase-${slug}`}>
-      <div className="container-site">
-        <div className="grid items-end gap-8 lg:grid-cols-[1.3fr_1fr]">
-          <div className="reveal">
-            <p className={cn("ui-label", ACCENT_TEXT[p.accent])}>
-              {p.kind} · {p.audience}
-            </p>
-            <h2 id={`${slug}-title`} className="mt-4 text-head">
-              {p.name}
-            </h2>
-            <p className="mt-4 max-w-[46ch] text-sub text-mute">{p.tagline}</p>
-          </div>
-          <div className="reveal flex flex-wrap items-center gap-3 lg:justify-end">
-            {p.status === "Live" ? <Badge tone="live">Live</Badge> : <Badge>{p.status}</Badge>}
-            <Badge tone="price">{p.price}</Badge>
-          </div>
-        </div>
-        <div className="reveal mt-10">{demo}</div>
-        <div className="reveal mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button href={p.path} variant="secondary">
-            How {p.name} works
-          </Button>
-          <Link href={p.cta.href} {...(/^https?:/.test(p.cta.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="inline-flex min-h-11 items-center gap-1.5 px-2 text-paper hover:text-accent-strong">
-            {p.cta.label} <ArrowUpRight aria-hidden className="size-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
+/** One plain line per product for the above-the-fold strip. */
+const HERO_LINES: Record<string, string> = {
+  "voice-agent": "Answers your business phone 24/7 and books, orders or hands off.",
+  "lead-extractor": "Turns a Google Maps search into a scored lead list with emails.",
+  orderrise: "Takes restaurant orders on WhatsApp, day and night.",
+  "ai-agents": "One repetitive process you run, handled by an agent.",
+};

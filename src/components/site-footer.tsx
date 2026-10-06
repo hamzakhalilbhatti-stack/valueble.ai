@@ -11,13 +11,16 @@ function LinkedInIcon({ className }: { className?: string }) {
   );
 }
 
-const linkCls = "text-mute transition-colors hover:text-paper";
+const linkCls = "rounded text-mute transition-colors hover:text-paper";
+const iconBtn =
+  "grid size-11 place-items-center rounded-full border border-rule-strong text-paper transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-ink-3";
 
+/** Dark footer: one of the few deliberate dark bands on a light site. */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-rule bg-ink-2" data-od-id="site-footer">
+    <footer className="theme-dark relative" data-od-id="site-footer">
       <div className="container-site py-16 md:py-20">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="max-w-sm">
@@ -25,33 +28,17 @@ export function SiteFooter() {
             <p className="mt-5 text-mute">{site.tagline}</p>
             <ul className="mt-6 flex gap-2" aria-label="Social and contact">
               <li>
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Message valueble.ai on WhatsApp"
-                  className="grid size-11 place-items-center rounded-full border border-rule-strong text-paper transition-colors hover:bg-white/[0.06]"
-                >
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="Message valueble.ai on WhatsApp" className={iconBtn}>
                   <MessageCircle aria-hidden className="size-5" />
                 </a>
               </li>
               <li>
-                <a
-                  href={contact.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Hamza Khalil Bhatti on LinkedIn"
-                  className="grid size-11 place-items-center rounded-full border border-rule-strong text-paper transition-colors hover:bg-white/[0.06]"
-                >
+                <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Hamza Khalil Bhatti on LinkedIn" className={iconBtn}>
                   <LinkedInIcon className="size-[1.125rem]" />
                 </a>
               </li>
               <li>
-                <a
-                  href={`mailto:${contact.email}`}
-                  aria-label="Email valueble.ai"
-                  className="grid size-11 place-items-center rounded-full border border-rule-strong text-paper transition-colors hover:bg-white/[0.06]"
-                >
+                <a href={`mailto:${contact.email}`} aria-label="Email valueble.ai" className={iconBtn}>
                   <Mail aria-hidden className="size-5" />
                 </a>
               </li>
@@ -111,9 +98,8 @@ export function SiteFooter() {
             © {year} {site.legalName}. Built and run by {site.founder}.
           </p>
           <p className="max-w-xl md:text-right">
-            Maps Lead Scraper reads the public Google Maps interface and public business websites.
-            It uses no paid API and bypasses no access control. Not affiliated with Google or
-            WhatsApp.
+            Maps Lead Scraper reads the public Google Maps interface and public business websites. It uses no paid API
+            and bypasses no access control. Not affiliated with Google or WhatsApp. Photos: StockSnap (CC0).
           </p>
         </div>
       </div>

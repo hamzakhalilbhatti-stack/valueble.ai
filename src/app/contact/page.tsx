@@ -90,11 +90,11 @@ export default function ContactPage() {
                     {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     className={
                       "card card-link group flex h-full items-start gap-4 p-6 " +
-                      (primary ? "border-accent/35 bg-[linear-gradient(180deg,rgb(95_232_200/0.08),transparent)]" : "")
+                      (primary ? "border-accent/40 bg-accent/5" : "")
                     }
                     data-od-id={`contact-channel-${label.split(" ")[0].toLowerCase()}`}
                   >
-                    <span className={"grid size-11 shrink-0 place-items-center rounded-full " + (primary ? "bg-accent text-ink" : "border border-rule-strong text-paper")}>
+                    <span className={"grid size-11 shrink-0 place-items-center rounded-full " + (primary ? "bg-accent text-on-accent" : "border border-rule-strong text-paper")}>
                       <Icon aria-hidden className="size-5" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -125,8 +125,8 @@ export default function ContactPage() {
               ["The volume.", "Ten a week and a thousand a week are different problems with different answers."],
               ["What you already use.", "The tools it has to talk to matter more than any preference about how it is built."],
             ].map(([t, b], i) => (
-              <li key={t} className="flex gap-4 rounded-2xl border border-cloud-2 bg-white p-5">
-                <span className="ui-label pt-1 text-slate">0{i + 1}</span>
+              <li key={t} className="card flex gap-4 p-5">
+                <span className="ui-label pt-1 text-accent">0{i + 1}</span>
                 <p>
                   <strong>{t}</strong> {b}
                 </p>
@@ -151,7 +151,7 @@ export default function ContactPage() {
                     className="group flex min-h-16 flex-wrap items-center justify-between gap-x-8 gap-y-1 py-5"
                   >
                     <span className="font-medium text-paper">{p.name}</span>
-                    <span className="inline-flex items-center gap-2 text-mute group-hover:text-paper">
+                    <span className="inline-flex items-center gap-2 text-mute underline-offset-4 group-hover:text-paper group-hover:underline">
                       {p.cta.label}
                       <ArrowUpRight aria-hidden className="size-4" />
                     </span>

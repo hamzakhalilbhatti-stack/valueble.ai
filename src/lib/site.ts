@@ -67,6 +67,12 @@ export type Product = {
   seo: { title: string; description: string };
   /** `eyebrow` is rendered inside the H1 as the keyword line; `headline` is the visible headline. */
   hero: { eyebrow: string; headline: string; sub: string };
+  /** Plain-language answers shown in the first lines of every product surface. */
+  plain: { what: string; who: string; cost: string; after: string };
+  /** The simple 3-step "How it works" visual. The detailed steps live in `steps`. */
+  how3: { title: string; body: string }[];
+  /** Real photo shown on the product page. Project-local, credited in public/images/CREDITS.md. */
+  photo: { src: string; width: number; height: number; alt: string };
   problem: { heading: string; body: string[] };
   steps: { title: string; body: string }[];
   features: { title: string; body: string }[];
@@ -99,6 +105,24 @@ export const products: Product[] = [
       eyebrow: "AI voice agent for business",
       headline: "An AI voice agent that answers every call.",
       sub: "Calls at 11pm, during the dinner rush, or while you're with a customer. Answered, understood and handled.",
+    },
+    // TODO (owner): draft copy — confirm against the real voice product.
+    plain: {
+      what: "Picks up your business phone, talks to the caller in natural speech, and books, takes the order or answers the question.",
+      who: "Restaurants, clinics, real estate teams and service businesses that miss calls.",
+      cost: "Custom, scoped to your call volume.",
+      after: "Calls are answered 24/7, every outcome lands in your CRM, sheet or inbox, and tricky calls are transferred to you.",
+    },
+    how3: [
+      { title: "A customer calls", body: "Your normal number. Answered on the first ring, day or night." },
+      { title: "The agent handles it", body: "Books the slot, takes the order or answers the question, out loud." },
+      { title: "You get the result", body: "Logged in your tools, confirmed to the caller, or transferred to a person." },
+    ],
+    photo: {
+      src: "/images/phone-call.webp",
+      width: 960,
+      height: 640,
+      alt: "A man in a suit taking a phone call outside an office building",
     },
     problem: {
       heading: "A missed call is a customer who rang the next number on the list.",
@@ -205,6 +229,23 @@ export const products: Product[] = [
       headline: "Every business on the map, with a way to reach them.",
       sub: "Search once. Export a lead list your sales team can actually work from — filtered, deduplicated, and ranked by how contactable each business actually is.",
     },
+    plain: {
+      what: "A Chrome extension that turns a Google Maps search into a spreadsheet of businesses with emails, phones and socials, each scored 0–100.",
+      who: "Agencies and sales teams who prospect local businesses.",
+      cost: "$200 one-time. No subscription, no API bill.",
+      after: "You install it, type a search like \"dentists in Austin\", press Start and export a CSV.",
+    },
+    how3: [
+      { title: "Search Google Maps", body: "Type the category and city, set how many leads you want." },
+      { title: "It visits every website", body: "Pulls the emails, phones and socials Maps never shows you." },
+      { title: "Export a scored list", body: "Every lead ranked 0–100. Download CSV, JSON or TXT." },
+    ],
+    photo: {
+      src: "/images/prospecting-laptop.webp",
+      width: 960,
+      height: 617,
+      alt: "A man working on a laptop and writing notes at a desk",
+    },
     problem: {
       heading: "Prospecting on Maps is real work pretending to be easy.",
       body: [
@@ -294,6 +335,23 @@ export const products: Product[] = [
       headline: "The number is already on the door. Now it answers.",
       sub: "Customers order in WhatsApp — no app to download, no link to trust, no account to make. The kitchen sees a clean ticket. Nobody misses a rush.",
     },
+    plain: {
+      what: "An AI assistant on your restaurant's WhatsApp number that answers customers, takes the order, adds up the total and confirms the address.",
+      who: "Restaurants and takeaways that already get orders on WhatsApp.",
+      cost: "$50 a month per restaurant. Menu setup included.",
+      after: "Customers order in a chat they already use, and you get a finished order on your dashboard.",
+    },
+    how3: [
+      { title: "Customer messages", body: "The same WhatsApp number on your door and your Instagram." },
+      { title: "The assistant takes the order", body: "Menu, cart, total, address and confirmation, in the chat." },
+      { title: "You get a clean ticket", body: "A complete order on your dashboard. The customer gets updates." },
+    ],
+    photo: {
+      src: "/images/restaurant-kitchen.webp",
+      width: 960,
+      height: 640,
+      alt: "A chef working the pass in a busy restaurant kitchen under pendant lights",
+    },
     problem: {
       heading: "Every unanswered message is a paid order that walked.",
       body: [
@@ -379,6 +437,23 @@ export const products: Product[] = [
       eyebrow: "Custom AI agents · business automation",
       headline: "Most businesses do not need AI. They need one job done every day without fail.",
       sub: "I build the agent for that job — the one your team does manually, at volume, and resents. Then I make it hold up in production.",
+    },
+    plain: {
+      what: "An AI agent built around one repetitive process you already run: qualifying leads, answering the same questions, moving data between tools.",
+      who: "Any business with a task your team does by hand, at volume, every day.",
+      cost: "Project-based. Starts with a 20-minute call.",
+      after: "You get a working system on your own tools, with a human checkpoint on anything risky, and a person to call.",
+    },
+    how3: [
+      { title: "Pick one process", body: "A 20-minute call to find the job worth automating first." },
+      { title: "I build it on your tools", body: "WhatsApp, email, CRM, sheets. Tested on your real inputs." },
+      { title: "It runs, a person checks the edge cases", body: "Anything ambiguous or expensive waits for a human." },
+    ],
+    photo: {
+      src: "/images/cafe-counter.webp",
+      width: 960,
+      height: 643,
+      alt: "A café counter with a barista working behind a display of food",
     },
     problem: {
       heading: "The gap is never the model. It's everything around it.",

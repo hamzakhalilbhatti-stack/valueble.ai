@@ -1,218 +1,220 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Brain, Check, Inbox, Play, RotateCcw, ShieldCheck, UserRound, Wrench, X, Zap } from "lucide-react";
+import { DemoLabel } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /**
- * Custom AI Agents — a build, drawn as what it actually is.
+ * Custom AI Agents — the 5-step flow, made interactive.
  *
- * The other two products can show a screen. This one cannot: every build is
- * different, so a screenshot would be a lie about what you are buying. What is
- * consistent is the shape of the work — a trigger, a chain of steps, a human
- * checkpoint where one is warranted, and a destination in a tool you already
- * own. So that is what is drawn.
+ * Every build is different, so there is no product screen to show. What is
+ * constant is the shape: Trigger → Understand → Act → Checkpoint (human) →
+ * Deliver. The visitor picks an example process and runs it. At the checkpoint
+ * the run stops and waits for *them* to approve or reject, which is exactly
+ * what the system does with anything ambiguous or expensive.
  *
- * It runs rather than sits there, because the thing being sold is a *process*
- * and a process is a sequence. The connector draws downward and each stage
- * lights as it is reached.
- *
- * The pause at the checkpoint is the point of the whole diagram. The line stops
- * there and waits, visibly longer than anywhere else, because that is exactly
- * what the system does — anything ambiguous or expensive halts for a person.
- * Being told which parts should stay manual is the part of this service worth
- * paying for, so it gets the one beat of silence in the sequence.
+ * Example scenarios are illustrative, not client work.
  */
 
-type Node = {
-  step: string;
-  body: string;
-  tone: "step" | "human";
-};
+const STEPS = [
+  { key: "Trigger", Icon: Zap, body: "A WhatsApp message, a form submission, a new row, a scheduled time." },
+  { key: "Understand", Icon: Brain, body: "Read the request in whatever language and format it actually arrived in." },
+  { key: "Act", Icon: Wrench, body: "Look things up, write records, call the tools you already pay for." },
+  { key: "Checkpoint", Icon: UserRound, body: "Anything ambiguous or expensive stops here and waits for a person." },
+  { key: "Deliver", Icon: Inbox, body: "Into your CRM, your sheet, your inbox — wherever the work already lives." },
+] as const;
 
-const FLOW: Node[] = [
+type Scenario = { id: string; label: string; log: string[]; ask: string; approved: string; rejected: string };
+const SCENARIOS: Scenario[] = [
   {
-    step: "Trigger",
-    body: "A WhatsApp message, a form submission, a new row, a scheduled time.",
-    tone: "step",
+    id: "leads",
+    label: "Qualify an inbound lead",
+    log: [
+      "New web form: “Need 40 staff trained on the CRM by March, budget ~$6k”",
+      "Intent: training project · size 40 seats · deadline March · budget stated",
+      "Looked up the company, matched to the ‘Mid-size’ tier, drafted a reply with two call slots",
+    ],
+    ask: "Quote above $5,000. Send the drafted reply?",
+    approved: "Reply sent, lead added to CRM as ‘Qualified’, call slots held",
+    rejected: "Held in your inbox with the draft attached, nothing sent",
   },
   {
-    step: "Understand",
-    body: "Read the request in whatever language and format it actually arrived in.",
-    tone: "step",
+    id: "support",
+    label: "Answer a support message",
+    log: [
+      "WhatsApp: “my order 8812 never came and I want my money back”",
+      "Intent: missing delivery + refund request · order #8812 · tone: upset",
+      "Checked order #8812: shipped, tracking stalled 6 days. Drafted an apology and refund",
+    ],
+    ask: "Refund of $64. Approve?",
+    approved: "Refund issued, customer told on WhatsApp, ticket closed in the helpdesk",
+    rejected: "Escalated to you with the full thread, customer told someone will reply today",
   },
   {
-    step: "Act",
-    body: "Look things up, write records, call the tools you already pay for.",
-    tone: "step",
-  },
-  {
-    step: "Checkpoint",
-    body: "Anything ambiguous or expensive stops here and waits for a person.",
-    tone: "human",
-  },
-  {
-    step: "Deliver",
-    body: "Into your CRM, your sheet, your inbox — wherever the work already lives.",
-    tone: "step",
+    id: "data",
+    label: "Move invoices into a sheet",
+    log: [
+      "New email with 3 PDF invoices attached",
+      "Read supplier, date, amount and VAT from each PDF",
+      "Two matched existing suppliers. One supplier name is new",
+    ],
+    ask: "New supplier “Kestrel Packaging”. Add it?",
+    approved: "3 rows written to the accounts sheet, new supplier created",
+    rejected: "2 rows written, the unknown one flagged in the sheet for you",
   },
 ];
 
-/** How long the connector takes to travel from one stage to the next. */
-const TRAVEL = 850;
-/** The extra silence after the human checkpoint. */
-const HUMAN_PAUSE = 1100;
-
-/** Absolute time, in ms, at which each stage lights up. */
-const ARRIVALS = FLOW.reduce<number[]>((acc, node, i) => {
-  if (i === 0) return [400];
-  const previous = FLOW[i - 1];
-  const wait = previous.tone === "human" ? TRAVEL + HUMAN_PAUSE : TRAVEL;
-  return [...acc, acc[i - 1] + wait];
-}, []);
-
 export function AgentDemo({ className }: { className?: string }) {
-  const host = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const [started, setStarted] = useState(false);
-  const [reached, setReached] = useState(0);
+  const [sid, setSid] = useState(SCENARIOS[0].id);
+  const [step, setStep] = useState(-1); // -1 idle, 0..4 active, 5 done
+  const [decision, setDecision] = useState<"approved" | "rejected" | null>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const sc = SCENARIOS.find((s) => s.id === sid)!;
 
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  // Auto-advance through Trigger → Understand → Act; stop at Checkpoint.
   useEffect(() => {
-    const el = host.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setStarted(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+    clearTimeout(timer.current);
+    if (step >= 0 && step < 3) timer.current = window.setTimeout(() => setStep((s) => s + 1), 1300);
+    if (step === 4) timer.current = window.setTimeout(() => setStep(5), 1100);
+  }, [step]);
 
-  /*
-   * `reached` is deliberately not a dependency here. Depending on it would
-   * re-run this effect on every tick, and the cleanup would clear the timers
-   * for every stage that had not fired yet — the sequence would stop dead
-   * after the first one.
-   */
-  useEffect(() => {
-    if (!started || reduced) return;
-    const timers = ARRIVALS.map((at, i) =>
-      window.setTimeout(() => setReached(i + 1), at),
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [started, reduced]);
+  const run = () => {
+    setDecision(null);
+    setStep(0);
+  };
+  const decide = (d: "approved" | "rejected") => {
+    setDecision(d);
+    setStep(4);
+  };
+  const choose = (id: string) => {
+    clearTimeout(timer.current);
+    setSid(id);
+    setStep(-1);
+    setDecision(null);
+  };
 
-  // Reduced motion sees the finished diagram, derived rather than written by an
-  // effect — the sequence is information, and it is all still there statically.
-  const done = reduced ? FLOW.length : reached;
+  const waiting = step === 3;
 
   return (
-    <div ref={host} className={cn("panel", className)}>
-      <div className="flex items-center justify-between border-b border-rule px-4 py-3">
-        <span className="ui-label text-paper">One process, automated</span>
-        <span className="ui-label text-faint">Built to your workflow</span>
+    <div className={cn("panel p-5 md:p-7", className)} data-od-id="agent-demo">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div role="tablist" aria-label="Example process" className="flex flex-wrap gap-2">
+          {SCENARIOS.map((s) => (
+            <button
+              key={s.id}
+              role="tab"
+              type="button"
+              aria-selected={s.id === sid}
+              onClick={() => choose(s.id)}
+              className="min-h-11 rounded-full border border-rule-strong px-4 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-selected:border-mind aria-selected:bg-mind/10 aria-selected:font-medium aria-selected:text-paper"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <DemoLabel>Interactive demo · example process</DemoLabel>
       </div>
 
-      <ol className="p-4 sm:p-6">
-        {FLOW.map((node, i) => {
-          const active = i < done;
-          const isLast = i === FLOW.length - 1;
-          // The segment below a stage fills once the *next* stage is reached.
-          const filled = i + 1 < done;
-          const waiting = node.tone === "human" && active && !filled;
-
+      {/* Flow */}
+      <ol className="mt-7 grid gap-3 md:grid-cols-5" aria-label="Agent flow">
+        {STEPS.map(({ key, Icon, body }, i) => {
+          const human = key === "Checkpoint";
+          const active = step === i;
+          const done = step > i;
           return (
-            <li key={node.step} className="relative flex gap-4 pb-7 last:pb-0">
-              {!isLast && (
-                /*
-                 * The connector track. Everything below is positioned against
-                 * this wrapper rather than the row, so the travelling head can
-                 * use a percentage offset — a percentage resolves against the
-                 * containing block's height, which is exactly the distance it
-                 * needs to cover. Sizing it off the row instead was the bug in
-                 * the first pass: `translateY(100%)` moves an element by its
-                 * *own* height, so the head shifted ten pixels and stopped.
-                 */
+            <li
+              key={key}
+              className={cn(
+                "relative rounded-2xl border p-4 transition-[border-color,background-color,transform,box-shadow] duration-500",
+                active && human && "-translate-y-1 border-mind bg-mind/10 shadow-[var(--shadow-lift)]",
+                active && !human && "-translate-y-1 border-paper/30 bg-ink-3 shadow-[var(--shadow-lift)]",
+                done && "border-rule bg-ink-2",
+                !active && !done && "border-rule bg-ink-2 opacity-75",
+              )}
+            >
+              <div className="flex items-center gap-2.5">
                 <span
                   aria-hidden
-                  className="absolute left-[0.4375rem] top-5 h-[calc(100%-1.25rem)] w-0.5"
+                  className={cn(
+                    "grid size-9 place-items-center rounded-xl transition-colors duration-500",
+                    done ? "bg-accent text-on-accent" : human ? "bg-mind/12 text-mind" : "bg-ink-3 text-paper",
+                  )}
                 >
-                  {/* Unlit track, so the shape of the whole flow is visible
-                      before the sequence has run through it. */}
-                  <span className="absolute inset-0 bg-rule-strong" />
-
-                  {/* The line itself. Scaled rather than resized so it animates
-                      on the compositor and never triggers layout. */}
-                  <span
-                    className={cn(
-                      "absolute inset-0 origin-top",
-                      node.tone === "human" ? "bg-mind" : "bg-paper",
-                    )}
-                    style={{
-                      transform: `scaleY(${filled ? 1 : 0})`,
-                      transition: `transform ${TRAVEL}ms linear`,
-                    }}
-                  />
-
-                  {/*
-                    A bright head riding the leading edge. The fill alone was
-                    far too quiet to register as motion — a hairline lengthening
-                    against a dark panel is not something the eye catches. A
-                    moving point of light is.
-                  */}
-                  <span
-                    className={cn(
-                      "absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full",
-                      node.tone === "human" ? "bg-mind" : "bg-paper",
-                      active && !filled ? "opacity-100" : "opacity-0",
-                    )}
-                    style={{
-                      top: filled ? "100%" : "0%",
-                      transition: `top ${TRAVEL}ms linear, opacity 220ms linear`,
-                      boxShadow: `0 0 14px 3px ${node.tone === "human" ? "#a99cff" : "#f3f4f8"}`,
-                    }}
-                  />
+                  {done ? <Check className="size-4" /> : <Icon className="size-4" />}
                 </span>
-              )}
-
-              <span
-                aria-hidden
-                className={cn(
-                  "relative mt-1 size-4 shrink-0 rounded-full border-2 transition-all duration-500",
-                  active
-                    ? node.tone === "human"
-                      ? "scale-110 border-mind bg-mind"
-                      : "scale-110 border-paper bg-paper"
-                    : "scale-90 border-rule-strong bg-ink",
-                )}
-              >
-                {/* Only while the flow is actually held at the checkpoint. */}
-                {waiting && (
-                  <span className="absolute -inset-2 animate-ping rounded-full border-2 border-mind" />
-                )}
-              </span>
-
-              <div
-                className={cn(
-                  "min-w-0 transition-all duration-500",
-                  active ? "translate-x-0 opacity-100" : "translate-x-1 opacity-25",
-                )}
-              >
-                <p className={cn("ui-label", node.tone === "human" ? "text-mind" : "text-paper")}>
-                  {node.step}
-                  {node.tone === "human" && " · human"}
-                </p>
-                <p className="mt-2 max-w-[46ch] text-sm text-mute">{node.body}</p>
+                <span className="ui-label text-faint">0{i + 1}</span>
               </div>
+              <h3 className="mt-3 text-[1.0625rem] font-semibold">
+                {key}
+                {human && <span className="ml-1.5 text-sm font-normal text-mind">(human)</span>}
+              </h3>
+              <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-mute">{body}</p>
             </li>
           );
         })}
       </ol>
+
+      {/* Run log */}
+      <div className="mt-5 rounded-2xl border border-rule bg-ink-3/60 p-4 md:p-5" aria-live="polite">
+        {step < 0 ? (
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-mute">Pick a process above and run it. The agent will stop and ask you at the checkpoint.</p>
+            <button
+              type="button"
+              onClick={run}
+              className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-ink transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-paper/90"
+            >
+              <Play aria-hidden className="size-4" /> Run the agent
+            </button>
+          </div>
+        ) : (
+          <ul className="space-y-2 font-mono text-[0.8125rem] leading-relaxed">
+            {sc.log.slice(0, Math.min(step + 1, 3)).map((l, i) => (
+              <li key={i} className="msg-in flex gap-2.5 text-paper">
+                <span className="text-faint">{STEPS[i].key.toLowerCase().padEnd(10, " ")}</span>
+                <span>{l}</span>
+              </li>
+            ))}
+            {step >= 3 && (
+              <li className="msg-in">
+                <div className="mt-2 rounded-xl border border-mind/40 bg-ink-2 p-3.5 font-sans">
+                  <p className="flex items-center gap-2 text-sm font-medium text-paper">
+                    <ShieldCheck aria-hidden className="size-4 text-mind" /> {sc.ask}
+                  </p>
+                  {waiting ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button type="button" onClick={() => decide("approved")} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-mind px-4 text-sm font-medium text-white transition-[transform,opacity] hover:-translate-y-0.5 hover:opacity-90">
+                        <Check aria-hidden className="size-4" /> Approve
+                      </button>
+                      <button type="button" onClick={() => decide("rejected")} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-rule-strong bg-ink-2 px-4 text-sm font-medium text-paper hover:bg-ink-3">
+                        <X aria-hidden className="size-4" /> Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="mt-1.5 text-sm text-mute">You {decision === "approved" ? "approved" : "rejected"} it.</p>
+                  )}
+                </div>
+              </li>
+            )}
+            {step >= 5 && decision && (
+              <li className="msg-in flex gap-2.5 text-paper">
+                <span className="text-faint">{"deliver".padEnd(10, " ")}</span>
+                <span>{sc[decision]}</span>
+              </li>
+            )}
+            {step >= 5 && (
+              <li className="pt-2 font-sans">
+                <button type="button" onClick={run} className="inline-flex min-h-11 items-center gap-2 rounded-full px-1 text-sm font-medium text-paper underline-offset-4 hover:underline">
+                  <RotateCcw aria-hidden className="size-4" /> Run it again
+                </button>
+              </li>
+            )}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

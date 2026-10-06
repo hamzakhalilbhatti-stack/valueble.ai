@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RevealDriver } from "@/components/reveal";
+import { ScrollProgress } from "@/components/motion";
 import { JsonLd, organizationLd, personLd } from "@/components/json-ld";
 import { site } from "@/lib/site";
 
@@ -49,8 +50,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07080d",
-  colorScheme: "dark",
+  themeColor: "#f8f9fb",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -64,22 +65,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         {/*
-          Marks the document JS-capable before first paint and arms the reveal
-          watchdog: content staying invisible is far worse than a reveal that
-          does not animate. Crawlers and no-JS visitors see everything.
+          Marks the document JS-capable before first paint so scroll reveals can
+          start hidden. Crawlers, no-JS visitors and reduced-motion users see
+          everything. (The old global 2.5s "reveal-done" watchdog is gone: it
+          force-showed every section before anyone scrolled, which is why the
+          scroll animations never played.)
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add("js");setTimeout(function(){document.documentElement.classList.add("reveal-done")},2500);`,
+            __html: `document.documentElement.classList.add("js");`,
           }}
         />
       </head>
       <body>
         <JsonLd data={[organizationLd, personLd]} />
         <RevealDriver />
+        <ScrollProgress />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-ink"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent"
         >
           Skip to main content
         </a>
