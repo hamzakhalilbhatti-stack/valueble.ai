@@ -6,7 +6,9 @@ import { ProductStack } from "@/components/product-stack";
 import { VoiceDemo } from "@/components/product/voice-demo";
 import { DemoTabs } from "@/components/product/demo-tabs";
 import { CountUp, ScrollWords } from "@/components/motion";
-import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, Photo } from "@/components/product-blocks";
+import { FluidCountUp, FluidNumberText } from "@/components/fluid-number";
+import { ACCENT_TEXT, ACCENT_TINT, CtaBand, PRODUCT_ICON, PRODUCT_IMAGE, Photo } from "@/components/product-blocks";
+import Image from "next/image";
 import { ArrowLink, Badge, Button, CheckList, FaqList, SectionHeader } from "@/components/ui";
 import { AppTile, FaqAside, StickyNote, TOOLS, ToolMark, ToolTiles } from "@/components/polish";
 import { Hand, ShieldCheck, UserRound } from "lucide-react";
@@ -65,16 +67,22 @@ export default function HomePage() {
                     href={p.path}
                     className="group flex h-full items-start gap-3 rounded-3xl border border-ink-2/80 bg-ink-2/75 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[transform,box-shadow,background-color] duration-300 ease-[var(--ease-spring)] hover:-translate-y-1.5 hover:bg-ink-2 hover:shadow-[var(--shadow-lift)]"
                   >
-                    <AppTile size="md" className={cn("transition-transform duration-300 ease-[var(--ease-spring)] group-hover:rotate-[-6deg]", ACCENT_TINT[p.accent].split(" ")[1])}>
-                      <Icon className="size-5" />
-                    </AppTile>
+                    <span aria-hidden className="relative size-11 shrink-0 overflow-hidden rounded-2xl border border-rule/70 bg-ink shadow-sm transition-transform duration-300 ease-[var(--ease-spring)] group-hover:scale-105 group-hover:rotate-[-4deg]">
+                      <Image
+                        src={PRODUCT_IMAGE[slug]}
+                        alt=""
+                        width={44}
+                        height={44}
+                        className="size-full object-cover"
+                      />
+                    </span>
                     <span className="min-w-0">
                       <span className="flex items-center gap-1.5 font-medium text-paper">
                         {p.name}
                         <ArrowUpRight aria-hidden className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
                       </span>
                       <span className="mt-0.5 block text-sm leading-snug text-mute">{HERO_LINES[slug]}</span>
-                      <span className="mt-1.5 block text-xs font-semibold text-paper">{p.price}</span>
+                      <span className="mt-1.5 block text-xs font-semibold text-paper"><FluidNumberText tint="accent">{p.price}</FluidNumberText></span>
                     </span>
                   </Link>
                 </li>
@@ -182,10 +190,10 @@ export default function HomePage() {
           {/* Real numbers from the offers above, not invented metrics. */}
           <dl className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { v: <CountUp to={200} prefix="$" />, k: "one-time for the Maps Lead Scraper" },
-              { v: <CountUp to={50} prefix="$" />, k: "a month per restaurant for OrderRise" },
-              { v: <CountUp to={24} suffix="/7" />, k: "call answering with the voice agent" },
-              { v: <CountUp to={1} />, k: "person, from scoping to support" },
+              { v: <FluidCountUp to={200} prefix="$" tint="accent" />, k: "one-time for the Maps Lead Scraper" },
+              { v: <FluidCountUp to={200} prefix="$" tint="scan" />, k: "from one-time setup for OrderRise" },
+              { v: <FluidCountUp to={24} suffix="/7" tint="voice" />, k: "call answering with the voice agent" },
+              { v: <FluidCountUp to={1} tint="blue" />, k: "person, from scoping to support" },
             ].map((s, i) => (
               <div
                 key={i}
@@ -194,7 +202,7 @@ export default function HomePage() {
               >
                 <dt className="sr-only">{s.k}</dt>
                 <dd>
-                  <span className="text-sheen block font-display text-[3rem] font-semibold leading-none tracking-[-0.04em] md:text-[3.75rem]">{s.v}</span>
+                  <span className="block font-display text-[3rem] font-semibold leading-none tracking-[-0.04em] md:text-[3.75rem]">{s.v}</span>
                   <span className="mt-10 block text-[0.9375rem] text-mute">{s.k}</span>
                 </dd>
               </div>
@@ -257,7 +265,7 @@ export default function HomePage() {
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
               { slug: "lead-extractor" as const, problem: "Prospecting by hand was eating weekends.", body: "A list of 400 prospects was becoming a weekend of tabs. So the extension reads the Maps results, visits each website and scores the lead." },
-              { slug: "orderrise" as const, problem: "Restaurants were losing paid orders to a phone nobody could reach during the dinner rush.", body: "So the WhatsApp number on the door now answers, builds the cart and sends a clean ticket to the restaurant." },
+               { slug: "orderrise" as const, problem: "Small businesses lose customers to missed messages and repetitive enquiries during their busiest hours.", body: "So the WhatsApp number now answers, captures details and connects the conversation to the right business tool." },
               { slug: "ai-agents" as const, problem: "The gap is never the model. It's everything around it.", body: "So every build starts with one process and an honest list of what should stay manual." },
             ].map((c) => {
               const p = getProduct(c.slug)!;
@@ -320,20 +328,19 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="reveal space-y-5 text-[1.0625rem]">
-            <p>
-              I am Hamza Khalil Bhatti. I scope the work, build it, and support it after it ships — there is no account manager
-              between you and the person writing the code. That is a hard limit on how much I take on, and it is the reason the work
-              holds.
-            </p>
-            <p>
-              Everything here came out of a real business problem rather than a product roadmap. The scraper exists because
-              prospecting by hand was eating weekends. OrderRise exists because restaurants were losing paid orders to a phone nobody
-              could reach during the dinner rush.
-            </p>
-            <p>
-              The first thing I do on any project is tell you which parts are not worth automating. A system that handles eighty
-              percent of a process reliably is worth more than one that claims all of it and quietly fails on the cases that matter.
-            </p>
+             <p>
+               I am Hamza Khalil Bhatti. I scope the work, build it, and support it after it ships — there is no account manager
+               between you and the person writing the code. That is a hard limit on how much I take on, and it is the reason the work
+               holds.
+             </p>
+             <p>
+               Everything here came out of a real business problem rather than a product roadmap. The scraper exists because
+               prospecting by hand was eating weekends. OrderRise exists because missed messages can mean missed orders.
+             </p>
+             <p>
+               The first thing I do on any project is tell you which parts are not worth automating. A system that handles eighty
+               percent of a process reliably is worth more than one that claims all of it and quietly fails on the cases that matter.
+             </p>
             <ArrowLink href="/about">More about how I work</ArrowLink>
           </div>
          </div>
@@ -386,6 +393,6 @@ export default function HomePage() {
 const HERO_LINES: Record<string, string> = {
   "voice-agent": "Answers your business phone 24/7 and books, orders or hands off.",
   "lead-extractor": "Turns a Google Maps search into a scored lead list with emails.",
-  orderrise: "Takes restaurant orders on WhatsApp, day and night.",
+  orderrise: "WhatsApp AI Chatbots & Agents for enquiries and ordering.",
   "ai-agents": "One repetitive process you run, handled by an agent.",
 };

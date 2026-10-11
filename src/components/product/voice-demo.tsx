@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, PhoneCall, PhoneForwarded, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { DemoLabel } from "@/components/ui";
+
 import { cn } from "@/lib/cn";
 
 /**
@@ -64,6 +65,7 @@ const lineAt = (p: number) => {
   });
   return line;
 };
+
 
 export function VoiceDemo({ className, compact = false }: { className?: string; compact?: boolean }) {
   const [pos, setPos] = useState(0);
@@ -157,7 +159,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
   const handoff = line >= 7;
 
   return (
-    <div className={cn("@container theme-dark overflow-hidden rounded-[1.75rem] border border-rule shadow-[0_40px_80px_-40px_oklch(0.2_0.02_265/0.6)]", className)} data-od-id="voice-demo">
+    <div className={cn("@container theme-dark relative overflow-hidden rounded-[1.75rem] border border-rule shadow-[0_40px_80px_-40px_oklch(0.2_0.02_265/0.6)]", className)} data-od-id="voice-demo">
       {CALL.map((l, i) =>
         l.audio ? (
           <audio
@@ -181,7 +183,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-paper">Inbound call · Smile Studio Dental</p>
-                <p className="ui-label mt-1 flex items-center gap-2 whitespace-nowrap text-voice" aria-live="polite">
+                <p className="ui-label mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-voice" aria-live="polite">
                   <span>{!started ? "Ready" : finished ? "Handed to a person" : speaking === "caller" ? "Caller speaking" : speaking === "agent" ? "AI agent speaking" : playing ? "On the line" : "Paused"}</span>
                   <span className="tabular-nums text-faint">0:{String(Math.min(elapsed, 59)).padStart(2, "0")}</span>
                 </p>
@@ -271,7 +273,7 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
         <aside className="border-t border-rule bg-ink-2 p-5 @3xl:border-l @3xl:border-t-0" aria-label="What the agent logged">
           <div className="flex items-center justify-between">
             <span className="ui-label text-paper">Logged to your CRM</span>
-            <span className={cn("ui-label", finished ? "text-accent" : "text-faint")}>{finished ? "Saved" : started ? "Live" : "Waiting"}</span>
+            <span className={cn("ui-label", finished ? "text-accent" : "text-faint")}>{finished ? "Saved" : started ? "Connected" : "Waiting"}</span>
           </div>
           <dl className="mt-4 grid gap-3 @md:grid-cols-2 @3xl:grid-cols-1">
             {CARD.map((f) => {
@@ -291,6 +293,8 @@ export function VoiceDemo({ className, compact = false }: { className?: string; 
           )}
         </aside>
       </div>
+
+
     </div>
   );
 }

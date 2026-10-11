@@ -72,6 +72,24 @@
   --color-sky: var(--sky);
   --color-wa: var(--wa);
 
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display-face);
@@ -116,6 +134,24 @@
   --shadow-card: 0 1px 0 oklch(1 0 0 / 0.05) inset, 0 24px 60px -30px oklch(0 0 0 / 0.85);
   --shadow-lift: 0 1px 0 oklch(1 0 0 / 0.07) inset, 0 40px 80px -30px oklch(0 0 0 / 0.95);
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --card: var(--ink-2);
+  --card-foreground: var(--paper);
+  --popover: var(--ink-2);
+  --popover-foreground: var(--paper);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--ink-3);
+  --secondary-foreground: var(--paper);
+  --muted: var(--ink-3);
+  --muted-foreground: var(--mute);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: var(--rule);
+  --input: var(--rule-strong);
+  --ring: var(--accent);
 }
 
 /* Dark bands: the voice feature, closing CTA, footer, phone bezels. */
@@ -849,9 +885,136 @@ details.faq[open] .faq-icon {
 @keyframes beam { 0%,100% { transform: rotate(-2deg); opacity: 0.85; } 50% { transform: rotate(2deg); opacity: 1; } }
 @keyframes line-up { from { transform: translate3d(0, 105%, 0); } to { transform: none; } }
 
+/* ── Fluid Number & Inflatable 3D Balloon Animations (Outcrowd style) ── */
+@keyframes fluid-wobble {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  25% {
+    transform: rotate(-1.5deg) scale(1.02, 0.98);
+  }
+  50% {
+    transform: rotate(0.8deg) scale(0.99, 1.02);
+  }
+  75% {
+    transform: rotate(1.2deg) scale(1.01, 0.99);
+  }
+}
+
+@keyframes fluid-jelly {
+  0% { transform: scale3d(1, 1, 1); }
+  30% { transform: scale3d(1.15, 0.82, 1); }
+  42% { transform: scale3d(0.88, 1.14, 1); }
+  60% { transform: scale3d(1.06, 0.95, 1); }
+  78% { transform: scale3d(0.98, 1.02, 1); }
+  100% { transform: scale3d(1, 1, 1); }
+}
+
+@keyframes fluid-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.fluid-balloon-root {
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+.fluid-balloon-root.is-active {
+  animation: fluid-float 4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spotlight, .line-mask > span { animation: none !important; }
   .tilt-screen { transform: none !important; }
   .scroll-words > span { color: var(--paper) !important; }
   .js .reveal.reveal-tilt { transform: none !important; }
+  .fluid-balloon-root, .fluid-balloon-root.is-active, .fluid-number-text {
+    animation: none !important;
+    transform: none !important;
+  }
 }
+
+/* Liquid glass: one continuous silhouette, inset optics, no external lobes. */
+@property --glass-angle { syntax: "<angle>"; inherits: false; initial-value: -75deg; }
+.walkthrough-dock { --guide-safe-top: env(safe-area-inset-top, 0px); --guide-safe-right: env(safe-area-inset-right, 0px); --guide-safe-bottom: env(safe-area-inset-bottom, 0px); --guide-safe-left: env(safe-area-inset-left, 0px); position: fixed; z-index: 45; inset: 88px 16px 16px; pointer-events: none; transition: opacity 260ms var(--ease-out), visibility 260ms; }
+.walkthrough-dock[data-visible="false"] { opacity: 0; visibility: hidden; }
+.walkthrough-dock[data-visible="true"] { opacity: 1; visibility: visible; }
+.walkthrough-panel { position: absolute; top: 0; left: 0; width: min(21rem, 100%); max-height: var(--guide-available-height, 80dvh); pointer-events: auto; font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif; }
+.walkthrough-panel[data-state="closed"] { width: max-content; max-width: 100%; border-radius: 999px; }
+.liquid-glass-surface {
+  isolation: isolate; border: 1px solid color-mix(in oklch, var(--paper) 32%, transparent); border-radius: 28px;
+  /* Let the actual demo show through instead of flattening it into a dark card. */
+  background: linear-gradient(135deg, color-mix(in oklch, var(--paper) 8%, transparent), transparent 24% 76%, color-mix(in oklch, var(--paper) 4%, transparent)), color-mix(in oklch, var(--ink) 50%, transparent);
+  color: var(--paper); -webkit-backdrop-filter: blur(12px) saturate(150%); backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: inset 0 1px 1px color-mix(in oklch, var(--paper) 70%, transparent), inset 1px 0 1px color-mix(in oklch, var(--paper) 26%, transparent), inset 0 -1px 1px color-mix(in oklch, var(--paper) 28%, transparent), inset 0 0 3px 1px color-mix(in oklch, var(--paper) 8%, transparent), 0 16px 40px -16px color-mix(in oklch, var(--ink) 60%, transparent);
+}
+.liquid-glass-surface::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background: radial-gradient(ellipse at 0% 0%, color-mix(in oklch, var(--paper) 16%, transparent), transparent 28%), radial-gradient(ellipse at 100% 100%, color-mix(in oklch, var(--paper) 8%, transparent), transparent 24%);
+}
+.liquid-glass-surface::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--glass-angle), var(--paper), transparent 12% 40%, color-mix(in oklch, var(--paper) 65%, transparent) 50%, transparent 65% 90%, var(--paper)); opacity: 0.7;
+  -webkit-mask: linear-gradient(var(--paper) 0 0) content-box, linear-gradient(var(--paper) 0 0); mask: linear-gradient(var(--paper) 0 0) content-box, linear-gradient(var(--paper) 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.guide-expanded { position: relative; isolation: isolate; border-radius: inherit; display: flex; flex-direction: column; min-height: 0; max-height: calc(var(--guide-available-height, 80dvh) - 2px); padding: 10px 16px 14px; }
+/* A quiet reading scrim protects text while leaving the perimeter clear. */
+.guide-expanded::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--ink) 26%, transparent) 5% 95%, transparent); }
+.guide-header { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+.guide-step-label { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.025em; color: var(--paper); }
+.guide-icon-button, .guide-drag-handle { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 999px; color: var(--paper); }
+.guide-drag-handle { touch-action: none; cursor: grab; user-select: none; }
+.guide-drag-handle:active { cursor: grabbing; }
+.guide-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 2px 4px; scrollbar-width: thin; }
+.guide-title { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.3; color: var(--paper); text-wrap: balance; }
+.guide-instruction { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--paper); }
+.guide-tip { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--paper); }
+.guide-footer { flex: 0 0 auto; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 4px; margin-top: 12px; padding-top: 4px; border-top: 1px solid color-mix(in oklch, var(--paper) 14%, transparent); }
+.guide-progress { grid-column: 1 / -1; grid-row: 1; display: flex; flex-wrap: wrap; justify-content: center; min-width: 0; }
+.guide-progress-step { display: grid; place-items: center; border-radius: 999px; }
+.guide-progress-step span { width: 6px; height: 6px; border-radius: 999px; background: var(--paper); transition: width 320ms var(--ease-out); }
+.guide-progress-step[aria-current="step"] span { width: 20px; }
+.guide-footer > .guide-icon-button { grid-row: 2; }
+.guide-footer > .glass-button-wrap { grid-column: 3; grid-row: 2; }
+.guide-launcher { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 4px 18px; color: var(--paper); font-size: 13px; font-weight: 600; border-radius: inherit; }
+.guide-minimized-title { width: 100%; text-align: left; font-size: 14px; font-weight: 600; color: var(--paper); border-radius: 12px; padding: 4px 8px; }
+.guide-control { min-height: 44px; min-width: 44px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 280ms var(--ease-out), border-color 280ms var(--ease-out), transform 280ms var(--ease-out); }
+.guide-control.guide-drag-handle { touch-action: none; }
+.guide-control:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+.guide-control:disabled { opacity: 0.45; cursor: not-allowed; }
+.glass-button-wrap { display: inline-flex; position: relative; max-width: 100%; border-radius: 999px; }
+.glass-button {
+  position: relative; isolation: isolate; display: inline-flex; justify-content: center; align-items: center; border-radius: inherit; border: 1px solid color-mix(in oklch, var(--paper) 25%, transparent);
+  background: linear-gradient(-75deg, color-mix(in oklch, var(--paper) 5%, transparent), color-mix(in oklch, var(--paper) 13%, transparent), color-mix(in oklch, var(--paper) 5%, transparent)), color-mix(in oklch, var(--ink-2) 18%, transparent);
+  color: var(--paper); font-weight: 600; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px color-mix(in oklch, var(--paper) 30%, transparent), inset 0 -1px 1px color-mix(in oklch, var(--paper) 10%, transparent), 0 4px 8px -4px var(--ink);
+}
+.glass-button-text { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: inherit; }
+.glass-button::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(var(--glass-angle), transparent 25%, color-mix(in oklch, var(--paper) 8%, transparent) 45%, transparent 65%); transition: --glass-angle 350ms var(--ease-out); }
+.glass-button:active:not(:disabled) { transform: scale(0.98); background-color: var(--ink); --glass-angle: -30deg; }
+@media (hover: hover) {
+  .guide-control:hover:not(:disabled) { background-color: var(--ink); color: var(--paper); }
+  .glass-button:hover:not(:disabled) { border-color: color-mix(in oklch, var(--paper) 50%, transparent); --glass-angle: -125deg; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .liquid-glass-surface { background: var(--ink-2); } }
+@media (prefers-reduced-transparency: reduce) { .liquid-glass-surface, .glass-button { background: var(--ink-2); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { .glass-button { transform: none !important; } .walkthrough-dock, .guide-control, .guide-progress-step span { transition: none; } }
+/* Mobile layout safeguards shared by every route; content reflows, not hides. */
+main, .container-site, main .grid > * { min-width: 0; }
+main p, main dd, main td, footer a { overflow-wrap: anywhere; }
+img, video { max-width: 100%; }
+button, a { touch-action: manipulation; }
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; min-height: 44px; }
+
+  .tilt-screen { transform: none; will-change: auto; }
+  .aurora > i { animation: none; will-change: auto; filter: blur(70px); }
+  .nav-pill { gap: 8px; }
+}
+@media (pointer: coarse) {
+  button:not(:disabled), [role="tab"], summary { min-height: 44px; }
+  header a, footer a { min-height: 44px; display: inline-flex; align-items: center; }
+}
+

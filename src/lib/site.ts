@@ -13,7 +13,8 @@ export const site = {
   tagline: "AI systems that do the work your team runs out of hours for.",
   headline: "Find the customers. Answer them instantly.",
   description:
-    "valueble.ai builds AI agents, a WhatsApp ordering bot for restaurants and a Google Maps lead scraper. One founder, honest scope, systems that hold up.",
+    "valueble.ai builds AI agents, WhatsApp AI Chatbots & Agents, and a Google Maps lead scraper. One founder, honest scope, systems that hold up.",
+
   founder: "Hamza Khalil Bhatti",
   founderRole: "Founder & AI Systems Engineer",
   logo: "/brand/valueble-logo-black.svg",
@@ -316,35 +317,35 @@ export const products: Product[] = [
     path: "/orderrise",
     index: "03",
     name: "OrderRise",
-    kind: "WhatsApp AI agent",
-    audience: "For restaurants and takeaways",
-    price: "$50 / month",
-    priceNote: "Per restaurant",
-    tagline: "A restaurant's WhatsApp, answered instantly — even at 11pm on a Friday.",
+    kind: "WhatsApp AI Chatbots & Agents",
+    audience: "For businesses handling customer enquiries on WhatsApp, restaurants included",
+    price: "From $200 one-time",
+    priceNote: "Chatbot setup: $200. Connected setup: $300-$400. (Plus operating costs)",
+    tagline: "WhatsApp chatbots that answer. AI agents that take the next step.",
     summary:
-      "An AI ordering assistant that lives in the WhatsApp number a restaurant already gives out. It shows the menu, builds the cart, takes delivery details, and drops a finished order onto the kitchen screen.",
+      "Help customers get answers, capture enquiries, and connect WhatsApp conversations to your business tools. Start with a chatbot built around your business information, or add a connected AI agent for a defined workflow.",
     status: "Live",
     accent: "warm",
     seo: {
-      title: "WhatsApp Ordering Bot for Restaurants | OrderRise",
+      title: "WhatsApp AI Chatbots & Agents | OrderRise by Valueble",
       description:
-        "OrderRise is a WhatsApp AI agent that takes restaurant orders 24/7, builds the cart and sends a clean ticket to the kitchen. $50/month per restaurant.",
+        "WhatsApp chatbots that answer FAQs, capture enquiries, and handle ordering. One-time setup from $200 USD.",
     },
     hero: {
-      eyebrow: "WhatsApp ordering bot for restaurants",
-      headline: "The number is already on the door. Now it answers.",
-      sub: "Customers order in WhatsApp — no app to download, no link to trust, no account to make. The kitchen sees a clean ticket. Nobody misses a rush.",
+      eyebrow: "OrderRise by Valueble",
+      headline: "WhatsApp chatbots that answer. AI agents that take the next step.",
+      sub: "Help customers get answers, capture enquiries, and connect WhatsApp conversations to your business tools. Start with a chatbot built around your business information, or add a connected AI agent for a defined workflow.",
     },
     plain: {
-      what: "An AI assistant on your restaurant's WhatsApp number that answers customers, takes the order, adds up the total and confirms the address.",
-      who: "Restaurants and takeaways that already get orders on WhatsApp.",
-      cost: "$50 a month per restaurant. Menu setup included.",
-      after: "Customers order in a chat they already use, and you get a finished order on your dashboard.",
+      what: "AI assistants on your WhatsApp number that handle approved-content answers, enquiry capture, and optionally scoped connections to your business tools.",
+      who: "Businesses handling customer enquiries on WhatsApp, including restaurants and service providers.",
+      cost: "Chatbot setup: $200 one-time. Connected setup: $300-$400 one-time. Plus monthly operating costs.",
+      after: "Discuss scope, build and test the agent, then agree on launch.",
     },
     how3: [
-      { title: "Customer messages", body: "The same WhatsApp number on your door and your Instagram." },
-      { title: "The assistant takes the order", body: "Menu, cart, total, address and confirmation, in the chat." },
-      { title: "You get a clean ticket", body: "A complete order on your dashboard. The customer gets updates." },
+      { title: "Message + knowledge", body: "Customer messages your business number. The agent uses your approved business info to understand." },
+      { title: "Answer or act", body: "It answers the FAQ, captures a lead, or uses a connected tool to take an order or book a slot." },
+      { title: "Reply or handoff", body: "The customer gets a clear reply. The result is recorded in your tools, or a human takes over." },
     ],
     photo: {
       src: "/images/restaurant-kitchen.webp",
@@ -353,64 +354,62 @@ export const products: Product[] = [
       alt: "A chef working the pass in a busy restaurant kitchen under pendant lights",
     },
     problem: {
-      heading: "Every unanswered message is a paid order that walked.",
+      heading: "Missed messages can mean missed orders.",
       body: [
-        "Restaurants already take orders on WhatsApp. It works right up until it doesn't — the phone is behind the counter during the rush, three people are typing at once, an address gets misread, and an order that was worth money becomes an argument.",
-        "The usual fix is a delivery platform that takes a third of the ticket, or an app nobody installs. Neither one gives the restaurant back the thing it actually lost, which is the ability to answer.",
+        "Many businesses already take enquiries or orders on WhatsApp. It works right up until the rush hits—the phone is behind the counter, three people are typing at once, and an enquiry that was worth money becomes a missed opportunity.",
+        "The usual fix is a delivery platform that takes a large cut, or an app nobody installs. Neither gives the business back the ability to answer instantly and personally.",
       ],
     },
     steps: [
       { title: "Customer sends a message", body: "To the same WhatsApp number already on the storefront, the flyer, and the Instagram bio. Nothing new to install." },
-      { title: "The assistant shows the menu and builds the cart", body: "It answers questions, handles modifications, applies coupons, and confirms the order back before anything is sent." },
-      { title: "The order lands on the dashboard", body: "A complete ticket — items, notes, address, delivery instructions — on the restaurant dashboard and the kitchen display at the same moment." },
-      { title: "The customer gets kept in the loop", body: "Confirmation, receipt, and status updates go back through the same WhatsApp thread the order started in." },
+      { title: "The assistant handles the request", body: "It answers questions from your knowledge base, handles modifications, or guides the customer through a specific workflow like ordering." },
+      { title: "The result lands on your dashboard", body: "A complete ticket—items, enquiry details, or lead info—lands on your dashboard and in your business tools at the same moment." },
+      { title: "The customer gets kept in the loop", body: "Confirmation, receipt, and status updates go back through the same WhatsApp thread the conversation started in." },
     ],
     features: [
-      { title: "Answers during the rush", body: "The hour when staff physically cannot reach the phone is the hour the assistant is most useful." },
-      { title: "Live dashboard", body: "Every order in one place, in order, with the state it is in — instead of scattered through a chat history." },
-      { title: "Kitchen display", body: "A separate view built to be read at a distance, in a hurry, by someone holding a pan." },
-      { title: "Pickup and delivery", body: "Addresses, delivery instructions, and driver details collected properly, once, in a structured form." },
-      { title: "Coupons and loyalty", body: "Promo codes and repeat-customer rewards handled inside the conversation." },
-      { title: "Analytics that answer questions", body: "What sells, when the peaks are, and which items carry the night." },
+      { title: "Instant FAQ & Enquiry Handling", body: "Handles the questions your staff answer twenty times a day, instantly, 24/7. (Included in Chatbot setup)" },
+      { title: "Lead Capture & Qualification", body: "Asks the right questions and records name, need, and contact details before handing off to you. (Included in Chatbot setup)" },
+      { title: "Live Order Dashboard", body: "Every order in one place, in order, with the state it is in—instead of scattered through a chat history. (Connected setup)" },
+      { title: "Kitchen/Tool Display", body: "A separate view built to be read at a distance, in a hurry, or synced to your existing business tools. (Connected setup)" },
+      { title: "Pickup and Delivery", body: "Addresses, delivery instructions, and driver details collected properly, once, in a structured form. (Connected setup)" },
+      { title: "Coupons and Loyalty", body: "Promo codes and repeat-customer rewards handled inside the conversation. (Connected setup)" },
     ],
     facts: [
       { label: "Channel", value: "WhatsApp" },
-      { label: "Price", value: "$50 / month per restaurant" },
-      { label: "Includes", value: "Menu setup & onboarding" },
+      { label: "Chatbot Setup", value: "$200 one-time" },
+      { label: "Connected Setup", value: "$300-$400 one-time" },
       { label: "Customer app required", value: "None" },
     ],
     cta: {
-      heading: "Talk to the demo before you talk to me.",
-      body: "There is a live restaurant running on it. Message it, place an order, and see the whole flow from the customer's side.",
-      label: "Book an OrderRise demo",
+      heading: "Ready to clear your inbox?",
+      body: "Let's talk through your most repetitive messages and see if we can hand them to an agent.",
+      label: "Discuss my setup",
       href: contact.bookingOrderRise,
     },
-    // TODO (owner): confirm the WhatsApp Business API / number requirements and
-    // setup timeline answers against how OrderRise is actually onboarded.
     faqs: [
       {
-        q: "How do I take restaurant orders on WhatsApp automatically?",
-        a: "OrderRise connects an AI ordering assistant to your restaurant's WhatsApp number. Customers message as they already do; the assistant shows the menu, builds the cart, takes the address and confirms the order, then sends a complete ticket to your dashboard and kitchen display.",
+        q: "How do I take restaurant orders or handle enquiries on WhatsApp automatically?",
+        a: "OrderRise connects an AI assistant to your WhatsApp number. It can handle simple Q&A and lead capture out of the box, or be connected to a full ordering workflow that sends tickets to your kitchen or CRM.",
       },
       {
         q: "How much does OrderRise cost?",
-        a: "$50 a month per restaurant. Menu setup and onboarding are included.",
+        a: "A basic chatbot setup for FAQs and enquiry capture is $200 one-time. A connected setup for workflows like ordering is $300-$400 one-time. Both require monthly operating costs for the API and platform.",
       },
       {
         q: "Do my customers need to download an app?",
-        a: "No. They order inside WhatsApp, which they already use. No app to download, no link to trust and no account to make.",
+        a: "No. They use WhatsApp, which they already have. No app to download, no link to trust and no account to make.",
       },
       {
         q: "Do I need a WhatsApp Business account?",
-        a: "An automated assistant normally runs on WhatsApp's business platform rather than a personal app. Requirements depend on your number and region, and setup is handled during onboarding so you know exactly what is needed before going live.",
+        a: "Yes, an automated assistant runs on WhatsApp's business platform. Requirements depend on your number and region; setup is handled during onboarding.",
       },
       {
         q: "Does it handle pickup, delivery and coupons?",
-        a: "Yes. It collects addresses and delivery instructions in a structured form, handles pickup orders, and applies promo codes and repeat-customer rewards inside the conversation.",
+        a: "Yes, as part of the connected setup. It collects addresses in a structured form and handles promo codes inside the chat.",
       },
       {
         q: "Can I try it first?",
-        a: "Yes. There is a live demo restaurant running on it. Book a demo and you can place an order yourself and see both the customer side and the kitchen side.",
+        a: "Yes. There is a live demo restaurant running on it. Book a demo and you can place an order yourself.",
       },
     ],
   },
@@ -521,7 +520,7 @@ export const productOrder: ProductSlug[] = ["voice-agent", "lead-extractor", "or
 export const homeFaqs: Faq[] = [
   {
     q: "What does valueble.ai build?",
-    a: "Four things: an AI voice agent that answers business calls, the Maps Lead Scraper Chrome extension, OrderRise (a WhatsApp ordering bot for restaurants), and custom AI agents built around one process you already run.",
+    a: "Four things: an AI voice agent that answers business calls, the Maps Lead Scraper Chrome extension, OrderRise (WhatsApp AI Chatbots & Agents), and custom AI agents built around one process you already run.",
   },
   {
     q: "Who will I actually work with?",
@@ -529,7 +528,7 @@ export const homeFaqs: Faq[] = [
   },
   {
     q: "What do the products cost?",
-    a: "The Maps Lead Scraper is $200 one-time. OrderRise is $50 a month per restaurant. The AI voice agent is custom, scoped to your call volume. Custom AI agents are project-based.",
+    a: "The Maps Lead Scraper is $200 one-time. OrderRise setup starts from $200 USD one-time. The AI voice agent is custom, scoped to your call volume. Custom AI agents are project-based.",
   },
   {
     q: "Will you tell me if something is not worth automating?",

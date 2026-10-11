@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, Globe, Mail, MapPin, Phone, Play, Search, Star, Square } from "lucide-react";
 import { DemoLabel } from "@/components/ui";
+import { LiquidCloudBubble, type WalkthroughStep } from "@/components/ui/liquid-cloud-bubble";
 import { cn } from "@/lib/cn";
 
 /**
@@ -77,6 +78,28 @@ function makeLeads(query: string, n: number): Lead[] {
 
 const STAGES = ["Scrolling the Maps results", "Visiting business websites", "Scoring and filtering"];
 
+
+const SCRAPER_STEPS: WalkthroughStep[] = [
+  {
+    title: "1. Choose niche & city",
+    instruction: "Enter a niche and city, such as 'dentists in Austin', then select 5, 10, or 20 target leads and a minimum rating.",
+    tip: "Scrapes directly from Google Maps without Places API keys.",
+    badge: "Step 1",
+  },
+  {
+    title: "2. Launch scraper",
+    instruction: "Tap 'Start'. Watch the demo results fill with business names, ratings, contact details, and scores.",
+    tip: "Visits each company's website to pull verified emails & socials.",
+    badge: "Step 2",
+  },
+  {
+    title: "3. Export clean CSV",
+    instruction: "When the progress bar reaches 100%, tap 'Export CSV' to download your cleaned lead sheet ready for cold outreach.",
+    tip: "One-time purchase · Lifetime use · No subscription fees.",
+    badge: "Step 3",
+  },
+];
+
 export function ScraperDemo({ className }: { className?: string }) {
   const [query, setQuery] = useState("dentists in Austin");
   const [target, setTarget] = useState(10);
@@ -146,7 +169,7 @@ export function ScraperDemo({ className }: { className?: string }) {
   const field = "min-h-11 w-full rounded-lg border border-rule-strong bg-ink-2 px-3 text-sm text-paper transition-colors hover:border-paper/40 focus-visible:border-accent";
 
   return (
-    <div className={cn("grid gap-4 lg:grid-cols-[19rem_1fr]", className)} data-od-id="scraper-demo">
+    <div className={cn("relative grid min-w-0 gap-4 lg:grid-cols-[19rem_minmax(0,1fr)]", className)} data-od-id="scraper-demo">
       {/* Extension popup */}
       <form
         className="panel flex flex-col gap-4 p-5"
@@ -265,7 +288,7 @@ export function ScraperDemo({ className }: { className?: string }) {
           <div className="h-full bg-scan transition-[width] duration-300 ease-out" style={{ width: `${ran ? pct : 0}%` }} />
         </div>
 
-        <div className="h-[26rem] overflow-auto overscroll-contain">
+        <div className="h-[22rem] overflow-auto overscroll-contain sm:h-[26rem]" tabIndex={0} aria-label="Scrollable demo leads">
           {rows.length === 0 ? (
             <div className="grid h-full place-items-center p-8 text-center">
               <div className="max-w-xs">
@@ -277,7 +300,27 @@ export function ScraperDemo({ className }: { className?: string }) {
               </div>
             </div>
           ) : (
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <>
+            <ul className="space-y-3 p-3 sm:hidden" aria-label="Demo lead cards">
+              {rows.map((l, i) => (
+                <li key={l.name} className="rounded-xl border border-rule bg-ink-2 p-4" data-od-id={`lead-card-${i}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="min-w-0 text-sm font-semibold text-paper">{l.name}</p>
+                    <span className="shrink-0 rounded-full bg-ink-3 px-2.5 py-1 text-xs font-semibold tabular-nums text-paper">{l.score}/100</span>
+                  </div>
+                  <dl className="mt-3 space-y-2 text-sm">
+                    <div><dt className="text-xs text-faint">Rating</dt><dd className="text-paper">{l.rating.toFixed(1)} · {l.reviews} reviews</dd></div>
+                    <div><dt className="text-xs text-faint">Email</dt><dd className="break-all text-paper">{l.email ?? "None found"}</dd></div>
+                    <div><dt className="text-xs text-faint">Phone</dt><dd className="text-paper">{l.phone ?? "None found"}</dd></div>
+                    <div><dt className="text-xs text-faint">Website & socials</dt><dd className="text-paper">{l.website ? "Website found" : "No website"} · {l.socials} social profiles</dd></div>
+                  </dl>
+                  <div className="mt-3 h-1.5 rounded-full bg-ink-3" aria-label={`Lead score ${l.score} out of 100`}>
+                    <div className="h-full rounded-full bg-scan" style={{ width: `${l.score}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <table className="hidden w-full min-w-[40rem] text-left text-sm sm:table">
               <caption className="sr-only">Demo leads for {ran}, sorted by score</caption>
               <thead className="sticky top-0 z-[1] bg-ink-2">
                 <tr className="border-b border-rule text-xs text-faint">
@@ -318,9 +361,15 @@ export function ScraperDemo({ className }: { className?: string }) {
                 ))}
               </tbody>
             </table>
+            </>
           )}
         </div>
       </div>
+      <LiquidCloudBubble
+        steps={SCRAPER_STEPS}
+        position="bottom-right"
+        accentColor="emerald"
+      />
     </div>
   );
 }

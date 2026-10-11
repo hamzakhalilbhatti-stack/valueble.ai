@@ -9,7 +9,7 @@ export default function Image() {
   return renderOg({
     eyebrow: "WhatsApp ordering bot for restaurants",
     title: "A restaurant's WhatsApp, answered instantly. Even at 11pm on a Friday.",
-    meta: "OrderRise · $50 / month per restaurant",
+    meta: "OrderRise · setup from $200 one-time, plus operating costs",
     accent: "#ffb35c",
   });
 }

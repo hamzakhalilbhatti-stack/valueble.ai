@@ -9,7 +9,7 @@ Next.js 16 (App Router, Turbopack) · React 19 · Tailwind v4 · TypeScript.
 ```bash
 npm run dev     # http://localhost:3000
 npm run build   # production build
-npm start       # serve the production build
+npm start       # serve the static production build at http://localhost:3000 (run build first)
 npm run lint    # eslint (note: `next lint` was removed in Next 16)
 ```
 

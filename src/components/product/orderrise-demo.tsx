@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, CheckCheck, ChevronLeft, MoreVertical, Phone, Play, RotateCcw, Video } from "lucide-react";
 import { DemoLabel } from "@/components/ui";
+import { LiquidCloudBubble, type WalkthroughStep } from "@/components/ui/liquid-cloud-bubble";
 import { cn } from "@/lib/cn";
 
 /**
@@ -48,6 +49,28 @@ function clock(i: number) {
   return `23:${String(m).padStart(2, "0")}`;
 }
 
+
+const ORDERRISE_STEPS: WalkthroughStep[] = [
+  {
+    title: "1. Tap customer reply",
+    instruction: "Tap the suggestion 'hi do you still deliver to marina?' in the chat box to message the restaurant.",
+    tip: "Simulates an actual hungry customer messaging your business.",
+    badge: "Step 1",
+  },
+  {
+    title: "2. Choose your order",
+    instruction: "Select '2 large pepperoni and a garlic bread'. Watch OrderRise instantly calculate subtotal and delivery availability.",
+    tip: "No external menus or complex ordering apps required.",
+    badge: "Step 2",
+  },
+  {
+    title: "3. Confirm address & kitchen ticket",
+    instruction: "Tap 'Marina Gate 2, Apt 1204'. OrderRise captures structured details and prepares the kitchen dispatch ticket.",
+    tip: "Tap Reset or try different dishes anytime.",
+    badge: "Step 3",
+  },
+];
+
 export function OrderRiseDemo({ className }: { className?: string }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [stage, setStage] = useState<Stage>("start");
@@ -55,6 +78,7 @@ export function OrderRiseDemo({ className }: { className?: string }) {
   const [progress, setProgress] = useState(0);
   const [order, setOrder] = useState<Order | null>(null);
   const [auto, setAuto] = useState(false);
+  const [mode, setMode] = useState<"demo" | "comparison">("demo");
   const scroller = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
 
@@ -142,9 +166,11 @@ export function OrderRiseDemo({ className }: { className?: string }) {
     setAuto(false);
   };
 
+  const busy = typing || (msgs.length > 0 && msgs[msgs.length - 1].from === "me");
+
   // "Play it for me": answer each stage with the first choice.
   useEffect(() => {
-    if (!auto || typing) return;
+    if (!auto || busy) return;
     const id = window.setTimeout(() => {
       if (stage === "start" && msgs.length === 0) start();
       else if (stage === "order") pickOrder(ORDERS[0]);
@@ -152,9 +178,8 @@ export function OrderRiseDemo({ className }: { className?: string }) {
     }, 900);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auto, stage, typing, msgs.length]);
+  }, [auto, stage, busy, msgs.length]);
 
-  const busy = typing || (msgs.length > 0 && msgs[msgs.length - 1].from === "me");
   let choices: Choice[] = [];
   if (stage === "start" && msgs.length === 0) choices = [{ label: "hi do you still deliver to marina?", kind: "start" }];
   if (stage === "order") choices = ORDERS.map((o, i) => ({ label: o.label, kind: "order" as const, arg: i }));
@@ -170,7 +195,31 @@ export function OrderRiseDemo({ className }: { className?: string }) {
   };
 
   return (
-    <div className={cn("grid items-center gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-14", className)} data-od-id="orderrise-demo">
+    <div className={cn("relative grid items-center gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-14", className)} data-od-id="orderrise-demo">
+      {/* Mode Controls */}
+      <div className="flex p-1 rounded-full bg-ink-2 border border-rule-strong w-fit mx-auto lg:mx-0 lg:col-span-2">
+        <button
+          type="button"
+          onClick={() => setMode("demo")}
+          className={cn(
+            "min-h-11 px-4 py-1.5 rounded-full text-xs font-medium transition-all",
+            mode === "demo" ? "bg-paper text-ink shadow-sm" : "text-mute hover:text-paper"
+          )}
+        >
+          Standard Demo
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("comparison")}
+          className={cn(
+            "min-h-11 px-4 py-1.5 rounded-full text-xs font-medium transition-all",
+            mode === "comparison" ? "bg-paper text-ink shadow-sm" : "text-mute hover:text-paper"
+          )}
+        >
+          Comparison Mode
+        </button>
+      </div>
+
       {/* Phone */}
       <div className="theme-dark mx-auto w-full max-w-[22rem] rounded-[2.5rem] border border-rule-strong bg-ink p-2.5 shadow-[0_40px_80px_-30px_oklch(0.2_0.02_265/0.55)]">
         <div className="overflow-hidden rounded-[2rem] bg-[oklch(0.945_0.014_85)]">
@@ -194,7 +243,7 @@ export function OrderRiseDemo({ className }: { className?: string }) {
           {/* Messages */}
           <div
             ref={scroller}
-            className="wa-surface h-[24rem] space-y-1.5 overflow-y-auto overscroll-contain px-3 py-3"
+            className="wa-surface h-[clamp(18rem,50svh,24rem)] space-y-1.5 overflow-y-auto overscroll-contain px-3 py-3"
             role="log"
             aria-label="Demo WhatsApp conversation"
             aria-live="polite"
@@ -270,60 +319,97 @@ export function OrderRiseDemo({ className }: { className?: string }) {
           </div>
         </div>
       </div>
-
-      {/* What is happening */}
-      <div>
-        <DemoLabel />
-        <h3 className="mt-5 text-title md:text-[1.5rem]">Order a pizza from the assistant.</h3>
-        <p className="mt-3 max-w-[46ch] text-mute">
-          You are the customer. Tap a reply and watch the assistant check delivery, take the order, add it up, get the
-          address and confirm. This is the flow OrderRise runs on a restaurant&apos;s real WhatsApp number.
-        </p>
-        <ol className="mt-7 grid gap-2.5" aria-label="Order progress">
-          {STEPS.map((s, i) => {
-            const done = i < progress;
-            const current = i === progress && stage !== "done" && msgs.length > 0;
-            return (
-              <li key={s} className="flex items-center gap-3">
-                <span
-                  aria-hidden
-                  className={cn(
-                    "grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold transition-[background-color,border-color,color] duration-300",
-                    done ? "border-wa bg-wa text-white" : current ? "border-wa text-wa" : "border-rule-strong text-faint",
-                  )}
-                >
-                  {done ? <Check className="size-3.5" /> : i + 1}
-                </span>
-                <span className={cn("text-[0.9375rem] transition-colors", done ? "text-paper" : "text-mute")}>
-                  {s}
-                  <span className="sr-only">{done ? " (done)" : ""}</span>
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              later(() => setAuto(true), 50);
-            }}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-rule-strong bg-ink-2 px-5 text-sm font-medium text-paper shadow-[var(--shadow-card)] transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-ink-3"
-          >
-            <Play aria-hidden className="size-4" /> Play it for me
-          </button>
-          {msgs.length > 0 && (
-            <button
-              type="button"
-              onClick={reset}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium text-paper underline-offset-4 hover:underline"
+      {/* What is happening */ }
+  <div>
+    <DemoLabel />
+    <h3 className="mt-5 text-title md:text-[1.5rem]">Order a pizza from the assistant.</h3>
+    <p className="mt-3 max-w-[46ch] text-mute">
+      You are the customer. Tap a reply and watch the assistant check delivery, take the order, add it up, get the
+      address and confirm. This is the flow OrderRise runs on a restaurant&apos;s real WhatsApp number.
+    </p>
+    <div className="mt-5 flex flex-wrap gap-3">
+      <button type="button" onClick={() => setAuto(true)} disabled={auto || busy || stage === "done"} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-rule-strong px-4 text-sm text-paper disabled:opacity-50">
+        <Play aria-hidden className="size-4" /> Play it for me
+      </button>
+      <button type="button" onClick={reset} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-rule-strong px-4 text-sm text-paper">
+        <RotateCcw aria-hidden className="size-4" /> Reset demo
+      </button>
+    </div>
+    <ol className="mt-7 grid gap-2.5" aria-label="Order progress">
+      {STEPS.map((s, i) => {
+        const done = i < progress;
+        const current = i === progress && stage !== "done" && msgs.length > 0;
+        return (
+          <li key={s} className="flex items-center gap-3">
+            <span
+              aria-hidden
+              className={cn(
+                "grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold transition-[background-color,border-color,color] duration-300",
+                done ? "border-wa bg-wa text-white" : current ? "border-wa text-wa" : "border-rule-strong text-faint",
+              )}
             >
-              <RotateCcw aria-hidden className="size-4" /> Restart
-            </button>
-          )}
-        </div>
+              {done ? <Check className="size-3.5" /> : i + 1}
+            </span>
+            <span className={cn("text-[0.9375rem] transition-colors", done ? "text-paper" : "text-mute")}>
+              {s}
+              <span className="sr-only">{done ? " (done)" : ""}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+    <div className="mt-8 flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {[
+          { title: "Standard AI", desc: "Answers FAQs, captures basic info, handles simple bookings. Fast and reliable." },
+          { title: "Connected AI", desc: "Integrates with your CRM, POS, or Sheets to sync real-time data. Fully automated." },
+          { title: "Human Handoff", desc: "Smart routing to your team when a personal touch is needed. No missed leads." },
+        ].map((item, i) => (
+          <div key={i} className="rounded-2xl border border-rule-strong bg-ink-2 p-4 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-accent">{item.title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-mute">{item.desc}</p>
+          </div>
+        ))}
       </div>
+
+      {mode === "comparison" && (
+        <div className="min-w-0 rounded-3xl border border-rule-strong bg-ink p-4 shadow-xl text-paper sm:p-6">
+          <h4 className="text-lg font-semibold">Why AI beats the manual grind</h4>
+          <div className="mt-6 overflow-x-auto rounded-xl border border-rule-strong bg-ink-2" tabIndex={0} aria-label="Scrollable OrderRise comparison">
+            <table className="w-full min-w-[28rem] text-left text-sm">
+              <thead className="border-b border-rule-strong bg-ink-3">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Task</th>
+                  <th className="px-4 py-3 font-medium text-mute">Manual Team</th>
+                  <th className="px-4 py-3 font-medium text-accent">OrderRise AI</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-rule-strong">
+                {[
+                  { t: "First Response", m: "5-30 mins", a: "Instant" },
+                  { t: "Order Accuracy", m: "Human Error", a: "Data-driven" },
+                  { t: "Peak Hour Load", m: "Overwhelmed", a: "Infinite Scale" },
+                  { t: "Lead Capture", m: "Forgotten", a: "Auto-recorded" },
+                ].map((row, i) => (
+                  <tr key={i}>
+                    <td className="px-4 py-3 font-medium">{row.t}</td>
+                    <td className="px-4 py-3 text-mute">{row.m}</td>
+                    <td className="px-4 py-3 font-semibold text-paper">{row.a}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+
+  </div>
+      <LiquidCloudBubble
+        steps={ORDERRISE_STEPS}
+        position="bottom-right"
+        accentColor="amber"
+      />
     </div>
   );
 }

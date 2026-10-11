@@ -2,11 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, MessageCircle, PhoneCall, Search, Workflow, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/cn";
 import { contact, getProduct, nav, productOrder, type ProductSlug } from "@/lib/site";
+
+export const PRODUCT_IMAGES: Record<ProductSlug, string> = {
+  "voice-agent": "/images/icons/voice-agent.jpg",
+  "lead-extractor": "/images/icons/lead-extractor.jpg",
+  orderrise: "/images/icons/orderrise.jpg",
+  "ai-agents": "/images/icons/ai-agents.jpg",
+};
 
 const ICONS: Record<ProductSlug, typeof PhoneCall> = {
   "voice-agent": PhoneCall,
@@ -44,6 +52,7 @@ export function SiteHeader() {
 
   const productsRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
   const hoverTimer = useRef<number | undefined>(undefined);
 
   const setProducts = useCallback((v: boolean) => setProductsFor(v ? pathname : null), [pathname]);
@@ -59,11 +68,39 @@ export function SiteHeader() {
   useEffect(() => {
     if (!open) return;
     const prev = document.documentElement.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const background = [document.querySelector("main"), document.querySelector("footer")]
+      .filter((element): element is HTMLElement => element instanceof HTMLElement)
+      .map((element) => ({ element, inert: element.inert }));
+    background.forEach(({ element }) => { element.inert = true; });
     document.documentElement.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileFor(null);
+    const focusable = () => Array.from(mobileRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    const focusFrame = requestAnimationFrame(() => focusable()[0]?.focus());
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.preventDefault(); setMobileFor(null); }
+      if (e.key === "Tab") {
+        const items = focusable();
+        const first = items[0];
+        const last = items[items.length - 1];
+        const outside = !mobileRef.current?.contains(document.activeElement);
+        if (outside || (e.shiftKey && document.activeElement === first) || (!e.shiftKey && document.activeElement === last)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first)?.focus();
+        }
+      }
+    };
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const onResize = () => { if (desktop.matches) setMobileFor(null); };
+    desktop.addEventListener("change", onResize);
     window.addEventListener("keydown", onKey);
     return () => {
+      cancelAnimationFrame(focusFrame);
       document.documentElement.style.overflow = prev;
+      background.forEach(({ element, inert }) => { element.inert = inert; });
+      previousFocus?.focus({ preventScroll: true });
+      desktop.removeEventListener("change", onResize);
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
@@ -169,10 +206,16 @@ export function SiteHeader() {
                                 href={p.path}
                                 onClick={() => setProducts(false)}
                                 aria-current={pathname === p.path ? "page" : undefined}
-                                className="flex gap-3 rounded-xl p-3 transition-colors hover:bg-ink-3 focus-visible:bg-ink-3 aria-[current=page]:bg-ink-3"
+                                className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-ink-3 focus-visible:bg-ink-3 aria-[current=page]:bg-ink-3"
                               >
-                                <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-xl", TINT[p.accent])}>
-                                  <Icon className="size-[1.125rem]" />
+                                <span aria-hidden className="relative size-10 shrink-0 overflow-hidden rounded-xl border border-rule/70 bg-ink shadow-sm">
+                                  <Image
+                                    src={PRODUCT_IMAGES[p.slug]}
+                                    alt=""
+                                    width={40}
+                                    height={40}
+                                    className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  />
                                 </span>
                                 <span className="min-w-0">
                                   <span className="flex items-center gap-2 text-sm font-medium text-paper">
@@ -222,7 +265,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href={contact.bookingGeneral}
-            className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 text-sm font-semibold text-on-accent shadow-[0_8px_24px_-10px_var(--accent)] transition-[background-color,transform] hover:-translate-y-px hover:bg-accent-strong md:min-h-11"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-accent px-3 text-sm font-semibold text-on-accent shadow-[0_8px_24px_-10px_var(--accent)] transition-[background-color,transform] hover:-translate-y-px hover:bg-accent-strong sm:px-4"
           >
             Book a call
           </Link>
@@ -232,7 +275,7 @@ export function SiteHeader() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid size-10 place-items-center rounded-xl border border-rule-strong bg-ink-2 md:size-11 text-paper transition-colors hover:bg-ink-3 lg:hidden"
+            className="grid size-11 shrink-0 place-items-center rounded-xl border border-rule-strong bg-ink-2 text-paper transition-colors hover:bg-ink-3 lg:hidden"
           >
             {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
           </button>
@@ -241,8 +284,14 @@ export function SiteHeader() {
 
       {/* Mobile sheet: fixed below the bar, scrolls on its own. */}
       {open && (
-        <div id="mobile-menu" className="menu-in fixed inset-x-3 bottom-3 top-[4.25rem] overflow-y-auto rounded-b-2xl border border-t-0 border-rule bg-ink-2 md:top-20 lg:hidden">
+        <div ref={mobileRef} id="mobile-menu" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" className="menu-in fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] top-[4.25rem] overflow-y-auto overscroll-contain rounded-b-2xl border border-t-0 border-rule bg-ink-2 md:top-20 lg:hidden">
           <nav aria-label="Mobile" className="container-site py-6">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <h2 id="mobile-menu-title" className="text-lg font-semibold text-paper">Navigation</h2>
+              <button type="button" onClick={() => setMobileFor(null)} className="grid size-11 place-items-center rounded-xl border border-rule-strong text-paper hover:bg-ink-3" aria-label="Close navigation">
+                <X aria-hidden className="size-5" />
+              </button>
+            </div>
             <p className="eyebrow mb-3">Products</p>
             <ul className="grid gap-2">
               {menuProducts.map((p) => {
@@ -253,12 +302,18 @@ export function SiteHeader() {
                       href={p.path}
                       onClick={() => setMobileFor(null)}
                       aria-current={pathname === p.path ? "page" : undefined}
-                      className="flex min-h-16 items-center gap-3 rounded-xl border border-rule bg-ink px-4 py-3 transition-colors active:bg-ink-3 aria-[current=page]:border-accent/40"
+                      className="group flex min-h-16 items-center gap-3 rounded-xl border border-rule bg-ink px-4 py-3 transition-colors active:bg-ink-3 aria-[current=page]:border-accent/40"
                     >
-                      <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-xl", TINT[p.accent])}>
-                        <Icon className="size-[1.125rem]" />
+                      <span aria-hidden className="relative size-10 shrink-0 overflow-hidden rounded-xl border border-rule/70 bg-ink-2 shadow-sm">
+                        <Image
+                          src={PRODUCT_IMAGES[p.slug]}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
                       </span>
-                      <span className="flex-1">
+                      <span className="min-w-0 flex-1">
                         <span className="block font-medium text-paper">{p.name}</span>
                         <span className="block text-sm text-mute">
                           {p.kind} · {p.price}

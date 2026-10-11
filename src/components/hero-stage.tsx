@@ -4,6 +4,7 @@ import { MapPin, MessageCircle, PhoneIncoming, Star } from "lucide-react";
 import { ScrollScene } from "@/components/motion";
 import { Waveform } from "@/components/product/voice-demo";
 import { Button } from "@/components/ui";
+import { FluidNumberText } from "@/components/fluid-number";
 import { contact, site } from "@/lib/site";
 
 /**
@@ -115,7 +116,7 @@ export function HeroStage() {
                       <span className="grid size-6 place-items-center rounded-lg bg-wa text-on-accent">
                         <MessageCircle className="size-3.5" />
                       </span>
-                      2× Margherita (L)
+                      <FluidNumberText tint="scan">2×</FluidNumberText> Margherita (L)
                     </span>
                     <span className="mt-1 block text-[0.6875rem] text-faint">Total sent · confirmed</span>
                   </div>
@@ -125,7 +126,7 @@ export function HeroStage() {
                     <span className="grid size-6 place-items-center rounded-full bg-scan text-on-accent">
                       <MapPin className="size-3.5" />
                     </span>
-                    <span className="font-medium text-paper">Lead scored 92</span>
+                    <span className="font-medium text-paper">Lead scored <FluidNumberText tint="accent">92</FluidNumberText></span>
                     <Star className="size-3 fill-warm text-warm" />
                   </div>
                 </div>
@@ -138,13 +139,13 @@ export function HeroStage() {
               className="relative z-10 grid grid-cols-3 gap-2 pb-6 lg:grid-cols-1 lg:gap-6 lg:self-center lg:pb-16 [transform:translate3d(0,calc(var(--p,0)*-60px),0)]"
             >
               {[
-                { v: "24/7", k: "AI Voice Agent", d: "answers your phone", href: "/voice-agent" },
-                { v: "$50", k: "OrderRise", d: "a month, WhatsApp orders", href: "/orderrise" },
-                { v: "$200", k: "Maps Lead Scraper", d: "one-time, no subscription", href: "/maps-lead-scraper" },
+                { v: <FluidNumberText tint="voice">24/7</FluidNumberText>, k: "AI Voice Agent", d: "answers your phone", href: "/voice-agent" },
+                { v: <>From <FluidNumberText tint="accent">$200</FluidNumberText></>, k: "OrderRise", d: "one-time setup, plus operating costs", href: "/orderrise" },
+                { v: <FluidNumberText tint="scan">$200</FluidNumberText>, k: "Maps Lead Scraper", d: "one-time, no subscription", href: "/maps-lead-scraper" },
               ].map((f) => (
                 <li key={f.k} className="lg:text-right">
                   <Link href={f.href} className="group block rounded-2xl p-2 transition-colors hover:bg-ink-3/70 lg:p-0 lg:hover:bg-transparent">
-                    <span className="text-sheen block font-display text-[1.75rem] font-semibold leading-none tracking-[-0.03em] md:text-[2.5rem]">{f.v}</span>
+                    <span className="block font-display text-[1.75rem] font-semibold leading-none tracking-[-0.03em] md:text-[2.5rem]">{f.v}</span>
                     <span className="mt-1.5 block text-[0.75rem] font-medium text-paper underline-offset-4 group-hover:underline md:text-sm">{f.k}</span>
                     <span className="block text-[0.6875rem] leading-snug text-mute md:text-[0.8125rem]">{f.d}</span>
                   </Link>

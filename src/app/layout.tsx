@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
@@ -80,7 +81,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           force-showed every section before anyone scrolled, which is why the
           scroll animations never played.)
         */}
-        <script
+        <Script
+          id="reveal-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `document.documentElement.classList.add("js");`,
           }}

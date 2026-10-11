@@ -1,17 +1,16 @@
-import Link from "next/link";
-import { Check } from "lucide-react";
-import { Badge, Breadcrumbs, Button, FaqList, SectionHeader } from "@/components/ui";
-import { ACCENT_TEXT, CtaBand } from "@/components/product-blocks";
+import { Breadcrumbs, FaqList, SectionHeader } from "@/components/ui";
+import { CtaBand } from "@/components/product-blocks";
 import { FaqAside } from "@/components/polish";
 import { JsonLd, breadcrumbLd, faqLd } from "@/components/json-ld";
-import { cn } from "@/lib/cn";
 import { pageMeta } from "@/lib/meta";
-import { getProduct, productOrder, type Faq } from "@/lib/site";
+import { type Faq } from "@/lib/site";
+import { PricingSection } from "@/components/ui/pricing-section";
+import type { PricingTier } from "@/components/ui/pricing-card";
 
 export const metadata = pageMeta({
   title: "Pricing | Maps Lead Scraper, OrderRise, AI Agents",
   description:
-    "Plain prices: Maps Lead Scraper $200 one-time, OrderRise $50/month per restaurant, AI voice agent scoped to call volume, custom AI agents project-based.",
+    "Plain prices: Maps Lead Scraper $200 one-time, OrderRise setup from $200 one-time plus operating costs, AI voice agent scoped to call volume, custom AI agents project-based.",
   path: "/pricing",
 });
 
@@ -23,11 +22,11 @@ const crumbs = [
 const pricingFaqs: Faq[] = [
   {
     q: "Is the Maps Lead Scraper a subscription?",
-    a: "No. It is a one-time purchase of $200. There is no subscription and no Places API bill.",
+    a: "No. It is a one-time purchase of $200. There is no subscription and no Google Places API bill.",
   },
   {
     q: "What is included in the OrderRise price?",
-    a: "$50 a month per restaurant, with menu setup and onboarding included.",
+    a: "Chatbot setup is $200 one-time. Connected setup is $300-$400 one-time. Monthly API and platform operating costs are separate.",
   },
   {
     q: "Why is the voice agent not listed with a fixed price?",
@@ -39,25 +38,104 @@ const pricingFaqs: Faq[] = [
   },
 ];
 
+const PAYMENT_FREQUENCIES = ["One-time / setup", "With ongoing support"];
+
+const VALUEBLE_TIERS: PricingTier[] = [
+  {
+    id: "lead-extractor",
+    name: "Maps Lead Scraper",
+    price: {
+      "One-time / setup": 200,
+      "With ongoing support": 200,
+    },
+    priceNote: "One-time purchase · Zero subscription",
+    description: "Unlimited Google Maps lead extraction directly into clean CSV with emails and socials.",
+    features: [
+      "Runs locally on your machine or VPS",
+      "Unlimited searches & query results",
+      "Pulls emails & socials from actual websites",
+      "No Google Places API billing ever",
+      "Direct CSV export ready for cold outreach",
+    ],
+    cta: "Get Maps Scraper",
+    href: "/contact?intent=maps-scraper",
+    productPath: "/products/lead-extractor",
+    popular: false,
+  },
+  {
+    id: "orderrise",
+    name: "OrderRise",
+    price: {
+      "One-time / setup": 200,
+      "With ongoing support": 350,
+    },
+    priceNote: "One-time setup · Direct POS / WhatsApp connect",
+    description: "Autonomous WhatsApp & Instagram ordering agent built for busy takeaway restaurants.",
+    features: [
+      "Takes orders & collects full delivery address",
+      "Calculates itemized subtotal accurately",
+      "Answers delivery radius & menu queries",
+      "Sends order tickets straight to kitchen staff",
+      "Live order management dashboard",
+    ],
+    cta: "Setup OrderRise",
+    href: "/contact?intent=orderrise",
+    productPath: "/products/orderrise",
+    popular: true,
+  },
+  {
+    id: "voice-agent",
+    name: "AI Voice Agent",
+    price: {
+      "One-time / setup": "Custom",
+      "With ongoing support": "Custom",
+    },
+    priceNote: "Scoped per call volume & integrations",
+    description: "Inbound voice assistant answering calls with ultra-low latency and natural pacing.",
+    features: [
+      "Sub-second voice response, no awkward lag",
+      "Answers FAQs, business hours, and services",
+      "Books appointments straight to calendar",
+      "Logs every call transcript & summary to CRM",
+      "Instant warm transfer to live team members",
+    ],
+    cta: "Book scoping call",
+    href: "/contact?intent=voice-agent",
+    productPath: "/products/voice-agent",
+    highlighted: true,
+  },
+  {
+    id: "ai-agents",
+    name: "Custom AI Agents",
+    price: {
+      "One-time / setup": "Project",
+      "With ongoing support": "Project",
+    },
+    priceNote: "Fixed-price milestone contracts",
+    description: "Bespoke operational workflows built around your specific tools and daily friction.",
+    features: [
+      "Detailed process audit & feasibility review",
+      "No generic AI wrap: built for your database",
+      "Integrates with your existing software stack",
+      "Clear definition of ROI before build starts",
+      "Handover training & dedicated monitoring",
+    ],
+    cta: "Discuss project",
+    href: "/contact?intent=ai-agents",
+    productPath: "/products/ai-agents",
+    popular: false,
+  },
+];
+
 export default function PricingPage() {
   return (
     <>
       <JsonLd data={[breadcrumbLd(crumbs), faqLd(pricingFaqs)]} />
 
-      <section id="overview" className="relative isolate pb-12 pt-10 md:pb-16 md:pt-14" data-od-id="pricing-hero">
+      <section id="overview" className="relative isolate pt-10 pb-4 md:pt-14" data-od-id="pricing-hero">
         <div className="atmosphere" />
         <div className="container-site">
           <Breadcrumbs items={crumbs} />
-          <div className="max-w-3xl">
-            <h1 className="text-display md:text-[clamp(2.5rem,5vw,4rem)]">
-              <span className="eyebrow mb-4 flex font-sans">valueble.ai pricing</span>
-              Four products. Plain prices.
-            </h1>
-            <p className="mt-6 text-sub text-mute">
-              Two have a fixed price. The other two depend on your volume and your process, so they are
-              scoped on a call instead of guessed at here.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -66,48 +144,12 @@ export default function PricingPage() {
           <h2 id="plans-title" className="sr-only">
             Prices by product
           </h2>
-          <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {productOrder.map((slug) => {
-              const p = getProduct(slug)!;
-              return (
-                <li key={slug} className="card reveal flex flex-col p-6" data-od-id={`pricing-card-${slug}`}>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={cn("ui-label", ACCENT_TEXT[p.accent])}>{p.kind}</span>
-                    {p.status === "Live" && <Badge tone="live">Live</Badge>}
-                  </div>
-                  <h3 className="mt-5 text-title">
-                    <Link href={p.path} className="hover:underline hover:underline-offset-4">
-                      {p.name}
-                    </Link>
-                  </h3>
-                  <p className="mt-1 text-sm text-faint">{p.audience}</p>
-                  <p className="mt-6 whitespace-nowrap font-display text-[1.75rem] font-semibold leading-none text-paper">{p.price}</p>
-                  <p className="mt-2 text-sm text-faint">{p.priceNote}</p>
-                  <ul className="mt-6 flex-1 space-y-2.5 border-t border-rule pt-6 text-[0.9375rem]">
-                    {p.facts
-                      .filter((f) => f.label !== "Price")
-                      .slice(0, 4)
-                      .map((f) => (
-                        <li key={f.label} className="flex gap-2.5">
-                          <Check aria-hidden className={cn("mt-1 size-4 shrink-0", ACCENT_TEXT[p.accent])} />
-                          <span>
-                            <span className="text-faint">{f.label}:</span> <span className="text-paper">{f.value}</span>
-                          </span>
-                        </li>
-                      ))}
-                  </ul>
-                  <div className="mt-7 grid gap-2">
-                    <Button href={p.cta.href} variant="secondary" size="sm" className="w-full">
-                      {slug === "voice-agent" ? "Book a call" : p.cta.label}
-                    </Button>
-                    <Link href={p.path} className="inline-flex min-h-10 items-center justify-center text-sm text-mute hover:text-paper">
-                      Read about {p.name}
-                    </Link>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <PricingSection
+            title="Four products. Plain prices."
+            subtitle="Two have fixed one-time pricing. The other two are scoped to your volume and process, so they are transparently quoted on a call."
+            frequencies={PAYMENT_FREQUENCIES}
+            tiers={VALUEBLE_TIERS}
+          />
         </div>
       </section>
 

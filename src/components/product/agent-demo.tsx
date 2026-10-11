@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Brain, Check, Inbox, Play, RotateCcw, ShieldCheck, UserRound, Wrench, X, Zap } from "lucide-react";
 import { DemoLabel } from "@/components/ui";
+import { LiquidCloudBubble, type WalkthroughStep } from "@/components/ui/liquid-cloud-bubble";
 import { cn } from "@/lib/cn";
 
 /**
@@ -65,6 +66,28 @@ const SCENARIOS: Scenario[] = [
   },
 ];
 
+
+const AGENT_STEPS: WalkthroughStep[] = [
+  {
+    title: "1. Pick an automation scenario",
+    instruction: "Choose a lead, support, or invoice scenario in the selector above.",
+    tip: "Every agent is custom-architected around your team's specific software.",
+    badge: "Step 1",
+  },
+  {
+    title: "2. Trigger the agent",
+    instruction: "Tap 'Run the agent'. Follow the example as it reads the input, understands the request, and prepares an action.",
+    tip: "Autonomous steps 1 through 3 execute in seconds.",
+    badge: "Step 2",
+  },
+  {
+    title: "3. Human approval checkpoint",
+    instruction: "When the run pauses at Checkpoint, click 'Approve' or 'Reject' to simulate human oversight on high-stakes tasks.",
+    tip: "Approved outputs deliver directly into your CRM, Slack, or inbox.",
+    badge: "Step 3",
+  },
+];
+
 export function AgentDemo({ className }: { className?: string }) {
   const [sid, setSid] = useState(SCENARIOS[0].id);
   const [step, setStep] = useState(-1); // -1 idle, 0..4 active, 5 done
@@ -99,7 +122,7 @@ export function AgentDemo({ className }: { className?: string }) {
   const waiting = step === 3;
 
   return (
-    <div className={cn("panel p-5 md:p-7", className)} data-od-id="agent-demo">
+    <div className={cn("panel relative p-5 md:p-7", className)} data-od-id="agent-demo">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="tablist" aria-label="Example process" className="flex flex-wrap gap-2">
           {SCENARIOS.map((s) => (
@@ -119,7 +142,7 @@ export function AgentDemo({ className }: { className?: string }) {
       </div>
 
       {/* Flow */}
-      <ol className="mt-7 grid gap-3 md:grid-cols-5" aria-label="Agent flow">
+      <ol className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-5" aria-label="Agent flow">
         {STEPS.map(({ key, Icon, body }, i) => {
           const human = key === "Checkpoint";
           const active = step === i;
@@ -129,6 +152,7 @@ export function AgentDemo({ className }: { className?: string }) {
               key={key}
               className={cn(
                 "relative rounded-2xl border p-4 transition-[border-color,background-color,transform,box-shadow] duration-500",
+                i === STEPS.length - 1 && "sm:col-span-2 xl:col-span-1",
                 active && human && "-translate-y-1 border-mind bg-mind/10 shadow-[var(--shadow-lift)]",
                 active && !human && "-translate-y-1 border-paper/30 bg-ink-3 shadow-[var(--shadow-lift)]",
                 done && "border-rule bg-ink-2",
@@ -173,8 +197,8 @@ export function AgentDemo({ className }: { className?: string }) {
         ) : (
           <ul className="space-y-2 font-mono text-[0.8125rem] leading-relaxed">
             {sc.log.slice(0, Math.min(step + 1, 3)).map((l, i) => (
-              <li key={i} className="msg-in flex gap-2.5 text-paper">
-                <span className="text-faint">{STEPS[i].key.toLowerCase().padEnd(10, " ")}</span>
+              <li key={i} className="msg-in flex min-w-0 flex-col gap-1 text-paper sm:flex-row sm:gap-2.5">
+                <span className="shrink-0 text-faint">{STEPS[i].key.toLowerCase().padEnd(10, " ")}</span>
                 <span>{l}</span>
               </li>
             ))}
@@ -200,8 +224,8 @@ export function AgentDemo({ className }: { className?: string }) {
               </li>
             )}
             {step >= 5 && decision && (
-              <li className="msg-in flex gap-2.5 text-paper">
-                <span className="text-faint">{"deliver".padEnd(10, " ")}</span>
+              <li className="msg-in flex min-w-0 flex-col gap-1 text-paper sm:flex-row sm:gap-2.5">
+                <span className="shrink-0 text-faint">{"deliver".padEnd(10, " ")}</span>
                 <span>{sc[decision]}</span>
               </li>
             )}
@@ -215,6 +239,12 @@ export function AgentDemo({ className }: { className?: string }) {
           </ul>
         )}
       </div>
+
+      <LiquidCloudBubble
+        steps={AGENT_STEPS}
+        position="bottom-right"
+        accentColor="violet"
+      />
     </div>
   );
 }

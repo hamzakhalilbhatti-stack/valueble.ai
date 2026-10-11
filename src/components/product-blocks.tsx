@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowUpRight, MessageCircle, PhoneCall, Search, Workflow } from "lucide-react";
 import { Badge, Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
+import { FluidBalloonDigit } from "@/components/fluid-number";
 import { contact, getProduct, type Product, type ProductSlug, whatsappUrl } from "@/lib/site";
 
 export const ACCENT_TEXT: Record<Product["accent"], string> = {
@@ -30,17 +31,29 @@ export const PRODUCT_ICON: Record<ProductSlug, typeof PhoneCall> = {
   "ai-agents": Workflow,
 };
 
+export const PRODUCT_IMAGE: Record<ProductSlug, string> = {
+  "voice-agent": "/images/icons/voice-agent.jpg",
+  "lead-extractor": "/images/icons/lead-extractor.jpg",
+  orderrise: "/images/icons/orderrise.jpg",
+  "ai-agents": "/images/icons/ai-agents.jpg",
+};
+
 /** Product overview card. The whole card is one link with descriptive text. */
 export function ProductCard({ slug, className }: { slug: ProductSlug; className?: string }) {
   const p = getProduct(slug)!;
-  const Icon = PRODUCT_ICON[slug];
   return (
     <article className={cn("card card-link group flex h-full flex-col p-6", className)} data-od-id={`product-card-${p.slug}`}>
       <div className="flex items-center justify-between gap-3">
-        <span aria-hidden className={cn("grid size-11 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-110", ACCENT_TINT[p.accent])}>
-          <Icon className="size-5" />
+        <span aria-hidden className="relative size-11 shrink-0 overflow-hidden rounded-xl border border-rule/70 bg-ink-2 shadow-sm transition-transform duration-300 group-hover:scale-110">
+          <Image
+            src={PRODUCT_IMAGE[p.slug]}
+            alt=""
+            width={44}
+            height={44}
+            className="size-full object-cover"
+          />
         </span>
-        {p.status === "Live" ? <Badge tone="live">Live</Badge> : <Badge>{p.status}</Badge>}
+        {p.status !== "Live" && <Badge>{p.status}</Badge>}
       </div>
       <h3 className="mt-5 text-title">
         <Link href={p.path} className="after:absolute after:inset-0 after:rounded-[1.25rem] focus-visible:outline-none">
@@ -90,9 +103,14 @@ export function HowItWorks3({ product, className }: { product: Product; classNam
       <span aria-hidden className="absolute left-[16.6%] right-[16.6%] top-8 hidden border-t-2 border-dashed border-rule-strong md:block" />
       {product.how3.map((s, i) => (
         <li key={s.title} className="reveal reveal-scale relative text-center" data-od-id={`how3-${product.slug}-${i + 1}`}>
-          <span className={cn("app-tile relative z-[1] mx-auto size-16 font-display text-2xl font-semibold transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-1 hover:rotate-[-4deg]", ACCENT_TEXT[product.accent])}>
-            {i + 1}
-          </span>
+          <div className="relative z-[1] mx-auto flex items-center justify-center size-20 transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-1.5 hover:scale-110">
+            <FluidBalloonDigit
+              char={String(i + 1)}
+              size={54}
+              tint={product.accent === "voice" ? "voice" : product.accent === "scan" ? "scan" : "blue"}
+              isActive={true}
+            />
+          </div>
           <h3 className="mt-5 text-title">{s.title}</h3>
           <p className="mx-auto mt-2 max-w-[28ch] text-[0.9375rem] text-mute">{s.body}</p>
         </li>

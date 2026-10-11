@@ -9,7 +9,7 @@ export default function Image() {
   return renderOg({
     eyebrow: "Pricing",
     title: "Four products. Plain prices.",
-    meta: "$200 one-time · $50 / month · custom voice · project-based",
+    meta: "$200 scraper · OrderRise setup from $200 · custom voice · project-based",
     accent: "#5fe8c8",
   });
 }
