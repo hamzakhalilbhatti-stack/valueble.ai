@@ -1,126 +1,187 @@
 @import "tailwindcss";
 
 /*
- * valueble.ai — design tokens.
+ * valueble.ai — design tokens (fix pass).
  *
- * Every contrast ratio below is computed against the background, not judged by
- * eye, and every one of them clears WCAG AA for the size it is used at.
+ * Light-dominant. Every colour utility (bg-ink, text-paper, …) resolves to a
+ * runtime CSS variable, so a band flips to the dark palette just by adding
+ * `.theme-dark` — the same markup works on both.
  *
- *   ink    #08080a  ground
- *   paper  #f4f4f6  headings          18.2:1
- *   mute   #a8a8ae  body              8.5:1
- *   faint  #8a8a90  meta and labels   5.8:1
+ * Semantic names kept from the previous pass:
+ *   ink / ink-2 / ink-3   page background / raised surface / tinted band
+ *   paper                 headings and strong text
+ *   mute                  body text
+ *   faint                 meta, labels
+ *   rule / rule-strong    hairlines
+ *   accent / on-accent    brand action colour and the text that sits on it
  *
- * Two deliberate departures from the reference build, both corrections:
- *
- * The ground is not pure black and the type is not pure white. At 21:1 white
- * letterforms halate — they glow and shimmer against true black, especially on
- * OLED — and that fatigues anyone reading more than a line of it. Pulling both
- * ends a few points off the extremes removes the shimmer and costs nothing that
- * can be seen side by side.
- *
- * `faint` was #6b6b70, which computes to 3.96:1 and fails AA outright. It was
- * carrying the audience labels — the lines that tell a visitor whether a
- * product is for them — so the most important small text on the site was also
- * the least legible thing on it.
+ * Light contrast on white: paper ~15:1, mute ~8:1, faint ~5.5:1,
+ * accent text ~5:1, white on accent ~5:1. Dark band values mirror the
+ * previous pass, which measured 6:1+ for every text token.
  */
 @theme {
-  --color-ink: #08080a;
-  --color-paper: #f4f4f6;
-  --color-mute: #a8a8ae;
-  --color-faint: #8a8a90;
-  --color-rule: #202024;
-  --color-rule-strong: #34343a;
+  --text-hero: clamp(2.75rem, 6.2vw, 5.5rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.045em;
 
-  /*
-   * One accent per product, and they are never used interchangeably.
-   *
-   * The page itself stays black and white — these appear only inside product
-   * demonstrations and on the index rows, where their whole job is to let a
-   * visitor tell three offerings apart at a glance. Without them the products
-   * read as one undifferentiated thing, which is the single most expensive
-   * mistake a three-product site can make.
-   */
-  --color-scan: #3ddbc0; /* 01 — Maps Lead Scraper. Data, precision */
-  --color-warm: #ffab4a; /* 02 — OrderRise. Conversation, response */
-  --color-mind: #9b8cff; /* 03 — Custom agents. Assembly, intelligence */
+  --text-display: clamp(2rem, 4.4vw, 3.5rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.03em;
 
-  /*
-   * Type scale.
-   *
-   * Tracking tightens as size grows, which is the single strongest signal that
-   * type has been set rather than merely specified. Letterforms that look
-   * correctly spaced at 17px are visibly loose at 80px, because tracking is
-   * perceived relative to the letter height — so display sizes carry −0.025em
-   * and body carries none at all.
-   */
-  --text-hero: clamp(2.5rem, 5.6vw, 5rem);
-  --text-hero--line-height: 1.06;
-  --text-hero--letter-spacing: -0.025em;
+  --text-head: clamp(1.75rem, 3.2vw, 2.625rem);
+  --text-head--line-height: 1.12;
+  --text-head--letter-spacing: -0.025em;
 
-  --text-head: clamp(1.75rem, 2.6vw, 2.1875rem);
-  --text-head--line-height: 1.26;
-  --text-head--letter-spacing: -0.015em;
+  --text-title: clamp(1.125rem, 1.5vw, 1.3125rem);
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.012em;
 
-  --text-sub: clamp(1.1875rem, 1.45vw, 1.4375rem);
-  --text-sub--line-height: 1.45;
-  --text-sub--letter-spacing: -0.008em;
+  --text-sub: clamp(1.0625rem, 1.35vw, 1.25rem);
+  --text-sub--line-height: 1.55;
 
-  /*
-   * 17px, not the 16px browser default. Sixteen reads as an application; this
-   * page is asking people to read several hundred words of argument, and at the
-   * measure used here 17/1.7 is the difference between scanning and reading.
-   */
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.7;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
 
-  --text-eyebrow: 1.0625rem;
-  --text-eyebrow--line-height: 1.5;
+  --text-fine: 0.8125rem;
+  --text-fine--line-height: 1.55;
 
-  /* Meta and legal only. Never qualifying information a buyer needs. */
-  --text-fine: 0.84375rem;
-  --text-fine--line-height: 1.6;
-
-  /* One easing, one set of durations. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --dur-fast: 200ms;
-  --dur-base: 450ms;
-  --dur-slow: 900ms;
 }
 
 @theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-paper: var(--paper);
+  --color-mute: var(--mute);
+  --color-faint: var(--faint);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-on-accent: var(--on-accent);
+  --color-mint: var(--mint);
+  --color-second: var(--warm);
+  --color-scan: var(--scan);
+  --color-warm: var(--warm);
+  --color-mind: var(--mind);
+  --color-voice: var(--voice);
+  --color-sun: var(--sun);
+  --color-coral: var(--coral);
+  --color-violet: var(--violet);
+  --color-sky: var(--sky);
+  --color-wa: var(--wa);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display-face);
+  --font-serif: var(--font-serif-face);
 }
 
+/*
+ * Flair pass: butter-yellow canvas, white frosted cards, near-black ink.
+ * Colour comes from a drifting aurora layer (coral / violet / mint / sun)
+ * behind translucent sections, not from flat fills. Text tokens measured on
+ * --ink (yellow): paper ~15:1, mute ~8.5:1, faint ~5.8:1; product accents 5:1+.
+ */
 :root {
   color-scheme: dark;
+  /* Dark pass: near-black canvas with a cold spotlight, butter-yellow as the
+     single accent. Text on --ink: paper ~17:1, mute ~9:1, faint ~6:1. */
+  --ink: oklch(0.13 0.004 270);
+  --ink-2: oklch(0.18 0.006 270);
+  --ink-3: oklch(0.23 0.008 270);
+  --paper: oklch(0.97 0.004 95);
+  --mute: oklch(0.78 0.008 270);
+  --faint: oklch(0.68 0.01 270);
+  --rule: oklch(0.27 0.008 270);
+  --rule-strong: oklch(0.36 0.01 270);
+
+  --accent: oklch(0.89 0.16 96);
+  --accent-strong: oklch(0.94 0.12 98);
+  --on-accent: oklch(0.17 0.01 75);
+  --mint: oklch(0.86 0.13 172);
+
+  --sun: oklch(0.89 0.17 95);
+  --coral: oklch(0.72 0.17 38);
+  --violet: oklch(0.68 0.17 295);
+  --sky: oklch(0.78 0.12 235);
+
+  --scan: oklch(0.84 0.13 175);
+  --warm: oklch(0.8 0.14 60);
+  --mind: oklch(0.78 0.13 295);
+  --voice: oklch(0.79 0.11 245);
+  --wa: oklch(0.78 0.15 152);
+
+  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.05) inset, 0 24px 60px -30px oklch(0 0 0 / 0.85);
+  --shadow-lift: 0 1px 0 oklch(1 0 0 / 0.07) inset, 0 40px 80px -30px oklch(0 0 0 / 0.95);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --card: var(--ink-2);
+  --card-foreground: var(--paper);
+  --popover: var(--ink-2);
+  --popover-foreground: var(--paper);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--ink-3);
+  --secondary-foreground: var(--paper);
+  --muted: var(--ink-3);
+  --muted-foreground: var(--mute);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: var(--rule);
+  --input: var(--rule-strong);
+  --ring: var(--accent);
+}
+
+/* Dark bands: the voice feature, closing CTA, footer, phone bezels. */
+.theme-dark {
+  /* Raised band on the dark canvas (voice feature, CTA, footer). */
+  --ink: oklch(0.16 0.006 270);
+  --ink-2: oklch(0.21 0.008 270);
+  --ink-3: oklch(0.26 0.01 270);
+  background-color: var(--ink);
+  color: var(--mute);
 }
 
 @layer base {
   html {
-    background-color: var(--color-ink);
-    scroll-behavior: auto;
+    background-color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
-    background-color: var(--color-ink);
-    color: var(--color-mute);
+    background-color: transparent;
+    color: var(--mute);
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    /* Never let a browser fake a weight we did not ship. */
     font-synthesis-weight: none;
-    /* Proportional figures read better in prose; tables opt into tabular. */
-    font-variant-numeric: proportional-nums;
+    overflow-x: clip;
   }
 
-  /*
-   * Paragraphs get `pretty`, which asks the browser to avoid leaving a single
-   * word alone on the last line. Headings get `balance` at the call site,
-   * because an even two-line heading beats a long line over a short one.
-   */
   p,
   li {
     text-wrap: pretty;
@@ -130,171 +191,830 @@
   h2,
   h3,
   h4 {
-    color: var(--color-paper);
-    font-weight: 400;
+    color: var(--paper);
+    font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
-  /*
-   * Emphasis is 500, and this is a deliberate relaxation of the reference's
-   * single-weight rule.
-   *
-   * With only one weight available, emphasising a phrase mid-paragraph meant
-   * changing its colour instead — which reads as a link, not as stress. One
-   * step up in weight is the correct tool and does not touch the register; 600
-   * and above is what would.
-   */
   strong,
   b {
-    color: var(--color-paper);
+    color: var(--paper);
     font-weight: 500;
   }
 
   ::selection {
-    background-color: var(--color-paper);
-    color: var(--color-ink);
+    background-color: var(--accent);
+    color: var(--on-accent);
   }
 
   :focus-visible {
-    outline: 1px solid var(--color-paper);
-    outline-offset: 4px;
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  [id] {
+    scroll-margin-top: 6rem;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
   }
 }
 
 @layer components {
-  /*
-   * The page grid. Everything on the site sits on these two columns:
-   * a narrow label rail on the left, and the content measure beside it.
-   * The right third stays empty on purpose — that void is most of what
-   * makes the layout read as considered rather than full.
-   */
-  .rail {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-    padding-inline: 1.5rem;
-    max-width: 96rem;
+  .container-site {
+    width: 100%;
+    max-width: 75rem;
     margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-site {
+      padding-inline: 2rem;
+    }
   }
 
-  @media (min-width: 900px) {
-    .rail {
-      grid-template-columns: 22% minmax(0, 1fr);
-      gap: 3rem;
-      padding-inline: 3.25rem;
-    }
-
-    /* Content stops well short of the right edge. */
-    .rail > .measure {
-      max-width: 46rem;
-    }
-
-    /*
-     * Baseline alignment for the label in the left rail.
-     *
-     * Grid places the label and the heading at the same *box top*, which is not
-     * the same thing as aligning them. A 17px label and a 35px heading have
-     * different first baselines, so the label ends up floating above the line it
-     * is labelling — measured at 13.8px out on section headings and 22.6px on
-     * the product rows. Close enough to look like a mistake rather than a style.
-     *
-     * The offset is derived rather than hardcoded, because every heading size
-     * here is a clamp and a fixed pixel nudge would only be correct at one
-     * viewport width. For a block of text the first baseline sits at:
-     *
-     *     (lineHeight − fontSize) / 2  +  ascender
-     *
-     * with Geist's ascender at ~0.75em. Folding the line-height factor in gives
-     * a single multiplier per size — 0.88 for `head` at 1.26, 0.78 for `hero` at
-     * 1.06 — so the padding is just the difference between the two baselines.
-     *
-     * Only above 900px. Below it the rail is one column and the label sits above
-     * the heading, where the offset would be meaningless space.
-     */
-    .rail-label {
-      padding-top: calc(0.88 * var(--text-head) - var(--text-eyebrow));
-    }
-
-    /* Same, where the label is a `ui-label`: 11px at line-height 1. */
-    .rail-label-ui {
-      padding-top: calc(0.88 * var(--text-head) - 0.515625rem);
-    }
-
-    /* Page heroes, whose headline is `hero` rather than `head`. */
-    .rail-label-hero {
-      padding-top: calc(0.78 * var(--text-hero) - var(--text-eyebrow));
+  .section {
+    padding-block: 4rem;
+  }
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 5.5rem;
     }
   }
 
   .eyebrow {
-    color: var(--color-paper);
-    font-size: var(--text-eyebrow);
-    line-height: var(--text-eyebrow--line-height);
-    letter-spacing: -0.006em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--faint);
   }
 
-  /* Hairline separator, deliberately barely visible. */
-  .hairline {
-    border-top: 1px solid var(--color-rule);
-  }
-
-  /*
-   * Interface label. Used only inside the product demonstrations — it is the
-   * voice of the software, not of the page, so it is monospaced and small
-   * where everything else is Geist at reading size.
-   */
   .ui-label {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.14em;
-    line-height: 1;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
     text-transform: uppercase;
-    /* Aligns digits in the demo panels' counters and score columns. */
     font-variant-numeric: tabular-nums;
   }
 
-  /* Chrome for the demo panels: one surface, one border, used everywhere. */
   .panel {
-    border: 1px solid var(--color-rule);
-    background-color: rgba(255, 255, 255, 0.022);
-    backdrop-filter: blur(6px);
+    border: 1px solid var(--rule);
+    border-radius: 1rem;
+    background: var(--ink-2);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .card {
+    position: relative;
+    border: 1px solid color-mix(in oklab, var(--ink-2) 70%, var(--rule));
+    border-radius: 1.5rem;
+    background: color-mix(in oklab, var(--ink-2) 88%, transparent);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 300ms var(--ease-out),
+      box-shadow 300ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+  .card-link:hover,
+  .card-hover:hover {
+    border-color: var(--rule-strong);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-4px);
+  }
+
+  /* Hero atmosphere: soft brand light and a fine masked grid. */
+  .atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .atmosphere::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(50% 55% at 88% 8%, color-mix(in oklab, var(--coral) 22%, transparent), transparent 70%),
+      radial-gradient(40% 45% at 4% 0%, color-mix(in oklab, var(--violet) 14%, transparent), transparent 70%);
+  }
+  .atmosphere::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--paper) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--paper) 6%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    opacity: 0.6;
+    mask-image: radial-gradient(70% 60% at 50% 20%, #000 10%, transparent 80%);
+  }
+
+  /* Tinted band to separate white sections. */
+  /* Former tinted band. Hard-edged bands cut the living background into
+     stripes, so sections now share one continuous canvas. */
+  .on-cloud {
+    background-color: transparent;
+  }
+
+  .prose-post h2 {
+    font-size: var(--text-title);
+    line-height: 1.3;
+    margin-top: 2.5rem;
+  }
+  .prose-post p,
+  .prose-post ul {
+    margin-top: 1rem;
+  }
+  .prose-post ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .prose-post li + li {
+    margin-top: 0.375rem;
+  }
+
+  /* WhatsApp-style chat wallpaper (OrderRise demo). */
+  .wa-surface {
+    background-color: oklch(0.945 0.014 85);
+    background-image: radial-gradient(oklch(0.3 0.03 85 / 0.07) 1px, transparent 1px);
+    background-size: 14px 14px;
   }
 }
 
 @layer utilities {
   /*
-   * Reveal-on-scroll. The hidden state is scoped to `html.js`, set by an inline
-   * script during parsing, so a failed bundle or a crawler sees plain content
-   * rather than an empty page. `html.reveal-done` is a hard watchdog: after a
-   * few seconds nothing may remain hidden for any reason at all.
+   * Scroll reveal. Content is hidden only after JS has confirmed it can reveal
+   * it (`html.js`), so crawlers and no-JS visitors always see everything.
+   * RevealDriver (reveal.tsx) flips data-revealed when an element enters view.
    */
   .reveal {
     transition:
-      opacity var(--dur-slow) var(--ease-out),
-      transform var(--dur-slow) var(--ease-out);
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
     transition-delay: var(--reveal-delay, 0ms);
   }
-
   .js .reveal:not([data-revealed="true"]) {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translate3d(0, 1.75rem, 0);
+  }
+  .js .reveal.reveal-scale:not([data-revealed="true"]) {
+    transform: translate3d(0, 1.25rem, 0) scale(0.96);
+  }
+  .js .reveal.reveal-left:not([data-revealed="true"]) {
+    transform: translate3d(-2.5rem, 0, 0);
+  }
+  .js .reveal.reveal-right:not([data-revealed="true"]) {
+    transform: translate3d(2.5rem, 0, 0);
   }
 
-  .js .reveal[data-revealed="true"] {
+  .float-a {
+    animation: float 9s ease-in-out infinite;
+  }
+  .float-b {
+    animation: float 11s ease-in-out -3s infinite;
+  }
+  .float-c {
+    animation: float 10s ease-in-out -6s infinite;
+  }
+
+  .wave-bar {
+    will-change: transform;
+    transform-origin: center;
+    animation: wave 1.1s ease-in-out infinite;
+  }
+
+  .pulse-dot {
+    position: relative;
+  }
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: pulse-dot 2s ease-out infinite;
+  }
+
+  .typing-dot {
+    animation: typing 1.2s ease-in-out infinite;
+  }
+
+  .msg-in {
+    animation: msg-in 380ms var(--ease-out) both;
+  }
+
+  .row-in {
+    animation: row-in 420ms var(--ease-out) both;
+  }
+
+  .menu-in {
+    animation: menu-in 220ms var(--ease-out) both;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.98);
+  }
+  to {
     opacity: 1;
     transform: none;
   }
+}
 
-  html.reveal-done .reveal {
-    opacity: 1 !important;
-    transform: none !important;
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* FAQ accordion: native <details>; opens with a height transition where supported. */
+details.faq > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.faq > summary::-webkit-details-marker {
+  display: none;
+}
+details.faq .faq-icon {
+  transition:
+    transform 250ms var(--ease-out),
+    background-color 200ms;
+}
+details.faq[open] .faq-icon {
+  transform: rotate(45deg);
+  background-color: var(--ink-3);
+}
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+  details.faq::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 320ms var(--ease-out),
+      content-visibility 320ms allow-discrete;
+  }
+  details.faq[open]::details-content {
+    block-size: auto;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .wave-bar,
+  .float-a,
+  .float-b,
+  .float-c {
+    animation: none !important;
+  }
   .js .reveal {
     opacity: 1 !important;
     transform: none !important;
-    transition: none !important;
   }
 }
+
+/* ───────── Flair layer ───────── */
+@layer components {
+  /* Page-wide living background: soft colour blooms drifting over the
+     yellow canvas, plus fine film grain. Fixed, behind everything,
+     transform-only animation so it stays on the compositor. */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  /* Soft colour embers drifting low on the black canvas. */
+  .aurora > i {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(110px);
+    will-change: transform;
+  }
+  .aurora > i:nth-child(1) { width: 40vmax; height: 40vmax; left: -18vmax; top: 30vh; background: var(--violet); opacity: 0.13; animation: drift-a 36s ease-in-out infinite; }
+  .aurora > i:nth-child(2) { width: 34vmax; height: 34vmax; right: -16vmax; top: 10vh; background: var(--sun); opacity: 0.09; animation: drift-b 42s ease-in-out infinite; }
+  .aurora > i:nth-child(3) { width: 30vmax; height: 30vmax; left: 35vw; bottom: -22vmax; background: var(--coral); opacity: 0.1; animation: drift-c 48s ease-in-out infinite; }
+  .aurora > i:nth-child(4) { width: 24vmax; height: 24vmax; left: 10vw; top: -10vmax; background: var(--sky); opacity: 0.07; animation: drift-b 54s ease-in-out -12s infinite reverse; }
+  .aurora::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* Framed hero shell (the rounded white "window" in the reference). */
+  .hero-frame {
+    position: relative;
+    isolation: isolate;
+    border-radius: 2rem;
+    background: color-mix(in oklab, var(--ink-2) 78%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 80%, transparent);
+    box-shadow: var(--shadow-lift);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    overflow: hidden;
+  }
+  @media (min-width: 768px) {
+    .hero-frame { border-radius: 2.5rem; }
+  }
+
+  /* Two-tone display headline: second half recedes, like the reference. */
+  .tone-2 { color: color-mix(in oklab, var(--paper) 55%, var(--ink-2)); }
+  .serif-flair {
+    font-family: var(--font-serif), Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* Scan-box annotation (corner brackets + label) drawn over the hero object. */
+  .scan-box {
+    position: absolute;
+    border: 1.5px solid oklch(1 0 0 / 0.95);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 1px oklch(0.19 0.012 75 / 0.12), 0 10px 30px -10px oklch(0.19 0.012 75 / 0.4);
+    pointer-events: none;
+  }
+  .scan-box > span {
+    position: absolute;
+    left: -1.5px;
+    top: calc(100% + 6px);
+    white-space: nowrap;
+    border-radius: 9999px;
+    background: oklch(0.19 0.012 75 / 0.88);
+    color: oklch(0.99 0.01 98);
+    padding: 0.2rem 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .scan-box::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 0.3rem;
+    background: linear-gradient(180deg, oklch(1 0 0 / 0.0), oklch(1 0 0 / 0.22));
+    animation: scan-sweep 2.8s var(--ease-out) infinite;
+  }
+
+  /* Glass pill (Arc secondary). */
+  .glass {
+    background: color-mix(in oklab, var(--ink-2) 72%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+
+  /* Infinite marquee of plain capability words (no logos, no fake proof). */
+  .marquee { display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .marquee > ul { display: flex; flex-shrink: 0; gap: 0.75rem; padding-right: 0.75rem; animation: marquee 38s linear infinite; }
+  .marquee:hover > ul { animation-play-state: paused; }
+
+  /* Gradient ring used on the featured voice card and step numbers. */
+  .bloom-ring {
+    background:
+      linear-gradient(var(--ink-2), var(--ink-2)) padding-box,
+      conic-gradient(from 200deg, var(--sun), var(--coral), var(--violet), var(--mint), var(--sun)) border-box;
+    border: 1.5px solid transparent;
+  }
+}
+
+@layer utilities {
+  /* Scroll-linked transforms are written as CSS variables by ScrollScene. */
+  .scroll-y { transform: translate3d(0, calc(var(--sp, 0) * var(--sy, 0px)), 0); }
+  .js .reveal.reveal-blur:not([data-revealed="true"]) {
+    filter: blur(8px);
+    transform: translate3d(0, 1.5rem, 0);
+  }
+  .reveal.reveal-blur { transition-property: opacity, transform, filter; }
+  .word-in > span {
+    display: inline-block;
+    animation: word-in 900ms var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 120ms);
+  }
+}
+
+@keyframes drift-a { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(10vw, 8vh, 0) scale(1.12); } }
+@keyframes drift-b { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(-8vw, 12vh, 0) scale(0.9); } }
+@keyframes drift-c { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(6vw, -10vh, 0) scale(1.15); } }
+@keyframes scan-sweep { 0% { transform: translateY(-30%); opacity: 0; } 40% { opacity: 1; } 100% { transform: translateY(30%); opacity: 0; } }
+@keyframes marquee { to { transform: translate3d(-100%, 0, 0); } }
+@keyframes word-in { from { opacity: 0; transform: translate3d(0, 0.5em, 0); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora > i, .marquee > ul, .scan-box::before { animation: none !important; }
+  .word-in > span { animation: none !important; opacity: 1; }
+  .js .reveal.reveal-blur { filter: none !important; }
+}
+
+/* ───────── Polish layer (ChronoTask-style craft) ─────────
+   Sections sit in framed "canvas" panels with a fine dot texture instead of
+   floating on the blurred background. Icons are glossy 3D tiles. Empty
+   corners are filled with small, real product fragments, not decoration. */
+@layer components {
+  .canvas-panel {
+    position: relative;
+    isolation: isolate;
+    border-radius: 2rem;
+    background-color: color-mix(in oklab, var(--ink-2) 86%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 70%, var(--rule));
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    overflow: hidden;
+  }
+  @media (min-width: 768px) { .canvas-panel { border-radius: 2.5rem; } }
+  .dot-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(color-mix(in oklab, var(--paper) 13%, transparent) 1px, transparent 1.2px);
+    background-size: 14px 14px;
+    mask-image: radial-gradient(85% 80% at 50% 45%, #000 35%, transparent 100%);
+  }
+
+  /* Glossy 3D app tile. */
+  .app-tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 28%;
+    background: linear-gradient(160deg, oklch(0.3 0.01 270), oklch(0.19 0.008 270));
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.16),
+      inset 0 -3px 6px oklch(0 0 0 / 0.3),
+      0 1px 2px oklch(0 0 0 / 0.4),
+      0 14px 28px -12px oklch(0 0 0 / 0.7);
+    border: 1px solid oklch(0.34 0.01 270);
+  }
+  .app-tile-dark {
+    background: linear-gradient(160deg, oklch(0.3 0.012 75), oklch(0.17 0.01 75));
+    border-color: oklch(0.32 0.012 75);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.14),
+      0 1px 2px oklch(0 0 0 / 0.3),
+      0 16px 30px -12px oklch(0.2 0.03 70 / 0.6);
+    color: oklch(0.98 0.01 98);
+  }
+
+  /* Pinned sticky note. */
+  .sticky-note {
+    position: relative;
+    background: linear-gradient(170deg, oklch(0.93 0.13 98), oklch(0.89 0.15 95));
+    color: oklch(0.24 0.03 80);
+    border-radius: 0.25rem 0.25rem 0.25rem 1.25rem;
+    box-shadow: 0 2px 4px oklch(0.4 0.06 80 / 0.15), 0 22px 40px -18px oklch(0.4 0.08 70 / 0.55);
+  }
+  .sticky-note::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, oklch(0.78 0.16 25), oklch(0.5 0.19 27));
+    box-shadow: 0 3px 5px oklch(0.3 0.08 30 / 0.4);
+  }
+
+  /* Two-tone headline: second line recedes (ChronoTask headline treatment). */
+  .head-muted { display: block; color: color-mix(in oklab, var(--paper) 48%, var(--ink-2)); }
+  .theme-dark .head-muted { color: color-mix(in oklab, var(--paper) 60%, var(--ink)); }
+
+  /* Little "app window" chip for floating fragments. */
+  .frag {
+    border-radius: 1.125rem;
+    background: color-mix(in oklab, var(--ink-2) 94%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 60%, var(--rule));
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* ───────── Dark pass (Outcrowd-inspired motion system) ─────────
+   Spotlight hero, floating pill nav, a tilted product screen that
+   straightens with scroll, words that light up as you read them, and
+   tilted cards that settle into place. All transform/opacity driven by
+   --p from ScrollScene, or by .reveal, so it stays on the compositor. */
+@layer components {
+  /* Cone of light from the top of the hero. */
+  .spotlight {
+    position: absolute;
+    inset: -10% 0 auto;
+    height: 120%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      conic-gradient(from 180deg at 50% -8%, transparent 158deg, oklch(1 0 0 / 0.14) 172deg, oklch(1 0 0 / 0.22) 180deg, oklch(1 0 0 / 0.14) 188deg, transparent 202deg);
+    mask-image: radial-gradient(70% 65% at 50% 0%, #000 30%, transparent 75%);
+    filter: blur(14px);
+    animation: beam 9s ease-in-out infinite;
+    transform-origin: 50% 0;
+  }
+  .grid-fade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, oklch(1 0 0 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(1 0 0 / 0.05) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(60% 55% at 50% 30%, #000, transparent 80%);
+  }
+
+  /* Floating pill navbar. */
+  .nav-pill {
+    border: 1px solid oklch(1 0 0 / 0.08);
+    background: oklch(0.16 0.006 270 / 0.9);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 1px 0 oklch(1 0 0 / 0.06) inset, 0 20px 50px -20px oklch(0 0 0 / 0.8);
+  }
+
+  /* Gradient headline fill (white to soft grey). */
+  .text-sheen {
+    background: linear-gradient(180deg, var(--paper) 30%, color-mix(in oklab, var(--paper) 55%, var(--ink)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Tilted product screen that flattens as you scroll (--p 0→1). */
+  .tilt-stage { perspective: 1600px; }
+  .tilt-screen {
+    transform-origin: 50% 0;
+    transform: rotateX(calc((1 - var(--p, 1)) * 24deg)) scale(calc(0.9 + var(--p, 1) * 0.1));
+    will-change: transform;
+  }
+
+  /* Scroll-lit text: each word goes from dim to full as --p passes it. */
+  .scroll-words > span {
+    color: color-mix(in oklab, var(--paper) calc(18% + var(--lit, 0) * 82%), transparent);
+    transition: color 120ms linear;
+  }
+
+  /* Tilted card that settles flat when revealed. */
+  .js .reveal.reveal-tilt:not([data-revealed="true"]) {
+    transform: translate3d(0, 4rem, 0) rotate(var(--tilt, -4deg));
+  }
+  .reveal.reveal-tilt { transition-duration: 1000ms; }
+
+  /* Headline mask reveal: lines slide up from behind a clip. */
+  .line-mask { display: block; overflow: hidden; padding-bottom: 0.08em; }
+  .line-mask > span {
+    display: block;
+    animation: line-up 1100ms var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 110ms + 100ms);
+  }
+
+  /* Glowing accent ring on stat/feature cards. */
+  .glow-card {
+    position: relative;
+    isolation: isolate;
+    border-radius: 2rem;
+    background: linear-gradient(180deg, oklch(0.19 0.006 270), oklch(0.14 0.005 270));
+    border: 1px solid oklch(1 0 0 / 0.08);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+  .glow-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 0%), oklch(1 0 0 / 0.07), transparent 60%);
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .glow-card:hover::after { opacity: 1; }
+}
+
+@keyframes beam { 0%,100% { transform: rotate(-2deg); opacity: 0.85; } 50% { transform: rotate(2deg); opacity: 1; } }
+@keyframes line-up { from { transform: translate3d(0, 105%, 0); } to { transform: none; } }
+
+/* ── Fluid Number & Inflatable 3D Balloon Animations (Outcrowd style) ── */
+@keyframes fluid-wobble {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  25% {
+    transform: rotate(-1.5deg) scale(1.02, 0.98);
+  }
+  50% {
+    transform: rotate(0.8deg) scale(0.99, 1.02);
+  }
+  75% {
+    transform: rotate(1.2deg) scale(1.01, 0.99);
+  }
+}
+
+@keyframes fluid-jelly {
+  0% { transform: scale3d(1, 1, 1); }
+  30% { transform: scale3d(1.15, 0.82, 1); }
+  42% { transform: scale3d(0.88, 1.14, 1); }
+  60% { transform: scale3d(1.06, 0.95, 1); }
+  78% { transform: scale3d(0.98, 1.02, 1); }
+  100% { transform: scale3d(1, 1, 1); }
+}
+
+@keyframes fluid-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.fluid-balloon-root {
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+.fluid-balloon-root.is-active {
+  animation: fluid-float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight, .line-mask > span { animation: none !important; }
+  .tilt-screen { transform: none !important; }
+  .scroll-words > span { color: var(--paper) !important; }
+  .js .reveal.reveal-tilt { transform: none !important; }
+  .fluid-balloon-root, .fluid-balloon-root.is-active, .fluid-number-text {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Liquid glass: one continuous silhouette, inset optics, no external lobes. */
+@property --glass-angle { syntax: "<angle>"; inherits: false; initial-value: -75deg; }
+.walkthrough-dock { --guide-safe-top: env(safe-area-inset-top, 0px); --guide-safe-right: env(safe-area-inset-right, 0px); --guide-safe-bottom: env(safe-area-inset-bottom, 0px); --guide-safe-left: env(safe-area-inset-left, 0px); position: fixed; z-index: 45; inset: 88px 16px 16px; pointer-events: none; transition: opacity 260ms var(--ease-out), visibility 260ms; }
+.walkthrough-dock[data-visible="false"] { opacity: 0; visibility: hidden; }
+.walkthrough-dock[data-visible="true"] { opacity: 1; visibility: visible; }
+.walkthrough-panel { position: absolute; top: 0; left: 0; width: min(21rem, 100%); max-height: var(--guide-available-height, 80dvh); pointer-events: auto; font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif; }
+.walkthrough-panel[data-state="closed"] { width: max-content; max-width: 100%; border-radius: 999px; }
+.liquid-glass-surface {
+  isolation: isolate; border: 1px solid color-mix(in oklch, var(--paper) 32%, transparent); border-radius: 28px;
+  /* Let the actual demo show through instead of flattening it into a dark card. */
+  background: linear-gradient(135deg, color-mix(in oklch, var(--paper) 8%, transparent), transparent 24% 76%, color-mix(in oklch, var(--paper) 4%, transparent)), color-mix(in oklch, var(--ink) 50%, transparent);
+  color: var(--paper); -webkit-backdrop-filter: blur(12px) saturate(150%); backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: inset 0 1px 1px color-mix(in oklch, var(--paper) 70%, transparent), inset 1px 0 1px color-mix(in oklch, var(--paper) 26%, transparent), inset 0 -1px 1px color-mix(in oklch, var(--paper) 28%, transparent), inset 0 0 3px 1px color-mix(in oklch, var(--paper) 8%, transparent), 0 16px 40px -16px color-mix(in oklch, var(--ink) 60%, transparent);
+}
+.liquid-glass-surface::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background: radial-gradient(ellipse at 0% 0%, color-mix(in oklch, var(--paper) 16%, transparent), transparent 28%), radial-gradient(ellipse at 100% 100%, color-mix(in oklch, var(--paper) 8%, transparent), transparent 24%);
+}
+.liquid-glass-surface::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--glass-angle), var(--paper), transparent 12% 40%, color-mix(in oklch, var(--paper) 65%, transparent) 50%, transparent 65% 90%, var(--paper)); opacity: 0.7;
+  -webkit-mask: linear-gradient(var(--paper) 0 0) content-box, linear-gradient(var(--paper) 0 0); mask: linear-gradient(var(--paper) 0 0) content-box, linear-gradient(var(--paper) 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.guide-expanded { position: relative; isolation: isolate; border-radius: inherit; display: flex; flex-direction: column; min-height: 0; max-height: calc(var(--guide-available-height, 80dvh) - 2px); padding: 10px 16px 14px; }
+/* A quiet reading scrim protects text while leaving the perimeter clear. */
+.guide-expanded::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--ink) 26%, transparent) 5% 95%, transparent); }
+.guide-header { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+.guide-step-label { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.025em; color: var(--paper); }
+.guide-icon-button, .guide-drag-handle { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 999px; color: var(--paper); }
+.guide-drag-handle { touch-action: none; cursor: grab; user-select: none; }
+.guide-drag-handle:active { cursor: grabbing; }
+.guide-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 2px 4px; scrollbar-width: thin; }
+.guide-title { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.3; color: var(--paper); text-wrap: balance; }
+.guide-instruction { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--paper); }
+.guide-tip { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--paper); }
+.guide-footer { flex: 0 0 auto; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 4px; margin-top: 12px; padding-top: 4px; border-top: 1px solid color-mix(in oklch, var(--paper) 14%, transparent); }
+.guide-progress { grid-column: 1 / -1; grid-row: 1; display: flex; flex-wrap: wrap; justify-content: center; min-width: 0; }
+.guide-progress-step { display: grid; place-items: center; border-radius: 999px; }
+.guide-progress-step span { width: 6px; height: 6px; border-radius: 999px; background: var(--paper); transition: width 320ms var(--ease-out); }
+.guide-progress-step[aria-current="step"] span { width: 20px; }
+.guide-footer > .guide-icon-button { grid-row: 2; }
+.guide-footer > .glass-button-wrap { grid-column: 3; grid-row: 2; }
+.guide-launcher { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 4px 18px; color: var(--paper); font-size: 13px; font-weight: 600; border-radius: inherit; }
+.guide-minimized-title { width: 100%; text-align: left; font-size: 14px; font-weight: 600; color: var(--paper); border-radius: 12px; padding: 4px 8px; }
+.guide-control { min-height: 44px; min-width: 44px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 280ms var(--ease-out), border-color 280ms var(--ease-out), transform 280ms var(--ease-out); }
+.guide-control.guide-drag-handle { touch-action: none; }
+.guide-control:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+.guide-control:disabled { opacity: 0.45; cursor: not-allowed; }
+.glass-button-wrap { display: inline-flex; position: relative; max-width: 100%; border-radius: 999px; }
+.glass-button {
+  position: relative; isolation: isolate; display: inline-flex; justify-content: center; align-items: center; border-radius: inherit; border: 1px solid color-mix(in oklch, var(--paper) 25%, transparent);
+  background: linear-gradient(-75deg, color-mix(in oklch, var(--paper) 5%, transparent), color-mix(in oklch, var(--paper) 13%, transparent), color-mix(in oklch, var(--paper) 5%, transparent)), color-mix(in oklch, var(--ink-2) 18%, transparent);
+  color: var(--paper); font-weight: 600; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px color-mix(in oklch, var(--paper) 30%, transparent), inset 0 -1px 1px color-mix(in oklch, var(--paper) 10%, transparent), 0 4px 8px -4px var(--ink);
+}
+.glass-button-text { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: inherit; }
+.glass-button::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(var(--glass-angle), transparent 25%, color-mix(in oklch, var(--paper) 8%, transparent) 45%, transparent 65%); transition: --glass-angle 350ms var(--ease-out); }
+.glass-button:active:not(:disabled) { transform: scale(0.98); background-color: var(--ink); --glass-angle: -30deg; }
+@media (hover: hover) {
+  .guide-control:hover:not(:disabled) { background-color: var(--ink); color: var(--paper); }
+  .glass-button:hover:not(:disabled) { border-color: color-mix(in oklch, var(--paper) 50%, transparent); --glass-angle: -125deg; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .liquid-glass-surface { background: var(--ink-2); } }
+@media (prefers-reduced-transparency: reduce) { .liquid-glass-surface, .glass-button { background: var(--ink-2); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { .glass-button { transform: none !important; } .walkthrough-dock, .guide-control, .guide-progress-step span { transition: none; } }
+/* Mobile layout safeguards shared by every route; content reflows, not hides. */
+main, .container-site, main .grid > * { min-width: 0; }
+main p, main dd, main td, footer a { overflow-wrap: anywhere; }
+img, video { max-width: 100%; }
+button, a { touch-action: manipulation; }
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; min-height: 44px; }
+
+  .tilt-screen { transform: none; will-change: auto; }
+  .aurora > i { animation: none; will-change: auto; filter: blur(70px); }
+  .nav-pill { gap: 8px; }
+}
+@media (pointer: coarse) {
+  button:not(:disabled), [role="tab"], summary { min-height: 44px; }
+  header a, footer a { min-height: 44px; display: inline-flex; align-items: center; }
+}
+

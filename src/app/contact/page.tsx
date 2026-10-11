@@ -1,130 +1,182 @@
-import type { Metadata } from "next";
-import { SceneBackdrop, SceneBreak } from "@/components/scene-backdrop";
-import { ArrowUpRight, Body, Head, Section } from "@/components/ui";
-import { contact, products, productCta, whatsappUrl } from "@/lib/site";
+import { ArrowUpRight, CalendarCheck, Mail, MessageCircle, UserRound } from "lucide-react";
+import { Breadcrumbs, SectionHeader } from "@/components/ui";
+import { JsonLd, breadcrumbLd } from "@/components/json-ld";
+import { ACCENT_TEXT, PRODUCT_ICON } from "@/components/product-blocks";
+import { AppTile, StickyNote } from "@/components/polish";
+import { pageMeta } from "@/lib/meta";
+import { contact, getProduct, productOrder, whatsappUrl } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Contact",
+export const metadata = pageMeta({
+  title: "Contact valueble.ai | WhatsApp, Email or LinkedIn",
   description:
-    "Reach Hamza Khalil Bhatti on WhatsApp, LinkedIn or email — or book a demo of OrderRise.",
-};
+    "Reach Hamza Khalil Bhatti on WhatsApp, email or LinkedIn, or book an OrderRise demo. Describe the job and get an honest answer on whether it is a fit.",
+  path: "/contact",
+});
+
+const crumbs = [
+  { name: "Home", href: "/" },
+  { name: "Contact", href: "/contact" },
+];
 
 /**
- * Contact.
- *
  * Every channel is listed with what it is actually for. The OrderRise booking
- * link is deliberately kept on its own row rather than promoted to the top: it
- * is a restaurant-ordering demo, and sending an agency lead there loses them.
+ * link stays on its own row: it is a restaurant-ordering demo, and sending an
+ * agency lead there loses them.
  */
 const channels = [
   {
     label: "WhatsApp",
+    // TODO (owner): confirm "same day" before it reads as a promise.
     detail: "Fastest. Usually answered same day.",
     href: whatsappUrl,
-    value: "+92 300 179 4940",
+    value: contact.whatsappDisplay,
+    Icon: MessageCircle,
+    primary: true,
   },
   {
     label: "Email",
     detail: "For anything that needs attachments or detail.",
     href: `mailto:${contact.email}`,
     value: contact.email,
+    Icon: Mail,
   },
   {
     label: "LinkedIn",
     detail: "If you would rather see who you are talking to first.",
     href: contact.linkedin,
     value: "hamza-khalil",
+    Icon: UserRound,
   },
   {
     label: "Book an OrderRise demo",
     detail: "Restaurants only — a live walkthrough of the ordering agent.",
     href: contact.bookingOrderRise,
     value: "cal.com",
+    Icon: CalendarCheck,
   },
 ];
 
 export default function ContactPage() {
   return (
     <>
-      <section className="relative isolate overflow-hidden pb-24 pt-40 md:pb-36 md:pt-56">
-        <SceneBackdrop density={4} seed={6190} />
-        <div className="rail">
-          <p className="eyebrow reveal rail-label-hero">Contact</p>
-          <div className="measure">
-            <h1 className="reveal text-hero max-w-[14ch] text-balance text-paper">
+      <JsonLd data={breadcrumbLd(crumbs)} />
+
+      <section id="overview" className="relative isolate pb-12 pt-10 md:pb-16 md:pt-14" data-od-id="contact-hero">
+        <div className="atmosphere" />
+        <div className="container-site">
+          <Breadcrumbs items={crumbs} />
+          <div className="max-w-3xl">
+            <h1 className="text-display md:text-[clamp(2.5rem,5vw,4rem)]">
+              <span className="eyebrow mb-4 flex font-sans">Contact valueble.ai</span>
               Describe the job. I will tell you if I can take it
             </h1>
-            <p className="reveal mt-8 max-w-[52ch] text-sub text-mute">
-              No form, no funnel, no discovery sequence. Pick whichever of these you already
-              have open.
+            <p className="mt-6 text-sub text-mute">
+              No form, no funnel, no discovery sequence. Pick whichever of these you already have open.
             </p>
           </div>
         </div>
       </section>
 
-      <Section label="Channels">
-        <ul>
-          {channels.map((channel) => (
-            <li key={channel.label} className="hairline reveal">
-              <a
-                href={channel.href}
-                target="_blank"
-                rel="noreferrer"
-                className="group flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 py-7 transition-opacity duration-300 hover:opacity-65"
-              >
-                <span className="flex items-center gap-3 text-sub text-paper">
-                  {channel.label}
-                  <ArrowUpRight className="size-3 opacity-40 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
-                </span>
-                <span className="text-fine text-faint">{channel.value}</span>
-                <span className="w-full text-mute">{channel.detail}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <SceneBreak seed={6745} />
-
-      <Section label="What helps">
-        <Head>Three things make the first reply useful</Head>
-        <div className="mt-8 space-y-6">
-          <Body>
-            <strong>The process, not the product.</strong>{" "}
-            Describe the task somebody on your team does repeatedly — what triggers it, what
-            they do, and where the output goes.
-          </Body>
-          <Body>
-            <strong>The volume.</strong> Ten a week and a
-            thousand a week are different problems with different answers.
-          </Body>
-          <Body>
-            <strong>What you already use.</strong> The
-            tools it has to talk to matter more than any preference about how it is built.
-          </Body>
+      <section id="channels" aria-labelledby="channels-title" className="pb-20 md:pb-28">
+        <div className="container-site">
+          <h2 id="channels-title" className="sr-only">
+            Channels
+          </h2>
+          <ul className="grid gap-4 md:grid-cols-2">
+            {channels.map(({ label, detail, href, value, Icon, primary }) => {
+              const newTab = /^https?:/.test(href);
+              return (
+                <li key={label} className="reveal">
+                  <a
+                    href={href}
+                    {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className={
+                      "card card-link group flex h-full items-start gap-4 p-6 " +
+                      (primary ? "bloom-ring shadow-[var(--shadow-lift)]" : "")
+                    }
+                    data-od-id={`contact-channel-${label.split(" ")[0].toLowerCase()}`}
+                  >
+                    <AppTile size="md" dark={primary} className={primary ? "" : "text-paper"}>
+                      <Icon className="size-5" />
+                    </AppTile>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2 font-display text-title font-semibold text-paper">
+                        {label}
+                        <ArrowUpRight aria-hidden className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                      </span>
+                      <span className="mt-1 block break-all text-sm text-faint">{value}</span>
+                      <span className="mt-3 block text-mute">{detail}</span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      </Section>
+      </section>
 
-      <Section label="Straight to a product">
-        <ul>
-          {products.map((product) => (
-            <li key={product.slug} className="hairline reveal">
-              <a
-                href={productCta[product.slug].href}
-                target="_blank"
-                rel="noreferrer"
-                className="group flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 py-6 transition-opacity duration-300 hover:opacity-65"
-              >
-                <span className="text-paper">{product.name}</span>
-                <span className="flex items-center gap-2 text-mute">
-                  {productCta[product.slug].label}
-                  <ArrowUpRight className="size-3 opacity-50 transition-transform duration-300 ease-[var(--ease-out)] group-hover:translate-x-1 group-hover:-translate-y-1" />
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <section id="what-helps" className="on-cloud section" aria-labelledby="helps-title">
+        <div className="container-site">
+         <div className="canvas-panel dot-grid grid gap-10 px-5 py-12 md:px-12 md:py-16 lg:grid-cols-[1fr_1.4fr]">
+          <div className="reveal">
+            <p className="eyebrow mb-4"><span aria-hidden className="h-px w-6 bg-accent" />What helps</p>
+            <h2 id="helps-title" className="text-head">Three things<span className="head-muted"> make the first reply useful</span></h2>
+            <StickyNote className="mt-10 hidden w-60 rotate-[-3deg] lg:block">
+              Bring the process, not the spec.
+            </StickyNote>
+          </div>
+          <ol className="reveal grid gap-4">
+            {[
+              ["The process, not the product.", "Describe the task somebody on your team does repeatedly — what triggers it, what they do, and where the output goes."],
+              ["The volume.", "Ten a week and a thousand a week are different problems with different answers."],
+              ["What you already use.", "The tools it has to talk to matter more than any preference about how it is built."],
+            ].map(([t, b], i) => (
+              <li key={t} className="frag flex items-start gap-4 p-5">
+                <AppTile size="sm"><span className="font-mono text-xs font-medium text-paper">0{i + 1}</span></AppTile>
+                <p>
+                  <strong>{t}</strong> {b}
+                </p>
+              </li>
+            ))}
+          </ol>
+         </div>
+        </div>
+      </section>
+
+      <section id="straight-to-a-product" className="section" aria-labelledby="direct-title">
+        <div className="container-site">
+          <SectionHeader eyebrow="Straight to a product" id="direct-title" title="Already know" muted="which one?" />
+          <ul className="mt-10 grid gap-3 md:grid-cols-2">
+            {productOrder.map((slug) => {
+              const p = getProduct(slug)!;
+              const newTab = /^https?:/.test(p.cta.href);
+              return (
+                <li key={slug} className="reveal">
+                  <a
+                    href={p.cta.href}
+                    {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="frag group flex min-h-16 flex-wrap items-center gap-x-4 gap-y-1 p-4 transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-1"
+                  >
+                    <AppTile size="sm" className={ACCENT_TEXT[p.accent]}>
+                      <ProductGlyph slug={slug} />
+                    </AppTile>
+                    <span className="mr-auto font-medium text-paper">{p.name}</span>
+                    <span className="inline-flex items-center gap-2 text-sm text-mute underline-offset-4 group-hover:text-paper group-hover:underline">
+                      {p.cta.label}
+                      <ArrowUpRight aria-hidden className="size-4" />
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
     </>
   );
+}
+
+function ProductGlyph({ slug }: { slug: keyof typeof PRODUCT_ICON }) {
+  const Icon = PRODUCT_ICON[slug];
+  return <Icon className="size-[1.125rem]" />;
 }

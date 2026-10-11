@@ -1,146 +1,354 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { ChevronDown, Menu, MessageCircle, PhoneCall, Search, Workflow, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/cn";
-import { contact, nav, products, whatsappUrl } from "@/lib/site";
+import { contact, getProduct, nav, productOrder, type ProductSlug } from "@/lib/site";
+
+export const PRODUCT_IMAGES: Record<ProductSlug, string> = {
+  "voice-agent": "/images/icons/voice-agent.jpg",
+  "lead-extractor": "/images/icons/lead-extractor.jpg",
+  orderrise: "/images/icons/orderrise.jpg",
+  "ai-agents": "/images/icons/ai-agents.jpg",
+};
+
+const ICONS: Record<ProductSlug, typeof PhoneCall> = {
+  "voice-agent": PhoneCall,
+  "lead-extractor": Search,
+  orderrise: MessageCircle,
+  "ai-agents": Workflow,
+};
+const TINT: Record<string, string> = {
+  voice: "bg-voice/10 text-voice",
+  scan: "bg-scan/10 text-scan",
+  warm: "bg-warm/10 text-warm",
+  mind: "bg-mind/10 text-mind",
+};
+
+const menuProducts = productOrder.map((slug) => getProduct(slug)!);
 
 /**
- * Header.
+ * Sticky translucent navbar.
  *
- * A menu button at every width, including desktop. A horizontal nav bar would
- * put six competing links across the top of a page whose entire argument is
- * restraint — the reference build makes the same call, and it is the right one
- * for a site with three products and one destination that matters.
+ * Fix-pass changes:
+ *  - Menus are keyed to the pathname they were opened on, so they close on
+ *    every navigation (including back/forward) without a setState-in-effect.
+ *  - Products opens on hover (with a grace delay) and on click/Enter/↓; Esc
+ *    closes and returns focus to the trigger; focus leaving the menu closes it.
+ *  - The mobile sheet is a fixed overlay instead of an in-flow block, so it
+ *    never pushes the page or fights the sticky header for height.
  */
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [mobileFor, setMobileFor] = useState<string | null>(null);
+  const [productsFor, setProductsFor] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const open = mobileFor === pathname;
+  const productsOpen = productsFor === pathname;
 
-  // Lock the page behind the overlay and restore focus affordances on escape.
+  const productsRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const hoverTimer = useRef<number | undefined>(undefined);
+
+  const setProducts = useCallback((v: boolean) => setProductsFor(v ? pathname : null), [pathname]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Lock page scroll behind the mobile sheet.
   useEffect(() => {
     if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const prev = document.documentElement.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const background = [document.querySelector("main"), document.querySelector("footer")]
+      .filter((element): element is HTMLElement => element instanceof HTMLElement)
+      .map((element) => ({ element, inert: element.inert }));
+    background.forEach(({ element }) => { element.inert = true; });
+    document.documentElement.style.overflow = "hidden";
+    const focusable = () => Array.from(mobileRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    const focusFrame = requestAnimationFrame(() => focusable()[0]?.focus());
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") { e.preventDefault(); setMobileFor(null); }
+      if (e.key === "Tab") {
+        const items = focusable();
+        const first = items[0];
+        const last = items[items.length - 1];
+        const outside = !mobileRef.current?.contains(document.activeElement);
+        if (outside || (e.shiftKey && document.activeElement === first) || (!e.shiftKey && document.activeElement === last)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first)?.focus();
+        }
+      }
     };
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const onResize = () => { if (desktop.matches) setMobileFor(null); };
+    desktop.addEventListener("change", onResize);
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = previous;
+      cancelAnimationFrame(focusFrame);
+      document.documentElement.style.overflow = prev;
+      background.forEach(({ element, inert }) => { element.inert = inert; });
+      previousFocus?.focus({ preventScroll: true });
+      desktop.removeEventListener("change", onResize);
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!productsOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!productsRef.current?.contains(e.target as Node)) setProductsFor(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setProductsFor(null);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [productsOpen]);
+
+  const hoverOpen = (v: boolean) => {
+    window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => setProducts(v), v ? 60 : 160);
+  };
+
+  const onTriggerKey = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setProducts(true);
+      requestAnimationFrame(() => productsRef.current?.querySelector<HTMLAnchorElement>("#products-menu a")?.focus());
+    }
+  };
+
+  const onMenuKey = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const items = Array.from(productsRef.current?.querySelectorAll<HTMLAnchorElement>("#products-menu a") ?? []);
+    const i = items.indexOf(document.activeElement as HTMLAnchorElement);
+    const next = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+    items[next]?.focus();
+  };
+
+  const isActive = (href: string) => !href.includes("#") && pathname === href;
+  const productActive = menuProducts.some((p) => p.path === pathname);
+
   return (
-    <>
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
-        <div className="pointer-events-auto mx-auto flex max-w-[96rem] items-center justify-between px-6 py-6 md:px-[3.25rem] md:py-8">
-          <Logo />
-
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="group relative z-50 grid h-6 w-9 place-items-center"
-          >
-            <span
-              className={cn(
-                "absolute block h-px w-9 bg-paper transition-transform duration-300 ease-[var(--ease-out)]",
-                open ? "rotate-45" : "-translate-y-1.5",
-              )}
-            />
-            <span
-              className={cn(
-                "absolute block h-px w-9 bg-paper transition-transform duration-300 ease-[var(--ease-out)]",
-                open ? "-rotate-45" : "translate-y-1.5",
-              )}
-            />
-          </button>
-        </div>
-      </header>
-
-      {/* Overlay menu */}
+    <header className="sticky top-0 z-50 px-3 pt-3 md:pt-4">
+      {/*
+        Floating pill bar. The blur lives on the inner pill, never on <header>:
+        backdrop-filter on an ancestor becomes the containing block for the
+        fixed mobile sheet (the old "mobile menu does nothing" bug).
+      */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-ink transition-opacity duration-500 ease-[var(--ease-out)]",
-          open ? "opacity-100" : "pointer-events-none opacity-0",
+          "nav-pill mx-auto flex h-14 max-w-[56rem] items-center justify-between gap-4 rounded-2xl pl-4 pr-2 transition-[max-width,box-shadow,background-color] duration-500 ease-[var(--ease-spring)] md:h-16 md:pl-5",
+          scrolled && "max-w-[50rem]",
+          open && "rounded-b-none",
         )}
       >
-        {/*
-          Closing on link click rather than on a pathname change. Reacting to
-          the route would mean setting state inside an effect on every
-          navigation, and it also fails for same-page anchors, which do not
-          change the pathname at all.
-        */}
-        <nav
-          aria-label="Main"
-          onClick={(event) => {
-            if ((event.target as HTMLElement).closest("a")) setOpen(false);
-          }}
-          className="mx-auto flex h-full max-w-[96rem] flex-col justify-center px-6 md:px-[3.25rem]"
-        >
-          <ul className="space-y-1">
-            {products.map((product, i) => (
-              <li key={product.slug}>
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="group flex items-baseline gap-5 py-2 text-[clamp(1.75rem,4.5vw,3.25rem)] leading-[1.2] text-paper transition-opacity duration-200 hover:opacity-60"
-                  style={{
-                    transitionDelay: open ? `${120 + i * 55}ms` : "0ms",
-                    opacity: open ? undefined : 0,
-                    transform: open ? undefined : "translateY(0.75rem)",
-                    transitionProperty: "opacity, transform",
-                    transitionDuration: "500ms",
-                  }}
-                >
-                  <span className="w-8 shrink-0 text-fine text-faint">{product.index}</span>
-                  {product.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <Logo />
 
-          <ul className="mt-12 flex flex-wrap gap-x-8 gap-y-3">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-mute transition-colors duration-200 hover:text-paper"
+        <nav aria-label="Main" className="hidden lg:block">
+          <ul className="flex items-center gap-1">
+            <li>
+              <div
+                ref={productsRef}
+                className="relative"
+                onPointerEnter={(e) => e.pointerType === "mouse" && hoverOpen(true)}
+                onPointerLeave={(e) => e.pointerType === "mouse" && hoverOpen(false)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setProducts(false);
+                }}
+              >
+                <button
+                  ref={triggerRef}
+                  type="button"
+                  aria-expanded={productsOpen}
+                  aria-controls="products-menu"
+                  aria-haspopup="true"
+                  onClick={() => setProducts(!productsOpen)}
+                  onKeyDown={onTriggerKey}
+                  className={cn(
+                    "inline-flex min-h-10 items-center gap-1 rounded-xl px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-expanded:bg-ink-3 aria-expanded:text-paper",
+                    productActive && "text-paper",
+                  )}
                 >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+                  Products
+                  <ChevronDown aria-hidden className={cn("size-4 transition-transform duration-200", productsOpen && "rotate-180")} />
+                </button>
+                {productsOpen && (
+                  // pt-2 is an invisible hover bridge between trigger and panel.
+                  <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 pt-4" onKeyDown={onMenuKey}>
+                    <div id="products-menu" className="menu-in w-[26rem] rounded-2xl border border-rule bg-ink-2 p-2 shadow-[var(--shadow-lift)]">
+                      <ul>
+                        {menuProducts.map((p) => {
+                          const Icon = ICONS[p.slug];
+                          return (
+                            <li key={p.slug}>
+                              <Link
+                                href={p.path}
+                                onClick={() => setProducts(false)}
+                                aria-current={pathname === p.path ? "page" : undefined}
+                                className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-ink-3 focus-visible:bg-ink-3 aria-[current=page]:bg-ink-3"
+                              >
+                                <span aria-hidden className="relative size-10 shrink-0 overflow-hidden rounded-xl border border-rule/70 bg-ink shadow-sm">
+                                  <Image
+                                    src={PRODUCT_IMAGES[p.slug]}
+                                    alt=""
+                                    width={40}
+                                    height={40}
+                                    className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  />
+                                </span>
+                                <span className="min-w-0">
+                                  <span className="flex items-center gap-2 text-sm font-medium text-paper">
+                                    {p.name}
+                                    {p.slug === "voice-agent" && (
+                                      <span className="rounded-full bg-voice/10 px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider text-voice">
+                                        New
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className="mt-0.5 block text-[0.8125rem] leading-snug text-mute">{p.plain.who}</span>
+                                  <span className="mt-1 block text-xs font-medium text-paper">{p.price}</span>
+                                </span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <Link
+                        href="/pricing"
+                        onClick={() => setProducts(false)}
+                        className="mt-1 flex min-h-11 items-center justify-between rounded-xl border-t border-rule px-3 pt-1 text-sm text-mute hover:text-paper"
+                      >
+                        Compare all prices <span aria-hidden>→</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </li>
+            {nav
+              .filter((n) => n.label !== "Products")
+              .map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    className="relative inline-flex min-h-10 items-center rounded-xl px-3.5 text-sm text-mute transition-colors hover:bg-ink-3 hover:text-paper aria-[current=page]:font-medium aria-[current=page]:text-paper"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
           </ul>
-
-          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 text-fine">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-mute transition-colors duration-200 hover:text-paper"
-            >
-              WhatsApp
-            </a>
-            <a
-              href={contact.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="text-mute transition-colors duration-200 hover:text-paper"
-            >
-              LinkedIn
-            </a>
-            <a
-              href={`mailto:${contact.email}`}
-              className="text-mute transition-colors duration-200 hover:text-paper"
-            >
-              {contact.email}
-            </a>
-          </div>
         </nav>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href={contact.bookingGeneral}
+            className="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-accent px-3 text-sm font-semibold text-on-accent shadow-[0_8px_24px_-10px_var(--accent)] transition-[background-color,transform] hover:-translate-y-px hover:bg-accent-strong sm:px-4"
+          >
+            Book a call
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMobileFor(open ? null : pathname)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="grid size-11 shrink-0 place-items-center rounded-xl border border-rule-strong bg-ink-2 text-paper transition-colors hover:bg-ink-3 lg:hidden"
+          >
+            {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
+          </button>
+        </div>
       </div>
-    </>
+
+      {/* Mobile sheet: fixed below the bar, scrolls on its own. */}
+      {open && (
+        <div ref={mobileRef} id="mobile-menu" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" className="menu-in fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] top-[4.25rem] overflow-y-auto overscroll-contain rounded-b-2xl border border-t-0 border-rule bg-ink-2 md:top-20 lg:hidden">
+          <nav aria-label="Mobile" className="container-site py-6">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <h2 id="mobile-menu-title" className="text-lg font-semibold text-paper">Navigation</h2>
+              <button type="button" onClick={() => setMobileFor(null)} className="grid size-11 place-items-center rounded-xl border border-rule-strong text-paper hover:bg-ink-3" aria-label="Close navigation">
+                <X aria-hidden className="size-5" />
+              </button>
+            </div>
+            <p className="eyebrow mb-3">Products</p>
+            <ul className="grid gap-2">
+              {menuProducts.map((p) => {
+                const Icon = ICONS[p.slug];
+                return (
+                  <li key={p.slug}>
+                    <Link
+                      href={p.path}
+                      onClick={() => setMobileFor(null)}
+                      aria-current={pathname === p.path ? "page" : undefined}
+                      className="group flex min-h-16 items-center gap-3 rounded-xl border border-rule bg-ink px-4 py-3 transition-colors active:bg-ink-3 aria-[current=page]:border-accent/40"
+                    >
+                      <span aria-hidden className="relative size-10 shrink-0 overflow-hidden rounded-xl border border-rule/70 bg-ink-2 shadow-sm">
+                        <Image
+                          src={PRODUCT_IMAGES[p.slug]}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium text-paper">{p.name}</span>
+                        <span className="block text-sm text-mute">
+                          {p.kind} · {p.price}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <ul className="mt-6 divide-y divide-rule border-y border-rule">
+              {nav
+                .filter((n) => n.label !== "Products" && n.label !== "Voice Agent")
+                .concat([{ label: "Blog", href: "/blog" }])
+                .map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileFor(null)}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      className="flex min-h-14 items-center text-lg text-paper aria-[current=page]:font-semibold"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+            <p className="mt-6 break-all text-sm text-mute">
+              <a href={`mailto:${contact.email}`} className="underline-offset-4 hover:text-paper hover:underline">
+                {contact.email}
+              </a>
+            </p>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }

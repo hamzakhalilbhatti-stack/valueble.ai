@@ -1,44 +1,75 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 /**
- * Drives every `.reveal` on the page from one observer.
+ * Drives every `.reveal` on the page from one IntersectionObserver.
  *
- * Elements are marked revealed and then unobserved — reveals do not replay on
- * scroll-up, which reads as a page that cannot settle. The CSS carries a hard
- * watchdog on top of this; see globals.css.
+ * Why scroll animations never played before this fix:
+ *  - The observer ran once from the root layout, so after any client-side
+ *    navigation the new page's `.reveal` nodes were never observed.
+ *  - A global 2.5s "watchdog" class force-showed every `.reveal`, so by the
+ *    time a visitor scrolled, every section was already static.
+ *
+ * Now it re-scans on every route change and on DOM insertions, staggers
+ * siblings, and only hides content after `html.js` is set (crawlers and no-JS
+ * visitors always see everything).
  */
 export function RevealDriver() {
-  useEffect(() => {
-    const nodes = document.querySelectorAll<HTMLElement>(".reveal");
-    if (!nodes.length) return;
+  const pathname = usePathname();
 
-    // Anything already on screen at load resolves immediately, without stagger.
-    const observer = new IntersectionObserver(
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!("IntersectionObserver" in window)) {
+      root.classList.remove("js");
+      return;
+    }
+
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const el = entry.target as HTMLElement;
-          el.dataset.revealed = "true";
-          observer.unobserve(el);
-        });
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          (entry.target as HTMLElement).dataset.revealed = "true";
+          io.unobserve(entry.target);
+        }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.01 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
     );
 
-    // Stagger siblings so a block of copy arrives as a block, not all at once.
-    const groups = new Map<Element | null, number>();
-    nodes.forEach((node) => {
-      const parent = node.parentElement;
-      const n = groups.get(parent) ?? 0;
-      groups.set(parent, n + 1);
-      node.style.setProperty("--reveal-delay", `${Math.min(n, 5) * 70}ms`);
-      observer.observe(node);
-    });
+    const seen = new WeakSet<Element>();
+    const scan = () => {
+      const groups = new Map<Element | null, number>();
+      document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+        if (seen.has(el) || el.dataset.revealed === "true") return;
+        seen.add(el);
+        const parent = el.parentElement;
+        const n = groups.get(parent) ?? 0;
+        groups.set(parent, n + 1);
+        if (!el.style.getPropertyValue("--reveal-delay")) {
+          el.style.setProperty("--reveal-delay", `${Math.min(n, 6) * 80}ms`);
+        }
+        io.observe(el);
+      });
+    };
 
-    return () => observer.disconnect();
-  }, []);
+    scan();
+    let queued = false;
+    const mo = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        scan();
+      });
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
+  }, [pathname]);
 
   return null;
 }
