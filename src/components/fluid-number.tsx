@@ -416,19 +416,21 @@ export function FluidCountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [val, setVal] = useState(to);
-  const [hasAnimated, setHasAnimated] = useState(false);
   const [isJelly, setIsJelly] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVal(to);
+      return;
+    }
 
     let raf = 0;
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting || hasAnimated) return;
+        if (!entry.isIntersecting) return;
         io.disconnect();
-        setHasAnimated(true);
 
         const startTime = performance.now();
         const step = (now: number) => {
@@ -457,7 +459,7 @@ export function FluidCountUp({
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [to, duration, hasAnimated]);
+  }, [to, duration]);
 
   const triggerHoverJelly = () => {
     setIsJelly(true);
